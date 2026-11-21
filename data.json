@@ -1,0 +1,4592 @@
+{
+"generatedAt":"2026-11-21T22:50:00Z",
+"status":{
+"seededAt":"2026-11-21T22:15:00Z",
+"lastRun":null,
+"note":"Initial research seeded by Claude on Nov 21-22, 2026",
+"_v":2
+},
+"config":{
+"quickCheck":"every 4 hours (03:18, 07:18, 11:18 Riyadh time and every 4 h after)",
+"fullCheck":"daily at 01:47 Riyadh time",
+"peakNote":"Nov 26–30 an extra check runs every 4 hours in between (every 2 hours overall), and quick checks re-verify LIVE deals."
+},
+"sources":{
+"NB":{
+"name":"NewBeauty BF/CM 2026 roundup (Nov 17)",
+"url":"https://www.newbeauty.com/view/black-friday-cyber-monday-beauty-sales-2026",
+"type":"press",
+"checkedAt":"2026-11-17T12:00:00Z"
+},
+"GMA":{
+"name":"Good Morning America beauty deals (Nov 20)",
+"url":"https://www.goodmorningamerica.com/shop/story/black-friday-beauty-deals-2026-138216373",
+"type":"press",
+"checkedAt":"2026-11-20T21:20:00Z"
+},
+"TODAY":{
+"name":"TODAY early BF beauty deals (Nov 19)",
+"url":"https://www.today.com/shop/black-friday-beauty-deals-2026-rcna608783",
+"type":"press",
+"checkedAt":"2026-11-19T15:37:00Z"
+},
+"HS":{
+"name":"Highsnobiety BF codes (updated Nov 21)",
+"url":"https://www.highsnobiety.com/p/black-friday-codes/",
+"type":"press",
+"checkedAt":"2026-11-21T12:00:00Z"
+},
+"TZR":{
+"name":"The Zoe Report BF fashion deals (Nov 18)",
+"url":"https://www.thezoereport.com/shopping/black-friday-cyber-monday-fashion-deals-2026",
+"type":"press",
+"checkedAt":"2026-11-18T12:00:00Z"
+},
+"ULTA":{
+"name":"Ulta Beauty official Black Friday page",
+"url":"https://www.ulta.com/promotion/black-friday",
+"type":"official",
+"checkedAt":"2026-11-21T22:15:00Z"
+},
+"TARTE":{
+"name":"tarte official Black Friday page",
+"url":"https://tartecosmetics.com/collections/black-friday",
+"type":"official",
+"checkedAt":"2026-11-21T22:15:00Z"
+},
+"CT":{
+"name":"Charlotte Tilbury official BF page (coming soon)",
+"url":"https://www.charlottetilbury.com/ca/content/black-friday",
+"type":"official",
+"checkedAt":"2026-11-21T22:15:00Z"
+},
+"MACYS":{
+"name":"PageCrawl summary of macys.com BF page (Nov 17)",
+"url":"https://pagecrawl.io/blog/macys-black-friday-price-alerts",
+"type":"third-party",
+"checkedAt":"2026-11-17T12:00:00Z"
+},
+"LULU":{
+"name":"Daily Beast: Lululemon BF event 2026",
+"url":"https://www.thedailybeast.com/lululemon-black-friday-sale-2",
+"type":"press",
+"checkedAt":"2026-11-20T12:00:00Z"
+},
+"ARITZIA":{
+"name":"Layers of Beauty: Aritzia BF 2026 (checked Nov 10)",
+"url":"https://layersofbeauty.com/?p=6847",
+"type":"third-party",
+"checkedAt":"2026-11-10T12:00:00Z"
+},
+"ANF":{
+"name":"StyleCaster: Abercrombie BF 2026 (Nov 18)",
+"url":"https://stylecaster.com/fashion/shopping-guides/1234973411/when-is-abercrombie-black-friday-sale-2026/",
+"type":"press",
+"checkedAt":"2026-11-18T12:00:00Z"
+},
+"HELLO":{
+"name":"HELLO! BF beauty deals 2026 (Nov 19)",
+"url":"https://www.hellomagazine.com/shopping/935745/best-beauty-black-friday-deals-2026/",
+"type":"press",
+"checkedAt":"2026-11-19T12:00:00Z"
+},
+"AMZSA":{
+"name":"Sabq: Amazon.sa White Friday announcement",
+"url":"https://sabq.org/article/qjnz8nx",
+"type":"press",
+"checkedAt":"2026-11-21T12:00:00Z"
+},
+"NICE":{
+"name":"Nice One official White Friday page",
+"url":"https://niceonesa.com/ar/white-friday",
+"type":"official",
+"checkedAt":"2026-11-21T22:15:00Z"
+},
+"C2B":{
+"name":"Care to Beauty official Saudi BF page",
+"url":"https://www.caretobeauty.com/sa/black-friday-foreo/",
+"type":"official",
+"checkedAt":"2026-11-21T22:15:00Z"
+},
+"NAMSHI":{
+"name":"Sahseh: Namshi offers as shown on namshi.com (Nov 16)",
+"url":"https://www.sahseh.co/stores/en-namshi?id=6",
+"type":"third-party",
+"checkedAt":"2026-11-16T12:00:00Z"
+},
+"NOON":{
+"name":"tbreak: Gulf BF 2026 names & dates",
+"url":"https://tbreak.com/black-friday-uae-2026/",
+"type":"press",
+"checkedAt":"2026-11-21T12:00:00Z"
+},
+"FACES":{
+"name":"FACES official Black Friday makeup page",
+"url":"https://www.faces.sa/en/black-friday-sale-makeup",
+"type":"official",
+"checkedAt":"2026-11-21T22:15:00Z"
+}
+},
+"runs":[],
+"stores":{
+"ulta-beauty":{
+"name":"Ulta Beauty",
+"domain":"ulta.com",
+"category":"makeup",
+"kind":"retailer",
+"origin":"US",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"Black Friday event: up to 50% off select products; BOGO mascara & lip; second wave Tue Nov 24 (Clinique, Estée Lauder, Olaplex 30%)",
+"discount":50,
+"scope":"Select",
+"start":"2026-11-22T02:00:00Z",
+"end":"2026-11-29T05:59:00Z",
+"salePage":"https://www.ulta.com/promotion/black-friday",
+"shipping":"US-based",
+"shippingVerified":true,
+"note":"Online start 8pm CT Nov 21; in stores Nov 22. Cyber Monday online Nov 29–Dec 1.",
+"src":"ULTA"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"sephora":{
+"name":"Sephora",
+"domain":"sephora.com",
+"category":"makeup",
+"kind":"retailer",
+"origin":"France",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"Cyber Week: up to 50% off select brands; 50% off select products on Nov 26",
+"discount":50,
+"scope":"Select",
+"start":"2026-11-23",
+"end":"2026-11-30",
+"salePage":"https://www.sephora.com/beauty/black-friday",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"GMA"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"dermstore":{
+"name":"Dermstore",
+"domain":"dermstore.com",
+"category":"skincare",
+"kind":"retailer",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Holiday Beauty Event: up to 30% off",
+"discount":30,
+"scope":"Select",
+"start":"2026-11-21T00:00:00Z",
+"shipping":"US-based",
+"shippingVerified":true,
+"note":"Event opened 7pm EST Nov 20.",
+"src":"HELLO"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"nordstrom":{
+"name":"Nordstrom",
+"domain":"nordstrom.com",
+"category":"fashion",
+"kind":"retailer",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Black Friday event: up to 60% off",
+"discount":60,
+"scope":"Select",
+"end":"2026-11-27",
+"shipping":"US-based",
+"shippingVerified":true,
+"note":"Beauty: 25%+ off select brands Nov 19–Dec 1 (GMA).",
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"nordstrom-rack":{
+"name":"Nordstrom Rack",
+"domain":"nordstromrack.com",
+"category":"fashion",
+"kind":"retailer",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Early Black Friday deals (no headline % published)",
+"scope":"Select",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"GMA"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"macy-s":{
+"name":"Macy's",
+"domain":"macys.com",
+"category":"fashion",
+"kind":"retailer",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Black Friday deals: up to 70% off; 40% off handbags from COACH & more",
+"discount":70,
+"scope":"Select",
+"salePage":"https://www.macys.com/shop/sale/black-friday-deals?id=62204",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"MACYS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"bloomingdale-s":{
+"name":"Bloomingdale's",
+"domain":"bloomingdales.com",
+"category":"fashion",
+"kind":"retailer",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Designer Sale: up to 50% off + extra 15–25% off qualifying purchases (applied in bag)",
+"discount":50,
+"scope":"Select",
+"end":"2026-11-22",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"saks-fifth-avenue":{
+"name":"Saks Fifth Avenue",
+"domain":"saksfifthavenue.com",
+"category":"fashion",
+"kind":"retailer",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Designer Sale: up to 50% off; free shipping $150+ with SHIPSAKS",
+"discount":50,
+"scope":"Select",
+"code":"SHIPSAKS",
+"minSpend":"$150 (free shipping)",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"amazon":{
+"name":"Amazon",
+"domain":"amazon.com",
+"category":"makeup",
+"kind":"marketplace",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Black Friday deals (beauty: medicube, LANEIGE, Summer Fridays, Dyson, Shark)",
+"scope":"Select",
+"start":"2026-11-19",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"GMA"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"walmart":{
+"name":"Walmart",
+"domain":"walmart.com",
+"category":"makeup",
+"kind":"marketplace",
+"origin":"US",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"Black Friday deals event",
+"scope":"Select",
+"start":"2026-11-23",
+"end":"2026-11-29",
+"shipping":"US-based",
+"shippingVerified":true,
+"note":"La Roche-Posay 25% off at Walmart Nov 23–Dec 2.",
+"src":"GMA"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"target":{
+"name":"Target",
+"domain":"target.com",
+"category":"makeup",
+"kind":"retailer",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Early Black Friday deals",
+"scope":"Select",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"GMA"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"farfetch":{
+"name":"Farfetch",
+"domain":"farfetch.com",
+"category":"fashion",
+"kind":"marketplace",
+"origin":"UK",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Up to 50% off sale styles + extra 20% off, applied automatically",
+"discount":50,
+"scope":"Select",
+"shipping":"Ships to US (unverified)",
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Not yet checked for White Friday 2026",
+"shipping":"Unverified",
+"note":"Saudi shipping not yet verified."
+}
+},
+"_v":1
+},
+"ssense":{
+"name":"SSENSE",
+"domain":"ssense.com",
+"category":"fashion",
+"kind":"retailer",
+"origin":"Canada",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Black Friday sale on designer & contemporary labels (no % published)",
+"scope":"Select",
+"shipping":"Ships to US (unverified)",
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"mytheresa":{
+"name":"Mytheresa",
+"domain":"mytheresa.com",
+"category":"fashion",
+"kind":"retailer",
+"origin":"Germany",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Designer edit sale, 'short time only' (no % published)",
+"scope":"Select",
+"shipping":"Ships to US (unverified)",
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Not yet checked for White Friday 2026",
+"shipping":"Unverified",
+"note":"Saudi shipping not yet verified."
+}
+},
+"_v":1
+},
+"end":{
+"name":"END.",
+"domain":"endclothing.com",
+"category":"fashion",
+"kind":"retailer",
+"origin":"UK",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"25% off Black Friday sale",
+"discount":25,
+"scope":"Select",
+"shipping":"Ships to US (unverified)",
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"ln-cc":{
+"name":"LN-CC",
+"domain":"ln-cc.com",
+"category":"fashion",
+"kind":"retailer",
+"origin":"UK",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Private Sale: up to 50% off selected pieces",
+"discount":50,
+"scope":"Select",
+"shipping":"Ships to US (unverified)",
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"footshop":{
+"name":"Footshop",
+"domain":"footshop.com",
+"category":"fashion",
+"kind":"retailer",
+"origin":"Czech Republic",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Black Friday sale: up to 70% off",
+"discount":70,
+"scope":"Select",
+"shipping":"Ships to US (unverified)",
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"backcountry":{
+"name":"Backcountry",
+"domain":"backcountry.com",
+"category":"fashion",
+"kind":"retailer",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"20% off full-price; up to 40% off this year's gear",
+"discount":40,
+"scope":"Select",
+"end":"2026-11-28",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"foot-locker":{
+"name":"Foot Locker",
+"domain":"footlocker.com",
+"category":"fashion",
+"kind":"retailer",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Up to 55% off; $15 off $150+ (TURKEY15) or $10 off $100+ (TURKEY10)",
+"discount":55,
+"scope":"Select",
+"code":"TURKEY15 / TURKEY10",
+"minSpend":"$100 / $150",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"note":"Codes valid through Dec 1.",
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"champs-sports":{
+"name":"Champs Sports",
+"domain":"champssports.com",
+"category":"fashion",
+"kind":"retailer",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"$15 off $150+ (FEAST15) or $10 off $100+ (FEAST10)",
+"scope":"Order tiers",
+"code":"FEAST15 / FEAST10",
+"minSpend":"$100 / $150",
+"end":"2026-12-01",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"tarte":{
+"name":"tarte",
+"domain":"tartecosmetics.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"Up to 83% off select items, hot drops from $5; bigger savings from Nov 26",
+"discount":83,
+"scope":"Select",
+"start":"2026-11-22",
+"end":"2026-11-30",
+"salePage":"https://tartecosmetics.com/collections/black-friday",
+"shipping":"US-based",
+"shippingVerified":true,
+"note":"Ulta: up to 50% off select tarte makeup.",
+"src":"TARTE"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"nyx-professional-makeup":{
+"name":"NYX Professional Makeup",
+"domain":"nyxcosmetics.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"40% off sitewide",
+"discount":40,
+"scope":"Sitewide",
+"start":"2026-11-19",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TODAY"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"glossier":{
+"name":"Glossier",
+"domain":"glossier.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"25% off sitewide; 30% off $100+; free Crème de You on $100+",
+"discount":30,
+"scope":"Sitewide",
+"minSpend":"$100 for 30%",
+"start":"2026-11-19",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"nars":{
+"name":"NARS",
+"domain":"narscosmetics.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"30% off sitewide; 50% off select Last Chance (Nov 26–29); GWP $125+/$150+ (Nov 29–Dec 2)",
+"discount":50,
+"scope":"Sitewide",
+"minSpend":"$125 / $150 (gifts)",
+"start":"2026-11-20",
+"end":"2026-12-02",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"kosas":{
+"name":"Kosas",
+"domain":"kosas.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"25% off sitewide; up to 40% off select; free serum spray $80+",
+"discount":40,
+"scope":"Sitewide",
+"minSpend":"$80 (gift)",
+"start":"2026-11-18",
+"end":"2026-12-01",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"ilia":{
+"name":"ILIA",
+"domain":"iliabeauty.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"20% off sitewide (25% for VIPs)",
+"discount":25,
+"scope":"Sitewide",
+"start":"2026-11-18",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"GMA"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"saie":{
+"name":"Saie",
+"domain":"saiehello.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"25% off sitewide",
+"discount":25,
+"scope":"Sitewide",
+"start":"2026-11-24",
+"end":"2026-12-01",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"GMA"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"merit":{
+"name":"Merit",
+"domain":"meritbeauty.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"20% off sitewide",
+"discount":20,
+"scope":"Sitewide",
+"start":"2026-11-23",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"GMA"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"westman-atelier":{
+"name":"Westman Atelier",
+"domain":"westman-atelier.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"20% off sitewide; up to 50% off select",
+"discount":50,
+"scope":"Sitewide",
+"start":"2026-11-24",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"refy":{
+"name":"REFY",
+"domain":"refybeauty.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"UK",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"20% off sitewide; up to 40% off select",
+"discount":40,
+"scope":"Sitewide",
+"start":"2026-11-20",
+"end":"2026-12-01",
+"shipping":"Ships to US (unverified)",
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"e-l-f-cosmetics":{
+"name":"e.l.f. Cosmetics",
+"domain":"elfcosmetics.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"Free shipping + gifts with purchase at $15/$35/$50 (no % discount)",
+"scope":"Order tiers",
+"minSpend":"$15 / $35 / $50",
+"start":"2026-11-24",
+"end":"2026-11-27",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"est-e-lauder":{
+"name":"Estée Lauder",
+"domain":"esteelauder.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"30% off favorites on Nov 27 and Nov 30",
+"discount":30,
+"scope":"Select",
+"start":"2026-11-27",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"note":"Ulta: 30% off Estée Lauder from Nov 24 (exclusions).",
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"half-magic":{
+"name":"Half Magic",
+"domain":"halfmagicbeauty.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"30% off sitewide; up to 40% off one collection; full-size gifts $49.99+",
+"discount":40,
+"scope":"Sitewide",
+"minSpend":"$49.99 (gifts)",
+"start":"2026-11-20",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"thrive-causemetics":{
+"name":"Thrive Causemetics",
+"domain":"thrivecausemetics.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"20% off sitewide; free shipping + full-size eye brightener $85+",
+"discount":20,
+"scope":"Sitewide",
+"minSpend":"$85 (gift)",
+"start":"2026-11-26",
+"end":"2026-12-01",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"live-tinted":{
+"name":"Live Tinted",
+"domain":"livetinted.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"30% off sitewide; 35% off $100+; 40% off $175+",
+"discount":40,
+"scope":"Sitewide",
+"minSpend":"$100 / $175",
+"start":"2026-11-24",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"tower-28":{
+"name":"Tower 28",
+"domain":"tower28beauty.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"28% off",
+"discount":28,
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"GMA"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"iconic-london":{
+"name":"Iconic London",
+"domain":"iconiclondoninc.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"UK",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"30% off sitewide",
+"discount":30,
+"scope":"Sitewide",
+"shipping":"Ships to US (unverified)",
+"src":"TODAY"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"inked-by-dani":{
+"name":"Inked by Dani",
+"domain":"inkedbydani.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"30% off",
+"discount":30,
+"start":"2026-11-27",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TODAY"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"olive-june":{
+"name":"Olive & June",
+"domain":"oliveandjune.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"25% off everything",
+"discount":25,
+"scope":"Sitewide",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"GMA"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"shark-beauty":{
+"name":"Shark Beauty",
+"domain":"sharkclean.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"30% off select beauty tools (FlexStyle, CryoGlow) with code SPARKLE",
+"discount":30,
+"scope":"Select",
+"code":"SPARKLE",
+"shipping":"US-based",
+"shippingVerified":true,
+"note":"Ulta: $100 off Shark FlexStyle.",
+"src":"GMA"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"t3":{
+"name":"T3",
+"domain":"t3micro.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"No own-site offer found",
+"shipping":"US-based",
+"shippingVerified":true,
+"note":"Retailers: $50 off Aire IQ/Aire 360 at Nordstrom & Sephora (Nov 19–30); up to 30% off at Ulta (Nov 22–30).",
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"charlotte-tilbury":{
+"name":"Charlotte Tilbury",
+"domain":"charlottetilbury.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"UK",
+"offers":{
+"us":{
+"status":"NOT_ANNOUNCED",
+"promo":"Brand page says the Black Friday sale is 'coming soon'",
+"shipping":"Ships to US (unverified)",
+"src":"CT"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"violette-fr":{
+"name":"Violette_FR",
+"domain":"violettefr.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"France",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"20% off sitewide; 25% off $125+",
+"discount":25,
+"scope":"Sitewide",
+"minSpend":"$125 for 25%",
+"start":"2026-11-23",
+"end":"2026-11-30",
+"shipping":"Ships to US (unverified)",
+"src":"GMA"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"goop-beauty":{
+"name":"goop Beauty",
+"domain":"goop.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"30% off select goop Beauty",
+"discount":30,
+"scope":"Select",
+"start":"2026-11-27",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"GMA"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"paula-s-choice":{
+"name":"Paula's Choice",
+"domain":"paulaschoice.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"30% off sitewide with code CYBER26",
+"discount":30,
+"scope":"Sitewide",
+"code":"CYBER26",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TODAY"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"asarai":{
+"name":"ASARAI",
+"domain":"asarai.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"Australia",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"35% off sitewide",
+"discount":35,
+"scope":"Sitewide",
+"start":"2026-11-07",
+"end":"2026-11-30",
+"shipping":"Ships to US (unverified)",
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"biossance":{
+"name":"Biossance",
+"domain":"biossance.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"30% off sitewide",
+"discount":30,
+"scope":"Sitewide",
+"start":"2026-11-17",
+"end":"2026-12-01",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"exuviance":{
+"name":"Exuviance",
+"domain":"exuviance.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"40% off sitewide + free cleanser",
+"discount":40,
+"scope":"Sitewide",
+"start":"2026-11-22",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"farmacy":{
+"name":"Farmacy",
+"domain":"farmacybeauty.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"25% off sitewide (to Nov 28), then 30% off; gifts on $100+",
+"discount":30,
+"scope":"Sitewide",
+"minSpend":"$100 (gift tiers)",
+"start":"2026-11-19",
+"end":"2026-12-02",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"mother-science":{
+"name":"Mother Science",
+"domain":"mother-science.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"25% off sitewide",
+"discount":25,
+"scope":"Sitewide",
+"start":"2026-11-18",
+"end":"2026-12-01",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"par-va-beauty":{
+"name":"Parëva Beauty",
+"domain":"parevabeauty.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"30% off sitewide; free shipping $50+",
+"discount":30,
+"scope":"Sitewide",
+"minSpend":"$50 (free shipping)",
+"start":"2026-11-07",
+"end":"2026-12-01",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"well-people":{
+"name":"Well People",
+"domain":"wellpeople.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"25% off sitewide; gifts at $50/$75",
+"discount":25,
+"scope":"Sitewide",
+"minSpend":"$50 / $75 (gifts)",
+"start":"2026-11-26",
+"end":"2026-12-02",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"dewsy":{
+"name":"Dewsy",
+"domain":"dewsy.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"20% off sitewide",
+"discount":20,
+"scope":"Sitewide",
+"start":"2026-11-25",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"note":"Also 20% off at Amazon (Nov 19–30) and Ulta (Nov 21–Dec 1).",
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"alpyn-beauty":{
+"name":"Alpyn Beauty",
+"domain":"alpynbeauty.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"30% off Black Friday sale",
+"discount":30,
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"GMA"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"true-botanicals":{
+"name":"True Botanicals",
+"domain":"truebotanicals.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"30% off",
+"discount":30,
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"GMA"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"colorscience":{
+"name":"Colorscience",
+"domain":"colorscience.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"25% off sitewide",
+"discount":25,
+"scope":"Sitewide",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TODAY"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"nuface":{
+"name":"NuFace",
+"domain":"mynuface.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"30% off everything at checkout",
+"discount":30,
+"scope":"Sitewide",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TODAY"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"grace-stella":{
+"name":"Grace & Stella",
+"domain":"graceandstella.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Up to 50% off sitewide",
+"discount":50,
+"scope":"Sitewide",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TODAY"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"luseta-beauty":{
+"name":"Luseta Beauty",
+"domain":"lusetabeauty.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"30–50% off sitewide with code BFGLOW26",
+"discount":50,
+"scope":"Sitewide",
+"code":"BFGLOW26",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TODAY"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"sickscience":{
+"name":"SickScience",
+"domain":"sickscience.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"25% off bundles",
+"discount":25,
+"scope":"Select",
+"start":"2026-11-09",
+"end":"2026-11-21",
+"shipping":"US-based",
+"shippingVerified":true,
+"note":"30% off at Ulta (app only) Nov 15–21.",
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"c-cred":{
+"name":"Cécred",
+"domain":"cecred.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"30% off sitewide with code BF30 (Nov 20–29); GM30 on Nov 30; free comb $75+",
+"discount":30,
+"scope":"Sitewide",
+"code":"BF30",
+"minSpend":"$75 (gift)",
+"start":"2026-11-20",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"note":"Ulta: 30% off select CÉCRED hair care.",
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"amika":{
+"name":"amika",
+"domain":"loveamika.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"30% off sitewide with code SALE30; gifts $75+/$125+",
+"discount":30,
+"scope":"Sitewide",
+"code":"SALE30",
+"minSpend":"$75 / $125 (gifts)",
+"start":"2026-11-23",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"note":"50% off at Sephora, 35% off at Amazon, Nov 26–30.",
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"oribe":{
+"name":"Oribe",
+"domain":"oribe.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"20% off the Obsessions Edit",
+"discount":20,
+"scope":"Select",
+"start":"2026-11-25",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TODAY"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"brunel":{
+"name":"Brunel",
+"domain":"brunel.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"20–25% off",
+"discount":25,
+"start":"2026-11-23",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"GMA"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"lolavie":{
+"name":"LolaVie",
+"domain":"lolavie.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"30% off sitewide; free cosmetic bag $99+",
+"discount":30,
+"scope":"Sitewide",
+"minSpend":"$99 (gift)",
+"start":"2026-11-18",
+"end":"2026-12-01",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"pattern-beauty":{
+"name":"PATTERN Beauty",
+"domain":"patternbeauty.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"30% off sitewide; 40% off select daily specials Nov 23–30",
+"discount":40,
+"scope":"Sitewide",
+"minSpend":"$65 (gift, Nov 19–22)",
+"start":"2026-11-19",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"higherdose":{
+"name":"HigherDOSE",
+"domain":"higherdose.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"20% off sitewide, 30–40% off bundles with code BFCM2026",
+"discount":40,
+"scope":"Sitewide",
+"code":"BFCM2026",
+"minSpend":"$250 (Mini DOSE Kit)",
+"start":"2026-11-23",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"flaus":{
+"name":"Flaus",
+"domain":"flaus.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"25% off sitewide; up to 40% off bundles",
+"discount":40,
+"scope":"Sitewide",
+"start":"2026-11-18",
+"end":"2026-12-06",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"cadence":{
+"name":"Cadence",
+"domain":"keepcadence.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"20% off $200+; 25% off $400+",
+"discount":25,
+"scope":"Order tiers",
+"minSpend":"$200 / $400",
+"start":"2026-11-25",
+"end":"2026-12-01",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"ciele":{
+"name":"ciele",
+"domain":"cielebeauty.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"20% off sitewide (excl. sets)",
+"discount":20,
+"scope":"Sitewide",
+"minSpend":"$75 / $100 (gifts)",
+"start":"2026-11-21",
+"end":"2026-11-22",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"dedcool":{
+"name":"DedCool",
+"domain":"dedcool.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"25% off sitewide",
+"discount":25,
+"scope":"Sitewide",
+"start":"2026-11-19",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"note":"Up to 30% off select fragrances at Sephora Nov 27–30.",
+"src":"NB"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"touchland":{
+"name":"Touchland",
+"domain":"touchland.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"30% off sitewide",
+"discount":30,
+"scope":"Sitewide",
+"start":"2026-11-27",
+"end":"2026-12-01",
+"shipping":"US-based",
+"shippingVerified":true,
+"note":"Ulta: 30% off entire brand during Black Friday.",
+"src":"GMA"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"adidas":{
+"name":"adidas",
+"domain":"adidas.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"Germany",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Up to 50% off select styles",
+"discount":50,
+"scope":"Select",
+"end":"2026-11-29",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Not yet checked for White Friday 2026",
+"shipping":"Unverified",
+"note":"Saudi shipping not yet verified."
+}
+},
+"_v":1
+},
+"nike":{
+"name":"Nike",
+"domain":"nike.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Up to 50% off best sellers",
+"discount":50,
+"scope":"Select",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Not yet checked for White Friday 2026",
+"shipping":"Unverified",
+"note":"Saudi shipping not yet verified."
+}
+},
+"_v":1
+},
+"vans":{
+"name":"Vans",
+"domain":"vans.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"30% off (exclusions); 40% off markdowns",
+"discount":40,
+"scope":"Sitewide",
+"end":"2026-12-01",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"new-balance":{
+"name":"New Balance",
+"domain":"newbalance.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Black Friday preview: up to 40% off select styles",
+"discount":40,
+"scope":"Select",
+"end":"2026-12-28",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"zara":{
+"name":"Zara",
+"domain":"zara.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"Spain",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"40% off selected items",
+"discount":40,
+"scope":"Select",
+"shipping":"Ships to US (unverified)",
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"gap":{
+"name":"Gap",
+"domain":"gap.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Up to 60% off, limited-time deals",
+"discount":60,
+"scope":"Sitewide",
+"end":"2026-11-23",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"uniqlo":{
+"name":"Uniqlo",
+"domain":"uniqlo.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"Japan",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Thank You Event: cashmere, HEATTECH, down (no % published)",
+"scope":"Select",
+"end":"2026-11-26",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"asics":{
+"name":"ASICS",
+"domain":"asics.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"Japan",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"$60 off $200+ with code CYBER; 20% off select clothing",
+"scope":"Order tiers",
+"code":"CYBER",
+"minSpend":"$200",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"puma":{
+"name":"PUMA",
+"domain":"puma.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"Germany",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Up to 50% off",
+"discount":50,
+"scope":"Select",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"timberland":{
+"name":"Timberland",
+"domain":"timberland.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"30% off sitewide, taken in cart (exclusions)",
+"discount":30,
+"scope":"Sitewide",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"hoka":{
+"name":"HOKA",
+"domain":"hoka.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Black Friday sale on running shoes (no % published)",
+"scope":"Select",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"merrell":{
+"name":"Merrell",
+"domain":"merrell.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Early Holiday Sale: up to 40% off select styles",
+"discount":40,
+"scope":"Select",
+"end":"2026-11-24",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"lululemon":{
+"name":"lululemon",
+"domain":"lululemon.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"Canada",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Black Friday event: 20–50% off hundreds of styles",
+"discount":50,
+"scope":"Select",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"LULU"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"skims":{
+"name":"SKIMS",
+"domain":"skims.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"30% off sitewide + extra 30% off markdowns",
+"discount":30,
+"scope":"Sitewide",
+"start":"2026-11-20",
+"end":"2026-12-02",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TZR"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"new-era":{
+"name":"New Era",
+"domain":"neweracap.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"30% off sitewide",
+"discount":30,
+"scope":"Sitewide",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"oakley":{
+"name":"Oakley",
+"domain":"oakley.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Up to 50% off sunglasses, apparel, footwear",
+"discount":50,
+"scope":"Select",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"ray-ban":{
+"name":"Ray-Ban",
+"domain":"ray-ban.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"Italy",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Up to 50% off sitewide; 30% off Icons; code CYBER50",
+"discount":50,
+"scope":"Sitewide",
+"code":"CYBER50",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"saucony":{
+"name":"Saucony",
+"domain":"saucony.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"25% off almost everything with code CHEER",
+"discount":25,
+"scope":"Sitewide",
+"code":"CHEER",
+"end":"2026-12-01",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"columbia":{
+"name":"Columbia",
+"domain":"columbia.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"End of Season Sale: up to 50% off",
+"discount":50,
+"scope":"Select",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"allsaints":{
+"name":"AllSaints",
+"domain":"allsaints.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"UK",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"30% or more off everything",
+"discount":30,
+"scope":"Sitewide",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"coach-outlet":{
+"name":"Coach Outlet",
+"domain":"coachoutlet.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Extra 25% off Black Friday sale",
+"discount":25,
+"scope":"Select",
+"end":"2026-12-02",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"HS"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"the-north-face":{
+"name":"The North Face",
+"domain":"thenorthface.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Up to 30% off (early access Nov 20–24; main Nov 25–29; Cyber Monday Nov 30)",
+"discount":30,
+"scope":"Select",
+"start":"2026-11-20",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TZR"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"mejuri":{
+"name":"Mejuri",
+"domain":"mejuri.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"Canada",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"Up to 30% off sitewide",
+"discount":30,
+"scope":"Sitewide",
+"start":"2026-11-23",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TZR"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"damson-madder":{
+"name":"Damson Madder",
+"domain":"damsonmadder.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"UK",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"30% off select styles; extra 15% from Nov 27",
+"discount":30,
+"scope":"Select",
+"start":"2026-11-20",
+"shipping":"Ships to US (unverified)",
+"src":"TZR"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"simkhai":{
+"name":"Simkhai",
+"domain":"simkhai.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"Up to 50% off Pre-Fall 2026 from Nov 23; 20% off sitewide Nov 27",
+"discount":50,
+"scope":"Select",
+"start":"2026-11-23",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TZR"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"leset":{
+"name":"Leset",
+"domain":"leset.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"25% off sitewide",
+"discount":25,
+"scope":"Sitewide",
+"start":"2026-11-20",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TZR"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"re-done":{
+"name":"Re/Done",
+"domain":"shopredone.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Up to 50% off styles",
+"discount":50,
+"scope":"Select",
+"start":"2026-11-20",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TZR"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"margaux":{
+"name":"Margaux",
+"domain":"margauxny.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"20% off shoes sitewide",
+"discount":20,
+"scope":"Sitewide",
+"start":"2026-11-19",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TZR"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"le-specs":{
+"name":"Le Specs",
+"domain":"lespecs.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"Australia",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"30% off sitewide + free shipping",
+"discount":30,
+"scope":"Sitewide",
+"start":"2026-11-25",
+"end":"2026-11-30",
+"shipping":"Ships to US (unverified)",
+"src":"TZR"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"the-horse":{
+"name":"The Horse",
+"domain":"thehorse.com.au",
+"category":"fashion",
+"kind":"brand",
+"origin":"Australia",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"25% off sitewide",
+"discount":25,
+"scope":"Sitewide",
+"start":"2026-11-24",
+"end":"2026-11-30",
+"shipping":"Ships to US (unverified)",
+"src":"TZR"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"quay":{
+"name":"Quay",
+"domain":"quayaustralia.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"Australia",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"50% off select styles",
+"discount":50,
+"scope":"Select",
+"start":"2026-11-16",
+"end":"2026-12-01",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TZR"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"charles-keith":{
+"name":"Charles & Keith",
+"domain":"charleskeith.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"Singapore",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"15% off eligible full-price styles",
+"discount":15,
+"scope":"Select",
+"start":"2026-11-20",
+"end":"2026-11-30",
+"shipping":"Ships to US (unverified)",
+"src":"TZR"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"khy":{
+"name":"KHY",
+"domain":"khy.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"40% off sitewide (exclusions); 60% off archive",
+"discount":60,
+"scope":"Sitewide",
+"start":"2026-11-18",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TZR"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"moose-knuckles":{
+"name":"Moose Knuckles",
+"domain":"mooseknucklescanada.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"Canada",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"30% off select styles",
+"discount":30,
+"scope":"Select",
+"start":"2026-11-19",
+"end":"2026-12-03",
+"shipping":"Ships to US (unverified)",
+"src":"TZR"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"bombas":{
+"name":"Bombas",
+"domain":"bombas.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"25% off sitewide (BIGHOLIDAY25, auto-applied)",
+"discount":25,
+"scope":"Sitewide",
+"code":"BIGHOLIDAY25",
+"start":"2026-11-21",
+"end":"2026-12-02",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TZR"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"ecco":{
+"name":"ECCO",
+"domain":"ecco.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"Denmark",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"40% off select styles to Nov 26; 50% off select Nov 27–Dec 2",
+"discount":50,
+"scope":"Select",
+"end":"2026-12-02",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TZR"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"kat-the-label":{
+"name":"Kat The Label",
+"domain":"katthelabel.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"Australia",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Up to 50% off sitewide",
+"discount":50,
+"scope":"Sitewide",
+"start":"2026-11-16",
+"end":"2026-11-30",
+"shipping":"Ships to US (unverified)",
+"src":"TZR"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"jennifer-meyer":{
+"name":"Jennifer Meyer",
+"domain":"jennifermeyer.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"20% off sitewide (auto-applied; exclusions)",
+"discount":20,
+"scope":"Sitewide",
+"start":"2026-11-23",
+"end":"2026-12-07",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TZR"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"cult-gaia":{
+"name":"Cult Gaia",
+"domain":"cultgaia.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"25% off",
+"discount":25,
+"start":"2026-11-24",
+"end":"2026-12-01",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TZR"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"patbo":{
+"name":"PatBO",
+"domain":"patbo.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"Brazil",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"Up to 60% off; extra 15% on 2+ pieces (Nov 20–26), extra 25% (Nov 27–Dec 1)",
+"discount":60,
+"scope":"Sitewide",
+"start":"2026-11-13",
+"end":"2026-12-01",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TZR"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"demellier":{
+"name":"DeMellier",
+"domain":"demellierlondon.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"UK",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"20% off sitewide",
+"discount":20,
+"scope":"Sitewide",
+"start":"2026-11-20",
+"end":"2026-11-30",
+"shipping":"Ships to US (unverified)",
+"src":"TZR"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"betsey-johnson":{
+"name":"Betsey Johnson",
+"domain":"betseyjohnson.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"35% off sitewide with HOLIDAY35 (exclusions)",
+"discount":35,
+"scope":"Sitewide",
+"code":"HOLIDAY35",
+"start":"2026-11-22",
+"end":"2026-12-01",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TZR"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"rowing-blazers":{
+"name":"Rowing Blazers",
+"domain":"rowingblazers.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"30% off sitewide",
+"discount":30,
+"scope":"Sitewide",
+"start":"2026-11-20",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TZR"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"susan-alexandra":{
+"name":"Susan Alexandra",
+"domain":"susanalexandra.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"35% off eligible styles (auto-applied)",
+"discount":35,
+"scope":"Select",
+"start":"2026-11-20",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TZR"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"heaven-mayhem":{
+"name":"Heaven Mayhem",
+"domain":"heavenmayhem.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"LIVE",
+"promo":"20–40% off; up to 60% off archive; gift on $100+",
+"discount":60,
+"scope":"Sitewide",
+"minSpend":"$100 (gift)",
+"start":"2026-11-18",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TZR"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"saint-sir-ne":{
+"name":"Saint Sirène",
+"domain":"saintsirene.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"20% off sitewide",
+"discount":20,
+"scope":"Sitewide",
+"start":"2026-11-27",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TZR"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"brilliant-earth":{
+"name":"Brilliant Earth",
+"domain":"brilliantearth.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"Free lab-grown diamond studs over $1,000; + necklace over $3,000",
+"scope":"Order tiers",
+"minSpend":"$1,000 / $3,000",
+"start":"2026-11-23",
+"end":"2026-11-30",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TZR"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"verafied":{
+"name":"Verafied",
+"domain":"verafied.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"UPCOMING",
+"promo":"15% off sitewide (public from Nov 26)",
+"discount":15,
+"scope":"Sitewide",
+"start":"2026-11-26",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"TZR"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"aritzia":{
+"name":"Aritzia",
+"domain":"aritzia.com",
+"category":"fashion",
+"kind":"retailer",
+"origin":"Canada",
+"offers":{
+"us":{
+"status":"NOT_ANNOUNCED",
+"promo":"2026 Black Fiveday dates not announced as of Nov 10",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"ARITZIA"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"abercrombie-fitch":{
+"name":"Abercrombie & Fitch",
+"domain":"abercrombie.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"NOT_ANNOUNCED",
+"promo":"2026 sale dates not announced as of Nov 18 (2025 ran Nov 24–Dec 1)",
+"shipping":"US-based",
+"shippingVerified":true,
+"src":"ANF"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"rare-beauty":{
+"name":"Rare Beauty",
+"domain":"rarebeauty.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"US-based",
+"shippingVerified":true
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"fenty-beauty":{
+"name":"Fenty Beauty",
+"domain":"fentybeauty.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"US-based",
+"shippingVerified":true
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"huda-beauty":{
+"name":"Huda Beauty",
+"domain":"hudabeauty.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"UAE",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"Ships to US (unverified)"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Not yet checked for White Friday 2026",
+"shipping":"Unverified",
+"note":"Saudi shipping not yet verified."
+}
+},
+"_v":1
+},
+"mac-cosmetics":{
+"name":"MAC Cosmetics",
+"domain":"maccosmetics.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"Canada",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"Ships to US (unverified)",
+"note":"Ulta: 30% off select MAC foundation & lip (from Nov 21)."
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Not yet checked for White Friday 2026",
+"shipping":"Unverified",
+"note":"Saudi shipping not yet verified."
+}
+},
+"_v":1
+},
+"makeup-by-mario":{
+"name":"Makeup by Mario",
+"domain":"makeupbymario.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"US-based",
+"shippingVerified":true
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"dior-beauty":{
+"name":"Dior Beauty",
+"domain":"dior.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"France",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"Ships to US (unverified)"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"ysl-beauty":{
+"name":"YSL Beauty",
+"domain":"yslbeautyus.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"France",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"Ships to US (unverified)"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"armani-beauty":{
+"name":"Armani Beauty",
+"domain":"giorgioarmanibeauty-usa.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"Italy",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"Ships to US (unverified)"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"patrick-ta":{
+"name":"Patrick Ta",
+"domain":"patrickta.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"US-based",
+"shippingVerified":true
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"hourglass":{
+"name":"Hourglass",
+"domain":"hourglasscosmetics.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"US-based",
+"shippingVerified":true
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"too-faced":{
+"name":"Too Faced",
+"domain":"toofaced.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"US-based",
+"shippingVerified":true
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"morphe":{
+"name":"Morphe",
+"domain":"morphe.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"US-based",
+"shippingVerified":true,
+"note":"Ulta: 40% off select Morphe face & eye."
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"colourpop":{
+"name":"ColourPop",
+"domain":"colourpop.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"US-based",
+"shippingVerified":true,
+"note":"Ulta: 30% off ColourPop eyeshadow & eyeliner from Nov 24."
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"clinique":{
+"name":"Clinique",
+"domain":"clinique.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"US-based",
+"shippingVerified":true,
+"note":"Ulta: 30% off entire brand from Nov 24."
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"lanc-me":{
+"name":"Lancôme",
+"domain":"lancome-usa.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"France",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"Ships to US (unverified)",
+"note":"Ulta: up to 50% off select Lancôme."
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"anastasia-beverly-hills":{
+"name":"Anastasia Beverly Hills",
+"domain":"anastasiabeverlyhills.com",
+"category":"makeup",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"US-based",
+"shippingVerified":true,
+"note":"Ulta: 30% off all brow."
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"the-ordinary":{
+"name":"The Ordinary",
+"domain":"theordinary.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"Canada",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"Ships to US (unverified)"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"drunk-elephant":{
+"name":"Drunk Elephant",
+"domain":"drunkelephant.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"US-based",
+"shippingVerified":true
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"tatcha":{
+"name":"Tatcha",
+"domain":"tatcha.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"US-based",
+"shippingVerified":true
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"kiehl-s":{
+"name":"Kiehl's",
+"domain":"kiehls.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"US-based",
+"shippingVerified":true
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"la-roche-posay":{
+"name":"La Roche-Posay",
+"domain":"laroche-posay.us",
+"category":"skincare",
+"kind":"brand",
+"origin":"France",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"Ships to US (unverified)",
+"note":"Ulta: 20% off select from Nov 24; Walmart: 25% off Nov 23–Dec 2."
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"cerave":{
+"name":"CeraVe",
+"domain":"cerave.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"US-based",
+"shippingVerified":true
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"cosrx":{
+"name":"COSRX",
+"domain":"cosrx.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"South Korea",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"Ships to US (unverified)"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"beauty-of-joseon":{
+"name":"Beauty of Joseon",
+"domain":"beautyofjoseon.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"South Korea",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"Ships to US (unverified)"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"medicube":{
+"name":"medicube",
+"domain":"medicube.us",
+"category":"skincare",
+"kind":"brand",
+"origin":"South Korea",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"Ships to US (unverified)",
+"note":"Amazon deals Nov 19–30; Ulta: up to 25% off select."
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"laneige":{
+"name":"Laneige",
+"domain":"us.laneige.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"South Korea",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"Ships to US (unverified)"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"sol-de-janeiro":{
+"name":"Sol de Janeiro",
+"domain":"soldejaneiro.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"US-based",
+"shippingVerified":true,
+"note":"Ulta: 25% off (excl. select sets & mists)."
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"l-occitane":{
+"name":"L'Occitane",
+"domain":"loccitane.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"France",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"Ships to US (unverified)"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"olaplex":{
+"name":"Olaplex",
+"domain":"olaplex.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"US-based",
+"shippingVerified":true,
+"note":"Ulta: 30% off select Olaplex from Nov 24."
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"color-wow":{
+"name":"Color Wow",
+"domain":"colorwowhair.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"US-based",
+"shippingVerified":true
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"dyson-beauty":{
+"name":"Dyson Beauty",
+"domain":"dyson.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"UK",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"Ships to US (unverified)",
+"note":"Ulta: $150 off Dyson Limited Edition Airwrap."
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"glow-recipe":{
+"name":"Glow Recipe",
+"domain":"glowrecipe.com",
+"category":"skincare",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"US-based",
+"shippingVerified":true
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"hollister":{
+"name":"Hollister",
+"domain":"hollisterco.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"US-based",
+"shippingVerified":true
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"american-eagle":{
+"name":"American Eagle",
+"domain":"ae.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"US-based",
+"shippingVerified":true
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"h-m":{
+"name":"H&M",
+"domain":"hm.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"Sweden",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"Ships to US (unverified)"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"mango":{
+"name":"Mango",
+"domain":"mango.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"Spain",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"Ships to US (unverified)"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"cos":{
+"name":"COS",
+"domain":"cos.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"Sweden",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"Ships to US (unverified)"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"massimo-dutti":{
+"name":"Massimo Dutti",
+"domain":"massimodutti.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"Spain",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"Ships to US (unverified)"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"asos":{
+"name":"ASOS",
+"domain":"asos.com",
+"category":"fashion",
+"kind":"retailer",
+"origin":"UK",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"Ships to US (unverified)"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Not yet checked for White Friday 2026",
+"shipping":"Unverified",
+"note":"Saudi shipping not yet verified."
+}
+},
+"_v":1
+},
+"revolve":{
+"name":"Revolve",
+"domain":"revolve.com",
+"category":"fashion",
+"kind":"retailer",
+"origin":"US",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"US-based",
+"shippingVerified":true
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"net-a-porter":{
+"name":"NET-A-PORTER",
+"domain":"net-a-porter.com",
+"category":"fashion",
+"kind":"retailer",
+"origin":"UK",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"Ships to US (unverified)"
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Not yet checked for White Friday 2026",
+"shipping":"Unverified",
+"note":"Saudi shipping not yet verified."
+}
+},
+"_v":1
+},
+"alo-yoga":{
+"name":"Alo Yoga",
+"domain":"aloyoga.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"US-based",
+"shippingVerified":true
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"coach":{
+"name":"Coach",
+"domain":"coach.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"US-based",
+"shippingVerified":true,
+"note":"Macy's: 40% off handbags from COACH & more."
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"madewell":{
+"name":"Madewell",
+"domain":"madewell.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"US-based",
+"shippingVerified":true
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"j-crew":{
+"name":"J.Crew",
+"domain":"jcrew.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"US-based",
+"shippingVerified":true
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"reformation":{
+"name":"Reformation",
+"domain":"thereformation.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"US-based",
+"shippingVerified":true
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"everlane":{
+"name":"Everlane",
+"domain":"everlane.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"US",
+"offers":{
+"us":{
+"status":"VERIFYING",
+"promo":"Not yet checked for 2026",
+"shipping":"US-based",
+"shippingVerified":true
+},
+"sa":{
+"status":"VERIFYING",
+"promo":"Saudi offer not yet checked",
+"shipping":"Unverified"
+}
+},
+"_v":2
+},
+"amazon-sa":{
+"name":"Amazon.sa",
+"domain":"amazon.sa",
+"category":"makeup",
+"kind":"marketplace",
+"origin":"Saudi Arabia",
+"offers":{
+"sa":{
+"status":"LIVE",
+"promo":"White Friday: millions of deals across 30+ categories incl. beauty & fashion; up to 40% off (up to 50% on Amazon devices)",
+"discount":40,
+"scope":"Select",
+"start":"2026-11-19",
+"end":"2026-11-30",
+"salePage":"https://www.amazon.sa/whitefriday",
+"shipping":"Saudi-based",
+"shippingVerified":true,
+"note":"Prime members get extra benefits; bank-card codes also listed on the page.",
+"src":"AMZSA"
+}
+},
+"_v":1
+},
+"nice-one":{
+"name":"Nice One",
+"domain":"niceonesa.com",
+"category":"makeup",
+"kind":"retailer",
+"origin":"Saudi Arabia",
+"offers":{
+"sa":{
+"status":"LIVE",
+"promo":"Black Friday / White Friday offers: up to 80% off (e.g. NARS concealer −53%, SKIN1004 −79%)",
+"discount":80,
+"scope":"Select",
+"salePage":"https://niceonesa.com/ar/white-friday",
+"shipping":"Saudi-based",
+"shippingVerified":true,
+"note":"Official page lists no end date.",
+"src":"NICE"
+}
+},
+"_v":1
+},
+"care-to-beauty":{
+"name":"Care to Beauty",
+"domain":"caretobeauty.com",
+"category":"skincare",
+"kind":"retailer",
+"origin":"Portugal",
+"offers":{
+"sa":{
+"status":"LIVE",
+"promo":"Sitewide Black Friday sale; early offers live, main sale Nov 17–Dec 1",
+"scope":"Sitewide",
+"start":"2026-11-17",
+"end":"2026-12-01",
+"salePage":"https://www.caretobeauty.com/sa/",
+"shipping":"Direct to KSA",
+"shippingVerified":true,
+"note":"Has a dedicated Saudi storefront (/sa/).",
+"src":"C2B"
+}
+},
+"saUrl":"https://www.caretobeauty.com/sa/",
+"_v":1
+},
+"namshi":{
+"name":"Namshi",
+"domain":"namshi.com",
+"category":"fashion",
+"kind":"retailer",
+"origin":"UAE",
+"offers":{
+"sa":{
+"status":"VERIFYING",
+"promo":"'Black November' sale with cashback reported on namshi.com (Nov 16); Black Friday terms not yet confirmed",
+"scope":"Select",
+"shipping":"Saudi-based",
+"src":"NAMSHI"
+}
+},
+"saUrl":"https://www.namshi.com/saudi-en/",
+"_v":1
+},
+"noon":{
+"name":"noon",
+"domain":"noon.com",
+"category":"makeup",
+"kind":"marketplace",
+"origin":"UAE",
+"offers":{
+"sa":{
+"status":"VERIFYING",
+"promo":"Runs 'Yellow Friday' in KSA (2025: Nov 20–30); 2026 dates not yet confirmed",
+"shipping":"Saudi-based",
+"shippingVerified":true,
+"src":"NOON"
+}
+},
+"saUrl":"https://www.noon.com/saudi-en/",
+"_v":1
+},
+"faces":{
+"name":"FACES",
+"domain":"faces.sa",
+"category":"makeup",
+"kind":"retailer",
+"origin":"Saudi Arabia",
+"offers":{
+"sa":{
+"status":"VERIFYING",
+"promo":"Big Beauty Sale page live (YSL, Armani, Lancôme, Clinique, Estée Lauder…); dates on page unclear",
+"scope":"Select",
+"salePage":"https://www.faces.sa/en/black-friday-sale-makeup",
+"shipping":"Saudi-based",
+"shippingVerified":true,
+"src":"FACES"
+}
+},
+"_v":1
+},
+"sephora-middle-east":{
+"name":"Sephora Middle East",
+"domain":"sephora.me",
+"category":"makeup",
+"kind":"retailer",
+"origin":"France",
+"offers":{
+"sa":{
+"status":"VERIFYING",
+"promo":"'The Beauty Sale' section live; White Friday terms not confirmed",
+"shipping":"Saudi-based",
+"shippingVerified":true
+}
+},
+"saUrl":"https://www.sephora.me/sa-en/",
+"_v":1
+},
+"ounass":{
+"name":"Ounass",
+"domain":"ounass.sa",
+"category":"fashion",
+"kind":"retailer",
+"origin":"UAE",
+"offers":{
+"sa":{
+"status":"VERIFYING",
+"promo":"Not yet checked for White Friday 2026",
+"shipping":"Saudi-based"
+}
+},
+"_v":1
+},
+"level-shoes":{
+"name":"Level Shoes",
+"domain":"levelshoes.com",
+"category":"fashion",
+"kind":"retailer",
+"origin":"UAE",
+"offers":{
+"sa":{
+"status":"VERIFYING",
+"promo":"Not yet checked for White Friday 2026",
+"shipping":"Unverified",
+"note":"Saudi shipping not yet verified."
+}
+},
+"_v":1
+},
+"6thstreet":{
+"name":"6thStreet",
+"domain":"6thstreet.com",
+"category":"fashion",
+"kind":"retailer",
+"origin":"UAE",
+"offers":{
+"sa":{
+"status":"VERIFYING",
+"promo":"Not yet checked for White Friday 2026",
+"shipping":"Unverified",
+"note":"Saudi shipping not yet verified."
+}
+},
+"_v":1
+},
+"styli":{
+"name":"Styli",
+"domain":"stylishop.com",
+"category":"fashion",
+"kind":"retailer",
+"origin":"UAE",
+"offers":{
+"sa":{
+"status":"VERIFYING",
+"promo":"Not yet checked for White Friday 2026",
+"shipping":"Unverified",
+"note":"Saudi shipping not yet verified."
+}
+},
+"_v":1
+},
+"vogacloset":{
+"name":"VogaCloset",
+"domain":"vogacloset.com",
+"category":"fashion",
+"kind":"retailer",
+"origin":"UAE",
+"offers":{
+"sa":{
+"status":"VERIFYING",
+"promo":"Not yet checked for White Friday 2026",
+"shipping":"Unverified",
+"note":"Saudi shipping not yet verified."
+}
+},
+"_v":1
+},
+"golden-scent":{
+"name":"Golden Scent",
+"domain":"goldenscent.com",
+"category":"makeup",
+"kind":"retailer",
+"origin":"Saudi Arabia",
+"offers":{
+"sa":{
+"status":"VERIFYING",
+"promo":"Not yet checked for White Friday 2026",
+"shipping":"Saudi-based"
+}
+},
+"_v":1
+},
+"max-fashion":{
+"name":"Max Fashion",
+"domain":"maxfashion.com",
+"category":"fashion",
+"kind":"retailer",
+"origin":"UAE",
+"offers":{
+"sa":{
+"status":"VERIFYING",
+"promo":"Not yet checked for White Friday 2026",
+"shipping":"Unverified",
+"note":"Saudi shipping not yet verified."
+}
+},
+"_v":1
+},
+"centrepoint":{
+"name":"Centrepoint",
+"domain":"centrepointstores.com",
+"category":"fashion",
+"kind":"retailer",
+"origin":"UAE",
+"offers":{
+"sa":{
+"status":"VERIFYING",
+"promo":"Not yet checked for White Friday 2026",
+"shipping":"Unverified",
+"note":"Saudi shipping not yet verified."
+}
+},
+"_v":1
+},
+"nahdi":{
+"name":"Nahdi",
+"domain":"nahdionline.com",
+"category":"skincare",
+"kind":"retailer",
+"origin":"Saudi Arabia",
+"offers":{
+"sa":{
+"status":"VERIFYING",
+"promo":"Not yet checked for White Friday 2026",
+"shipping":"Saudi-based"
+}
+},
+"_v":1
+},
+"al-dawaa":{
+"name":"Al-Dawaa",
+"domain":"al-dawaa.com",
+"category":"skincare",
+"kind":"retailer",
+"origin":"Saudi Arabia",
+"offers":{
+"sa":{
+"status":"VERIFYING",
+"promo":"Not yet checked for White Friday 2026",
+"shipping":"Saudi-based"
+}
+},
+"_v":1
+},
+"zara-saudi":{
+"name":"Zara Saudi",
+"domain":"zara.com",
+"category":"fashion",
+"kind":"brand",
+"origin":"Spain",
+"offers":{
+"sa":{
+"status":"VERIFYING",
+"promo":"Not yet checked for White Friday 2026",
+"shipping":"Unverified",
+"note":"Saudi shipping not yet verified."
+}
+},
+"_v":1
+},
+"iherb":{
+"name":"iHerb",
+"domain":"iherb.com",
+"category":"skincare",
+"kind":"marketplace",
+"origin":"US",
+"offers":{
+"sa":{
+"status":"VERIFYING",
+"promo":"Not yet checked for White Friday 2026",
+"shipping":"Unverified",
+"note":"Saudi shipping not yet verified."
+}
+},
+"_v":1
+},
+"shein":{
+"name":"SHEIN",
+"domain":"shein.com",
+"category":"fashion",
+"kind":"marketplace",
+"origin":"Singapore",
+"offers":{
+"sa":{
+"status":"VERIFYING",
+"promo":"Not yet checked for White Friday 2026",
+"shipping":"Unverified",
+"note":"Saudi shipping not yet verified."
+}
+},
+"_v":1
+},
+"trendyol":{
+"name":"Trendyol",
+"domain":"trendyol.com",
+"category":"fashion",
+"kind":"marketplace",
+"origin":"Turkey",
+"offers":{
+"sa":{
+"status":"VERIFYING",
+"promo":"Not yet checked for White Friday 2026",
+"shipping":"Unverified",
+"note":"Saudi shipping not yet verified."
+}
+},
+"_v":1
+},
+"boutiqaat":{
+"name":"Boutiqaat",
+"domain":"boutiqaat.com",
+"category":"makeup",
+"kind":"marketplace",
+"origin":"Kuwait",
+"offers":{
+"sa":{
+"status":"VERIFYING",
+"promo":"Not yet checked for White Friday 2026",
+"shipping":"Unverified",
+"note":"Saudi shipping not yet verified."
+}
+},
+"_v":1
+}
+}
+}

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Black Friday Deals Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a quiet editorial ledger. Summary strip, then a filter rail and a grid of store cards; status is carried by small pills and a left stripe. */
+:root{
+  --paper:#FAF8F4; --card:#FFFFFF; --line:#E6E1D8; --mute:#77716A; --ink:#151413; --soft:#F1EDE6;
+  --live:#2F6B4F; --soon:#8A6A2E; --new:#151413; --off:#9A948C; --check:#5B5E8C; --gone:#A24B3B;
+  --display:"Cormorant Garamond", "Iowan Old Style", Georgia, serif;
+  --body:"Manrope", "Helvetica Neue", Arial, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#131211; --card:#1B1A18; --line:#2E2B27; --mute:#A39C93; --ink:#F3EFE8; --soft:#23211E;
+  --live:#7DC4A0; --soon:#D9B46A; --new:#F3EFE8; --off:#7D776F; --check:#A7AAE0; --gone:#E08D7C; color-scheme:dark; } }
+:root[data-theme="dark"]{
+  --paper:#131211; --card:#1B1A18; --line:#2E2B27; --mute:#A39C93; --ink:#F3EFE8; --soft:#23211E;
+  --live:#7DC4A0; --soon:#D9B46A; --new:#F3EFE8; --off:#7D776F; --check:#A7AAE0; --gone:#E08D7C; color-scheme:dark; }
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+a{color:inherit}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.wrap{max-width:1280px;margin:0 auto;padding:0 20px}
+header.top{border-bottom:1px solid var(--line);background:var(--paper);position:sticky;top:0;z-index:5}
+.brandrow{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding:18px 0 10px;flex-wrap:wrap}
+.brandrow h1{font-family:var(--display);font-weight:600;font-size:30px;margin:0;letter-spacing:.01em;text-wrap:balance}
+.brandrow .sub{color:var(--mute);font-size:13px}
+nav.main{display:flex;gap:4px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none}
+nav.main a{flex:none;text-decoration:none;font-size:13px;font-weight:600;letter-spacing:.02em;padding:7px 12px;border-radius:999px;color:var(--mute);border:1px solid transparent}
+nav.main a:hover{color:var(--ink);border-color:var(--line)}
+nav.main a[aria-current="page"]{color:var(--paper);background:var(--ink)}
+.monitor{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--mute)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--off);flex:none}
+.dot.ok{background:var(--live)} .dot.warn{background:var(--soon)}
+section.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:22px 0 10px}
+.stat{background:var(--card);padding:16px 18px}
+.stat .n{font-family:var(--display);font-size:40px;line-height:1;font-weight:600;font-variant-numeric:tabular-nums}
+.stat .l{font-size:12px;color:var(--mute);margin-top:6px;letter-spacing:.03em;text-transform:uppercase}
+.recent{display:flex;gap:10px;overflow-x:auto;padding:6px 0 18px;scrollbar-width:thin}
+.recent .chip{flex:none;border:1px solid var(--line);background:var(--card);padding:8px 12px;font-size:12.5px;max-width:300px}
+.recent .chip b{display:block;font-weight:700}
+.recent .chip span{color:var(--mute)}
+.layout{display:grid;grid-template-columns:250px 1fr;gap:28px;align-items:start;padding-bottom:60px}
+aside.filters{position:sticky;top:120px;display:flex;flex-direction:column;gap:16px;max-height:calc(100vh - 140px);overflow:auto;padding-right:4px}
+.fgroup h3{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin:0 0 8px;font-weight:700}
+.fgroup select,.fgroup input[type=search]{width:100%;padding:9px 10px;border:1px solid var(--line);background:var(--card);border-radius:0}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pills button{border:1px solid var(--line);background:var(--card);padding:5px 10px;font-size:12.5px;cursor:pointer;border-radius:999px}
+.pills button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+input[type=range]{width:100%;accent-color:var(--ink)}
+.small{font-size:12px;color:var(--mute)}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.toolbar h2{font-family:var(--display);font-size:26px;font-weight:600;margin:0;text-wrap:balance}
+.toolbar .right{display:flex;gap:8px;align-items:center}
+.toolbar select{padding:8px 10px;border:1px solid var(--line);background:var(--card)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--off);padding:16px;display:flex;flex-direction:column;gap:10px;transition:transform .15s ease, box-shadow .15s ease}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.06)}
+.card.s-LIVE{border-left-color:var(--live)} .card.s-UPCOMING{border-left-color:var(--soon)}
+.card.s-NEW{border-left-color:var(--new)} .card.s-VERIFYING{border-left-color:var(--check)}
+.card.s-EXPIRED{border-left-color:var(--gone);opacity:.75} .card.s-NOT_ANNOUNCED{border-left-color:var(--off)}
+.chead{display:flex;gap:12px;align-items:center}
+.logo{width:44px;height:44px;flex:none;display:grid;place-items:center;font-family:var(--display);font-weight:600;font-size:19px;background:var(--soft);border:1px solid var(--line);color:var(--ink)}
+.cname{min-width:0;flex:1}
+.cname b{display:block;font-size:15.5px;line-height:1.25}
+.cname span{font-size:12px;color:var(--mute)}
+.disc{font-family:var(--display);font-size:34px;line-height:.9;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+.disc small{display:block;font-family:var(--body);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);font-weight:600}
+.tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{font-size:11px;font-weight:600;letter-spacing:.03em;padding:2px 8px;border:1px solid var(--line);border-radius:999px;color:var(--mute);white-space:nowrap}
+.st{color:#fff;border:none}
+.st.LIVE{background:var(--live)} .st.UPCOMING{background:var(--soon)} .st.NEW{background:var(--new);color:var(--paper)}
+.st.VERIFYING{background:var(--check)} .st.EXPIRED{background:var(--gone)} .st.NOT_ANNOUNCED{background:var(--off)}
+.promo{font-size:14px;margin:0}
+dl.facts{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:0;font-size:12.5px}
+dl.facts dt{color:var(--mute)} dl.facts dd{margin:0;overflow-wrap:anywhere}
+.code{display:inline-flex;gap:6px;align-items:center}
+.code kbd{font-family:ui-monospace,Menlo,monospace;background:var(--soft);border:1px dashed var(--line);padding:1px 6px;font-size:12px}
+.code button{border:1px solid var(--line);background:none;font-size:11px;padding:1px 6px;cursor:pointer}
+.note{font-size:12px;color:var(--mute);margin:0}
+.links{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+.links a{font-size:12.5px;font-weight:600;text-decoration:none;padding:7px 11px;border:1px solid var(--ink)}
+.links a.primary{background:var(--ink);color:var(--paper)}
+p.ref{margin:0;font-size:12.5px;background:var(--soft);border:1px solid var(--line);padding:8px 10px}
+p.ref span{color:var(--mute);font-size:11.5px}
+details.hist{font-size:12px;color:var(--mute)}
+details.hist summary{cursor:pointer}
+details.hist ol{margin:6px 0 0;padding-left:18px}
+.empty,.notice{border:1px dashed var(--line);padding:24px;text-align:center;color:var(--mute)}
+.notice{text-align:left;margin-bottom:14px;padding:12px 14px;font-size:13px}
+footer{border-top:1px solid var(--line);padding:24px 0 40px;color:var(--mute);font-size:12.5px}
+footer h4{font-family:var(--display);font-size:20px;color:var(--ink);margin:0 0 8px;font-weight:600}
+.panel{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.runs li{margin-bottom:4px}
+.adm{display:grid;gap:8px;max-width:420px}
+.adm input,.adm select{padding:8px 10px;border:1px solid var(--line);background:var(--card)}
+.adm button,.fbtn{padding:8px 12px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer;font-weight:600}
+.fbtn{display:none}
+.muted-btn{background:none;color:var(--ink)}
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr}
+  aside.filters{position:static;max-height:none;display:none;border:1px solid var(--line);padding:14px;background:var(--card)}
+  aside.filters.open{display:flex}
+  .fbtn{display:inline-block}
+  section.stats{grid-template-columns:repeat(2,1fr)}
+  .panel{grid-template-columns:1fr}
+  header.top{position:static}
+}
+@media (max-width:420px){ .wrap{padding:0 16px} .brandrow h1{font-size:25px} .stat .n{font-size:32px} .grid{grid-template-columns:1fr} }
+@media (prefers-reduced-motion:reduce){ .card{transition:none} .card:hover{transform:none} }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brandrow">
+      <div>
+        <h1>Black Friday Deals Intelligence</h1>
+        <div class="sub">Beauty, skincare &amp; fashion · United States &amp; Saudi Arabia · Black Friday Nov 27, Cyber Monday Nov 30, 2026</div>
+      </div>
+      <div class="monitor" id="monitor"><span class="dot" id="mdot"></span><span id="mtext">Connecting to the deals database…</span></div>
+    </div>
+    <nav class="main" id="nav" aria-label="Sections">
+      <a href="#home">Home</a><a href="#us">US Deals</a><a href="#sa">Saudi Arabia Deals</a>
+      <a href="#makeup">Makeup &amp; Beauty</a><a href="#skincare">Skincare &amp; Haircare</a><a href="#fashion">Clothing &amp; Fashion</a>
+      <a href="#new">New Deals</a><a href="#biggest">Biggest Discounts</a><a href="#expiring">Expiring Soon</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="stats" aria-label="Summary">
+    <div class="stat"><div class="n" id="sStores">–</div><div class="l">Monitored stores</div></div>
+    <div class="stat"><div class="n" id="sLive">–</div><div class="l">Active deals</div></div>
+    <div class="stat"><div class="n" id="sNew">–</div><div class="l">New in last 48h</div></div>
+    <div class="stat"><div class="n" id="sUp">–</div><div class="l">Stores with upcoming sales</div></div>
+  </section>
+  <div class="small">Recently updated</div>
+  <div class="recent" id="recent"><div class="chip"><span>Waiting for data…</span></div></div>
+
+  <div class="layout">
+    <aside class="filters" id="filters" aria-label="Filters">
+      <div class="fgroup"><h3><label for="q">Search store or brand</label></h3><input type="search" id="q" placeholder="e.g. NARS, Namshi, Nike"></div>
+      <div class="fgroup"><h3>Region</h3><div class="pills" data-f="region">
+        <button data-v="all" aria-pressed="true">Both</button><button data-v="us">United States</button><button data-v="sa">Saudi Arabia</button></div></div>
+      <div class="fgroup"><h3>Category</h3><div class="pills" data-f="category">
+        <button data-v="all" aria-pressed="true">All</button><button data-v="makeup">Makeup &amp; Beauty</button><button data-v="skincare">Skincare &amp; Hair</button><button data-v="fashion">Fashion</button></div></div>
+      <div class="fgroup"><h3>Sale status</h3><div class="pills" data-f="status" data-multi="1">
+        <button data-v="LIVE" aria-pressed="true">Live</button><button data-v="NEW" aria-pressed="true">New</button><button data-v="UPCOMING" aria-pressed="true">Upcoming</button>
+        <button data-v="NOT_ANNOUNCED">Not announced</button><button data-v="VERIFYING">Verifying</button><button data-v="EXPIRED">Expired</button></div></div>
+      <div class="fgroup"><h3><label for="minD">Minimum discount: <span id="minDv">0</span>%</label></h3><input type="range" id="minD" min="0" max="80" step="5" value="0"></div>
+      <div class="fgroup"><h3>Store type</h3><div class="pills" data-f="kind">
+        <button data-v="all" aria-pressed="true">All</button><button data-v="brand">Brand website</button><button data-v="multi">Multi-brand / marketplace</button></div></div>
+      <div class="fgroup"><h3><label for="ship">Shipping</label></h3><select id="ship">
+        <option value="all">Any shipping</option><option value="US-based">US-based store</option><option value="Ships to US (unverified)">International, ships to US (unverified)</option>
+        <option value="Saudi-based">Saudi-based / Saudi storefront</option><option value="Direct to KSA">International, ships direct to KSA</option>
+        <option value="Via international delivery">Via international delivery service</option><option value="Unverified">Saudi shipping unverified</option><option value="verified">Shipping verified only</option></select></div>
+      <div class="fgroup"><h3>Price range</h3><p class="small" style="margin:0">Available once product-level prices are tracked. Current entries are store-level promotions.</p></div>
+      <button class="muted-btn fbtn" style="display:block" id="reset">Reset filters</button>
+    </aside>
+
+    <section aria-live="polite">
+      <div class="toolbar">
+        <h2 id="viewTitle">All deals</h2>
+        <div class="right">
+          <button class="fbtn" id="ftoggle" aria-expanded="false" aria-controls="filters">Filters</button>
+          <label class="small" for="sort">Sort</label>
+          <select id="sort">
+            <option value="disc">Highest discount</option><option value="added">Most recently added</option>
+            <option value="updated">Recently updated</option><option value="ending">Ending soon</option><option value="az">A–Z</option>
+          </select>
+        </div>
+      </div>
+      <div id="notice"></div>
+      <div class="small" id="count" style="margin-bottom:10px"></div>
+      <div class="grid" id="grid"></div>
+    </section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap panel">
+    <div>
+      <h4>Monitoring</h4>
+      <p id="schedText">Schedule: loading…</p>
+      <ol class="runs" id="runs"><li>No automated check has been recorded yet.</li></ol>
+      <p>How statuses work: <b>Live</b> = active and sourced; <b>New</b> = found by monitoring in the last 48 hours (the initial Nov 21 research counts as the baseline); <b>Upcoming</b> = confirmed future dates; <b>Not announced</b> = source checked, nothing published yet; <b>Verifying</b> = in the directory but not yet confirmed; <b>Expired</b> = end date passed (history kept). Dates switch Live/Upcoming/Expired automatically. Promo codes marked "unconfirmed" were reported by press, not tested at checkout. Logos are monograms because brand images can't load on this page.</p>
+    </div>
+    <div>
+      <h4>About this tracker</h4>
+      <p>Black Friday and White Friday 2026 promotions for beauty, skincare and fashion stores in the United States and Saudi Arabia. Every deal links to its source. An automated research run re-checks stores every 2–4 hours and this page updates itself; nothing here is guessed, so stores without a confirmed offer are marked Verifying or Not announced.</p>
+      <p class="small">Always confirm the final price, code and shipping on the store's own site before buying.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+const RIYADH=3, NY=-5;
+const LABEL={LIVE:"Live",NEW:"New",UPCOMING:"Upcoming",NOT_ANNOUNCED:"Not announced",VERIFYING:"Verifying",EXPIRED:"Expired"};
+const CAT={makeup:"Makeup & Beauty",skincare:"Skincare & Haircare",fashion:"Clothing & Fashion"};
+const REG={us:"United States",sa:"Saudi Arabia"};
+const VIEWS={home:"All deals",us:"US deals",sa:"Saudi Arabia deals",makeup:"Makeup & Beauty",skincare:"Skincare & Haircare",fashion:"Clothing & Fashion",new:"New deals",biggest:"Biggest discounts",expiring:"Expiring soon"};
+let stores=[], sources={}, status=null, config=null, runs=[];
+const F={region:"all",category:"all",kind:"all",status:new Set(["LIVE","NEW","UPCOMING"]),q:"",minD:0,ship:"all",sort:"disc"};
+let view="home";
+const $=id=>document.getElementById(id);
+
+function parseWhen(v,region,isEnd){
+  if(!v) return null;
+  if(v.length>10) return new Date(v).getTime();
+  const off=region==="sa"?RIYADH:NY;
+  const [y,m,d]=v.split("-").map(Number);
+  const base=Date.UTC(y,m-1,d)-off*3600e3;
+  return isEnd? base+86400e3-1 : base;
+}
+function eff(o,region){
+  const now=Date.now(); let s=o.status;
+  const st=parseWhen(o.start,region,false), en=parseWhen(o.end,region,true);
+  if(s==="LIVE"||s==="UPCOMING"){
+    if(en && now>en) s="EXPIRED";
+    else if(s==="UPCOMING" && st && now>=st) s="LIVE";
+    else if(s==="LIVE" && st && now<st) s="UPCOMING";
+  }
+  const fs=o.firstSeen?Date.parse(o.firstSeen):0;
+  const isNew = (s==="LIVE"||s==="UPCOMING") && fs && (now-fs)<48*3600e3 && fs > (status&&status.seededAt ? Date.parse(status.seededAt)+3600e3 : 0);
+  return {status:s, display:isNew?"NEW":s, isNew, st, en};
+}
+function rows(){
+  const out=[];
+  for(const d of stores){
+    for(const r of Object.keys(d.offers||{})){
+      const o=d.offers[r]; if(!o) continue;
+      const e=eff(o,r);
+      const seed=(status&&status.seededAt)||null;
+      out.push({d,r,o,e,upd:Date.parse(o.lastUpdated||o.firstSeen||d.updatedAt||seed||0)||0,add:Date.parse(o.firstSeen||d.addedAt||seed||0)||0});
+    }
+  }
+  return out;
+}
+function initials(n){const w=n.replace(/[^A-Za-z0-9& ]/g," ").split(/\s+/).filter(Boolean);return (w.length>1?w[0][0]+w[1][0]:n.slice(0,2)).toUpperCase();}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function safeUrl(u){try{const x=new URL(u);return (x.protocol==="https:"||x.protocol==="http:")?x.href:null}catch(e){return null}}
+function fmtDate(v,region){ if(!v) return null; const t=parseWhen(v,region,false); const opt={month:"short",day:"numeric",timeZone:region==="sa"?"Asia/Riyadh":"America/New_York"}; if(v.length>10){opt.hour="numeric";opt.minute="2-digit"} return new Date(t).toLocaleString("en-US",opt); }
+function ago(iso){ if(!iso) return "never"; const m=Math.round((Date.now()-Date.parse(iso))/60000); if(m<1) return "just now"; if(m<60) return m+" min ago"; const h=Math.round(m/60); if(h<48) return h+" h ago"; return Math.round(h/24)+" days ago"; }
+
+function passes(x){
+  const {d,r,o,e}=x;
+  if(view==="us"&&r!=="us") return false; if(view==="sa"&&r!=="sa") return false;
+  if(["makeup","skincare","fashion"].includes(view)&&d.category!==view) return false;
+  if(view==="new"&&!e.isNew) return false;
+  if(view==="expiring"&&!(e.status==="LIVE"&&e.en&&e.en-Date.now()<4*86400e3)) return false;
+  if(view==="biggest"&&!((o.discount||0)>=40&&(e.status==="LIVE"||e.status==="UPCOMING"))) return false;
+  if(F.region!=="all"&&r!==F.region) return false;
+  if(F.category!=="all"&&d.category!==F.category) return false;
+  if(F.kind==="brand"&&d.kind!=="brand") return false;
+  if(F.kind==="multi"&&d.kind==="brand") return false;
+  if(!["new","expiring","biggest"].includes(view) && !F.status.has(e.display)) return false;
+  if(F.minD>0&&!((o.discount||0)>=F.minD)) return false;
+  if(F.ship==="verified"&&!o.shippingVerified) return false;
+  if(F.ship!=="all"&&F.ship!=="verified"&&o.shipping!==F.ship) return false;
+  if(F.q){const q=F.q.toLowerCase(); if(!(d.name.toLowerCase().includes(q)||(d.domain||"").includes(q)||(o.promo||"").toLowerCase().includes(q)||(o.note||"").toLowerCase().includes(q))) return false;}
+  return true;
+}
+const ORDER={LIVE:0,NEW:0,UPCOMING:1,NOT_ANNOUNCED:2,VERIFYING:3,EXPIRED:4};
+function sorter(a,b){
+  const s=view==="expiring"?"ending":F.sort;
+  if(s==="az") return a.d.name.localeCompare(b.d.name);
+  if(s==="added") return b.add-a.add || a.d.name.localeCompare(b.d.name);
+  if(s==="updated") return b.upd-a.upd;
+  if(s==="ending"){const ea=a.e.en||Infinity, eb=b.e.en||Infinity; return ea-eb;}
+  return (ORDER[a.e.display]-ORDER[b.e.display]) || ((b.o.discount||0)-(a.o.discount||0)) || a.d.name.localeCompare(b.d.name);
+}
+
+function card(x){
+  const {d,r,o,e}=x; const src=o.src&&sources[o.src]; const srcUrl=safeUrl(o.sourceUrl||(src&&src.url)); const srcName=o.sourceName||(src&&src.name);
+  const srcType=o.sourceType||(src&&src.type); const verified=o.verifiedAt||(src&&src.checkedAt);
+  const store=safeUrl((r==="sa"&&d.saUrl)||d.url||("https://"+d.domain)); const sale=safeUrl(o.salePage);
+  let ref=null; if(r==="sa"&&(e.status==="VERIFYING"||e.status==="NOT_ANNOUNCED")&&d.offers.us){const ue=eff(d.offers.us,"us"); if((ue.status==="LIVE"||ue.status==="UPCOMING")&&d.offers.us.promo) ref={o:d.offers.us,e:ue};}
+  const facts=[];
+  if(o.scope) facts.push(["Applies to",o.scope]);
+  if(o.code) facts.push(["Promo code",`<span class="code"><kbd>${esc(o.code)}</kbd><button type="button" data-copy="${esc(o.code.split(" / ")[0])}">Copy</button></span>${o.codeVerified!==true?' <span class="small">unconfirmed</span>':''}`,1]);
+  if(o.minSpend) facts.push(["Minimum spend",o.minSpend]);
+  if(o.start||o.end) facts.push(["Dates",`${esc(fmtDate(o.start,r)||"—")} → ${esc(fmtDate(o.end,r)||"not stated")}`,1]);
+  facts.push(["Shipping",`${esc(o.shipping||"Unverified")}${o.shippingVerified?" ✓":""}`,1]);
+  facts.push(["Origin",d.origin||"—"]);
+  facts.push(["Prices",(o.currency|| (r==="sa"?"SAR":"USD"))+(o.taxNote?" · "+o.taxNote:" · taxes/duties not stated")]);
+  facts.push(["Verified",verified?`${esc(ago(verified))}${srcUrl?` · <a href="${esc(srcUrl)}" target="_blank" rel="noopener">${esc(srcName||"source")}</a>`:""}${srcType&&srcType!=="official"?` <span class="small">(${esc(srcType)})</span>`:""}`:"Not yet verified",1]);
+  const H=(o.history&&o.history.length)?o.history:[{at:o.firstSeen||(status&&status.seededAt)||new Date().toISOString(),event:"added in initial research"}];
+  const hist=H.slice(-8).reverse().map(h=>`<li>${esc(new Date(h.at).toLocaleDateString("en-US",{month:"short",day:"numeric"}))}: ${esc(h.event)}${h.detail?" — "+esc(h.detail):""}</li>`).join("");
+  return `<article class="card s-${e.display}">
+    <div class="chead"><div class="logo" aria-hidden="true">${esc(initials(d.name))}</div>
+      <div class="cname"><b>${esc(d.name)}</b><span>${esc(d.domain||"")} · ${esc(d.kind==="brand"?"Brand site":d.kind==="marketplace"?"Marketplace":"Multi-brand retailer")}</span></div>
+      <div class="disc">${o.discount?o.discount+"%":"—"}<small>${o.discount?(o.scope==="Sitewide"?"off sitewide":"up to"):"no % stated"}</small></div></div>
+    <div class="tags"><span class="tag st ${e.display}">${LABEL[e.display]}</span><span class="tag">${r==="us"?"US":"Saudi Arabia"}</span><span class="tag">${esc(CAT[d.category]||d.category)}</span></div>
+    <p class="promo">${esc(o.promo||"No promotion recorded")}</p>
+    <dl class="facts">${facts.map(f=>`<dt>${esc(f[0])}</dt><dd>${f[2]?f[1]:esc(f[1])}</dd>`).join("")}</dl>
+    ${o.note?`<p class="note">${esc(o.note)}</p>`:""}
+    ${ref?`<p class="ref"><b>US offer for reference${ref.e.display!=="LIVE"?" ("+esc(LABEL[ref.e.display].toLowerCase())+")":""}:</b> ${esc(ref.o.promo)}${ref.o.discount?" · "+ref.o.discount+"%":""}<br><span>Not confirmed for Saudi Arabia yet; Saudi prices, dates and shipping may differ.</span></p>`:""}
+    ${o.previousDiscount!=null?`<p class="note">Previously ${esc(o.previousDiscount)}% off</p>`:""}
+    <div class="links">${sale?`<a class="primary" href="${esc(sale)}" target="_blank" rel="noopener">Sale page</a>`:""}${store?`<a href="${esc(store)}" target="_blank" rel="noopener">Visit store</a>`:""}</div>
+    ${hist?`<details class="hist"><summary>Update history</summary><ol>${hist}</ol></details>`:""}
+  </article>`;
+}
+
+function render(){
+  const all=rows();
+  const live=all.filter(x=>x.e.status==="LIVE");
+  $("sStores").textContent=stores.length;
+  $("sLive").textContent=live.length;
+  $("sNew").textContent=all.filter(x=>x.e.isNew).length;
+  $("sUp").textContent=new Set(all.filter(x=>x.e.status==="UPCOMING").map(x=>x.d.name)).size;
+  const rec=all.filter(x=>x.o.history&&x.o.history.length).sort((a,b)=>b.upd-a.upd).slice(0,10);
+  $("recent").innerHTML=rec.length?rec.map(x=>{const h=x.o.history[x.o.history.length-1];return `<div class="chip"><b>${esc(x.d.name)} · ${x.r==="us"?"US":"KSA"}</b><span>${esc(h.event)}${h.detail?": "+esc(h.detail):""} · ${esc(ago(h.at))}</span></div>`}).join(""):`<div class="chip"><b>Initial research</b><span>${stores.length} stores added ${status&&status.seededAt?esc(ago(status.seededAt)):""} · monitoring updates will appear here</span></div>`;
+  const list=all.filter(passes).sort(sorter);
+  $("viewTitle").textContent=VIEWS[view];
+  $("count").textContent=`${list.length} of ${all.length} store listings`;
+  $("grid").innerHTML=list.length?list.map(card).join(""):`<div class="empty">Nothing matches these filters. Try including more statuses or lowering the minimum discount.</div>`;
+  document.querySelectorAll("#nav a").forEach(a=>a.setAttribute("aria-current",a.getAttribute("href")==="#"+view?"page":"false"));
+}
+function renderMonitor(){
+  const last=status&&status.lastRun; const dot=$("mdot");
+  if(!last){dot.className="dot warn";$("mtext").textContent="Seeded "+ (status&&status.seededAt?ago(status.seededAt):"") +" · waiting for first automated check";}
+  else{const h=(Date.now()-Date.parse(last))/3600e3; dot.className="dot "+(h<8?"ok":"warn"); $("mtext").textContent=`Last automated check ${ago(last)}${status.lastRunResult?" · "+status.lastRunResult:""}`;}
+  $("schedText").textContent=config?`Schedule: ${config.quickCheck||"—"}; full directory verification ${config.fullCheck||"—"}. ${config.peakNote||""}`:"Schedule: not configured yet.";
+  $("runs").innerHTML=runs.length?runs.slice(0,6).map(r=>`<li>${esc(new Date(r.at).toLocaleString("en-US",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}))} · ${esc(r.type||"check")}: ${esc(r.summary||"")}</li>`).join(""):"<li>No automated check has been recorded yet.</li>";
+}
+
+function route(){ const h=(location.hash||"#home").slice(1); view=VIEWS[h]?h:"home";
+  if(view==="sa"){["VERIFYING","NOT_ANNOUNCED"].forEach(s=>F.status.add(s)); document.querySelectorAll('[data-f="status"] button').forEach(b=>b.setAttribute("aria-pressed",F.status.has(b.dataset.v)));}
+  render(); }
+window.addEventListener("hashchange",route);
+
+document.querySelectorAll(".pills").forEach(g=>{
+  g.addEventListener("click",ev=>{const b=ev.target.closest("button"); if(!b) return; const f=g.dataset.f;
+    if(g.dataset.multi){ const on=b.getAttribute("aria-pressed")!=="true"; b.setAttribute("aria-pressed",on); on?F.status.add(b.dataset.v):F.status.delete(b.dataset.v); }
+    else { g.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b)); F[f]=b.dataset.v; }
+    render();});
+});
+$("q").addEventListener("input",e=>{F.q=e.target.value.trim();render();});
+$("minD").addEventListener("input",e=>{F.minD=+e.target.value;$("minDv").textContent=F.minD;render();});
+$("ship").addEventListener("change",e=>{F.ship=e.target.value;render();});
+$("sort").addEventListener("change",e=>{F.sort=e.target.value;render();});
+$("ftoggle").addEventListener("click",()=>{const f=$("filters");const o=f.classList.toggle("open");$("ftoggle").setAttribute("aria-expanded",o);});
+$("reset").addEventListener("click",()=>{Object.assign(F,{region:"all",category:"all",kind:"all",q:"",minD:0,ship:"all"});F.status=new Set(["LIVE","NEW","UPCOMING"]);
+  document.querySelectorAll(".pills").forEach(g=>g.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed", g.dataset.multi?F.status.has(b.dataset.v):(b.dataset.v==="all"))));
+  $("q").value="";$("minD").value=0;$("minDv").textContent=0;$("ship").value="all";render();});
+$("grid").addEventListener("click",async ev=>{const b=ev.target.closest("[data-copy]"); if(!b) return; try{await navigator.clipboard.writeText(b.dataset.copy);b.textContent="Copied";}catch(e){b.textContent="Select it";} setTimeout(()=>b.textContent="Copy",1500);});
+
+route();
+
+(async function(){
+  async function load(){
+    try{
+      const r=await fetch("data.json?t="+Date.now(),{cache:"no-store"}); if(!r.ok) throw new Error(r.status);
+      const j=await r.json();
+      stores=Object.entries(j.stores||{}).map(([id,d])=>Object.assign({id},d));
+      status=j.status||null; config=j.config||null; sources=j.sources||{};
+      runs=(j.runs||[]).slice().sort((a,b)=>Date.parse(b.at)-Date.parse(a.at));
+      $("notice").innerHTML=""; renderMonitor(); render();
+    }catch(e){ if(!stores.length) $("notice").innerHTML='<div class="notice">Couldn\'t load the deals right now. Refresh the page to try again.</div>'; }
+  }
+  await load(); setInterval(load,5*60000);
+})();
+setInterval(()=>{ if(stores.length) render(); renderMonitor(); },60000);
+})();
+</script>
+</body>
+</html>
