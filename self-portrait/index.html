@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="robots" content="noindex, nofollow">
+
 <title>SELF-PORTRAIT | BLACK FRIDAY EDIT</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -188,13 +188,14 @@ footer{border-top:1px solid var(--rule);padding:26px var(--pad) 40px;font-size:1
 </head>
 <body>
 
-<div id="gate">
+<div id="gate" class="hidden">
   <form id="gateForm" autocomplete="off">
     <b>SELF-PORTRAIT</b>
-    <p>Your private Black Friday edit. Enter your passcode.</p>
+    <p>Owner area. Enter your passcode to manage the collection.</p>
     <input id="pass" type="password" aria-label="Passcode" placeholder="Passcode" autocomplete="current-password">
     <div class="err" id="gateErr"></div>
     <button class="cta" type="submit">Enter</button>
+    <p><a href="#home">Back to the collection</a></p>
   </form>
 </div>
 
@@ -205,7 +206,7 @@ footer{border-top:1px solid var(--rule);padding:26px var(--pad) 40px;font-size:1
     <a href="#all">All sale dresses<span class="count" id="cAll"></span></a>
     <a href="#favorites">My favorites<span class="count" id="cFav"></span></a>
     <a href="#recent">Recently added<span class="count" id="cNew"></span></a>
-    <a href="#admin">Admin</a>
+    <a href="#admin" id="navAdmin" class="hidden">Admin</a>
   </nav>
   <div class="status" id="status"></div>
 </header>
@@ -213,8 +214,8 @@ footer{border-top:1px solid var(--rule);padding:26px var(--pad) 40px;font-size:1
 <main id="view" aria-live="polite"></main>
 
 <footer>
-  Private tracker for personal use. Product data, photos and prices come from the official Self-Portrait Spain store (eu.self-portrait.com/es-es) and link back to it.
-  Not affiliated with Self-Portrait. Final SAR prices are estimates: discounted € price × EUR/SAR rate + your fixed amount per dress.
+  Independent personal shopping service — not affiliated with or endorsed by Self-Portrait. Product names and photos belong to Self-Portrait.
+  Prices are in Saudi riyals. Size availability is refreshed every 30 minutes and can change quickly, so please confirm your size before ordering.
 </footer>
 
 <dialog id="dlg"><div class="dlg" id="dlgBody"></div></dialog>
@@ -237,12 +238,17 @@ let loaded = false, pollTimer = null, syncTimer = null;
 const defaults = () => ({ fav:{}, notes:{}, ov:{}, manual:[], del:{}, settings:{ extra:450, rate:null, sizes:[], poll:10 }, updatedAt:0 });
 let S = Object.assign(defaults(), JSON.parse(store.get(LS) || "{}"));
 S.settings = Object.assign(defaults().settings, S.settings || {});
+let OWNER = store.get("sp-unlock") === PASS_HASH;
+let REMOTE = null;
+const C = () => OWNER ? S : (REMOTE || defaults());
 let GH = JSON.parse(store.get("sp-gh") || '{"token":"","sync":false}');
 let UI = { q:"", sort:"new", avail:"all", sizes:[], mineOnly:false, limit:48 };
 
 /* ---------- helpers ---------- */
-const rate = () => Number(S.settings.rate) || Number(DATA.meta.rate && DATA.meta.rate.value) || 0;
-const extra = () => Number.isFinite(Number(S.settings.extra)) ? Number(S.settings.extra) : 450;
+const rate = () => Number(C().settings && C().settings.rate) || Number(DATA.meta.rate && DATA.meta.rate.value) || 0;
+const extra = () => { const v = C().settings && C().settings.extra; return v !== undefined && v !== null && Number.isFinite(Number(v)) ? Number(v) : 450; };
+const wasSAR = p => Math.round(p.compare * rate() + extra());
+const offShown = p => OWNER ? pct(p) : (wasSAR(p) > finalSAR(p) ? Math.round((1 - finalSAR(p) / wasSAR(p)) * 100) : 0);
 const finalSAR = p => Math.round(p.price * rate() + extra());
 const pct = p => p.compare > p.price ? Math.round((1 - p.price / p.compare) * 100) : 0;
 const isAvail = p => (p.sizes || []).some(s => s.a);
@@ -261,9 +267,10 @@ function save(){
 }
 
 function products(){
-  const merge = p => { const o = S.ov[p.handle]; return o ? Object.assign({}, p, o, { edited:true }) : p; };
-  return DATA.products.filter(p => !S.del[p.handle]).map(merge)
-    .concat(S.manual.filter(p => !S.del[p.handle]).map(p => merge(Object.assign({ manual:true }, p))));
+  const c = C(), ov = c.ov || {}, del = c.del || {};
+  const merge = p => { const o = ov[p.handle]; return o ? Object.assign({}, p, o, { edited:true }) : p; };
+  return DATA.products.filter(p => !del[p.handle]).map(merge)
+    .concat((c.manual || []).filter(p => !del[p.handle]).map(p => merge(Object.assign({ manual:true }, p))));
 }
 
 /* ---------- data ---------- */
@@ -285,6 +292,7 @@ async function pullSync(){
     const r = await fetch("personal.json?t=" + Date.now(), { cache:"no-store" });
     if (!r.ok) return;
     const remote = await r.json();
+    if (!OWNER){ REMOTE = remote; return; }
     if (remote && remote.updatedAt > (S.updatedAt || 0)){
       const keep = S.settings;
       S = Object.assign(defaults(), remote); S.settings = Object.assign(defaults().settings, remote.settings || keep);
@@ -333,6 +341,7 @@ function sizesHTML(p){
 }
 
 function card(p, admin){
+  if (!OWNER) return shopCard(p);
   const fav = !!S.fav[p.handle], note = S.notes[p.handle], out = !isAvail(p);
   const isNew = DATA.meta.initialImport && p.firstSeen > DATA.meta.initialImport;
   const chg = (p.changes || []).filter(c => c !== "Newly discovered on sale").slice(0, 2).join("; ");
@@ -355,10 +364,31 @@ function card(p, admin){
   </article>`;
 }
 
+function shopCard(p){
+  const fav = !!S.fav[p.handle], out = !isAvail(p), off = offShown(p);
+  const isNew = DATA.meta.initialImport && p.firstSeen > DATA.meta.initialImport;
+  return `<article class="card${out ? " out" : ""}">
+    <div class="ph">
+      ${p.image ? `<img loading="lazy" src="${esc(img(p.image, 700))}" alt="${esc(p.title)}">` : '<span class="empty" style="display:grid;place-items:center;height:100%">No image</span>'}
+      ${off ? `<span class="badge">−${off}%</span>` : ""}
+      ${out ? '<span class="flag">Sold out</span>' : isNew ? '<span class="flag">New to sale</span>' : ""}
+    </div>
+    <button class="heart" data-fav="${esc(p.handle)}" aria-pressed="${fav}" aria-label="${fav ? "Remove from" : "Save to"} favorites">${heartSVG}</button>
+    <h3>${esc(p.title)}</h3>
+    <p class="sar">${fmt(finalSAR(p))}<small>SAR</small></p>
+    ${off ? `<p class="eur"><s>${fmt(wasSAR(p))} SAR</s></p>` : ""}
+    ${sizesHTML(p)}
+  </article>`;
+}
+
 function statusBar(){
   const m = DATA.meta, el = $("#status");
   if (!loaded){ el.innerHTML = "Loading the collection…"; return; }
   const stale = m.lastSuccess && (Date.now() - new Date(m.lastSuccess)) > 3 * 3600e3;
+  if (!OWNER){
+    el.innerHTML = `<span>Prices and sizes updated ${ago(m.lastSuccess)} · ${when(m.lastSuccess)}</span>${stale || m.lastError ? '<span class="warn">Availability may have changed — confirm your size before ordering</span>' : ""}<button id="refreshNow">Refresh</button>`;
+    $("#refreshNow").onclick = () => loadData(true); return;
+  }
   el.innerHTML = `<span>Last successful update: ${when(m.lastSuccess)}</span>
     <span>EUR/SAR ${rate().toFixed(3)}${S.settings.rate ? " (your manual rate)" : ""}</span>
     ${m.lastError ? `<span class="warn">Latest check couldn't reach the store — prices shown are from ${ago(m.lastSuccess)}</span>` : stale ? `<span class="warn">Not verified for ${ago(m.lastSuccess).replace(" ago","")} — check the store before buying</span>` : ""}
@@ -396,7 +426,7 @@ function viewHome(list){
       <div>
         <h1>Black Friday Edit</h1>
         <p class="sub">The Midi Dress Sale Collection</p>
-        <p class="lede">Every discounted midi dress from Self-Portrait Spain, priced in riyals with your ${fmt(extra())} SAR added to each dress, and re-checked against the store every 30 minutes.</p>
+        <p class="lede">${OWNER ? `Every discounted midi dress from Self-Portrait Spain, priced in riyals with your ${fmt(extra())} SAR added to each dress, and re-checked against the store every 30 minutes.` : "Every Self-Portrait midi dress in the sale, priced in Saudi riyals. Sizes and prices are refreshed every 30 minutes."}</p>
         <div class="facts">
           <div><strong>${avail.length}</strong><small>dresses available now</small></div>
           <div><strong>${cheapest ? fmt(cheapest) : "—"}</strong><small>lowest final price, SAR</small></div>
@@ -404,7 +434,7 @@ function viewHome(list){
         </div>
         <a class="cta" href="#all">Shop all sale dresses</a>
       </div>
-      <div class="triptych">${picks.map(p => `<a href="${esc(url(p))}" target="_blank" rel="noopener"><img src="${esc(img(p.image, 600))}" alt="${esc(p.title)}"></a>`).join("")}</div>
+      <div class="triptych">${picks.map(p => `<a href="#all"><img src="${esc(img(p.image, 600))}" alt="${esc(p.title)}"></a>`).join("")}</div>
     </section>
     <div class="section-head"><h2>Deepest markdowns</h2><a href="#all" data-sort="disc">See all by discount</a></div>
     <div class="grid">${top.map(p => card(p)).join("")}</div>`;
@@ -413,7 +443,7 @@ function viewHome(list){
 function viewAll(list){
   const all = filtered(list), shown = all.slice(0, UI.limit);
   const sizeBtns = [...FR, ...KNIT].map(s => `<button data-size="${s}" aria-pressed="${UI.sizes.includes(s)}">${s.replace("FR ","")}</button>`).join("");
-  return `<div class="section-head"><h2>All sale dresses</h2><p>Discounted midi dresses on Self-Portrait Spain. Prices include the EUR/SAR conversion and ${fmt(extra())} SAR per dress.</p></div>
+  return `<div class="section-head"><h2>All sale dresses</h2><p>${OWNER ? `Discounted midi dresses on Self-Portrait Spain. Prices include the EUR/SAR conversion and ${fmt(extra())} SAR per dress.` : "All prices in Saudi riyals. Tap the heart to save dresses you love."}</p></div>
     <div class="toolbar" id="toolbar">
       <label class="search"><input id="q" type="search" placeholder="Search by name — lace, boucle, rhinestone…" value="${esc(UI.q)}" aria-label="Search dresses"></label>
       <select id="sort" aria-label="Sort">
@@ -421,7 +451,7 @@ function viewAll(list){
         <option value="asc">Final price: low to high</option><option value="desc">Final price: high to low</option><option value="disc">Biggest discount</option>
       </select>
       <select id="avail" aria-label="Availability"><option value="all">Available and sold out</option><option value="in">Available only</option><option value="out">Sold out only</option></select>
-      <button class="tbtn" id="mine" aria-pressed="${UI.mineOnly}" ${S.settings.sizes.length ? "" : "disabled title='Set your sizes in Admin'"}>In my sizes${S.settings.sizes.length ? " (" + S.settings.sizes.map(s => s.replace("FR ","")).join(", ") + ")" : ""}</button>
+      ${OWNER ? "" : "<!--"}<button class="tbtn" id="mine" aria-pressed="${UI.mineOnly}" ${S.settings.sizes.length ? "" : "disabled title='Choose your sizes below'"}>In my sizes${S.settings.sizes.length ? " (" + S.settings.sizes.map(s => s.replace("FR ","")).join(", ") + ")" : ""}</button>${OWNER ? "" : "-->"}
       <div class="sizebar" ${UI.mineOnly ? 'style="opacity:.4;pointer-events:none"' : ""}>Available in: <span class="small">FR</span>${sizeBtns.slice(0)}${UI.sizes.length ? ' <button id="clearSizes">Clear</button>' : ""}</div>
     </div>
     <p class="result-line">${all.length} of ${list.length} dresses</p>
@@ -435,10 +465,10 @@ function viewFav(list){
   const mine = S.settings.sizes;
   const total = favs.reduce((t,p) => t + finalSAR(p), 0);
   return `<div class="section-head"><h2>My favorites</h2><p>${favs.length} saved · together ${fmt(total)} SAR</p></div>
-    <div class="table-wrap"><table class="compare"><thead><tr><th></th><th>Dress</th><th>Final price</th><th>Sale €</th><th>Off</th><th>${mine.length ? "My sizes" : "Sizes in stock"}</th></tr></thead><tbody>
+    <div class="table-wrap"><table class="compare"><thead><tr><th></th><th>Dress</th><th>Final price</th>${OWNER ? "<th>Sale €</th>" : ""}<th>Off</th><th>${mine.length ? "My sizes" : "Sizes in stock"}</th></tr></thead><tbody>
     ${favs.map((p,i) => { const inStock = (p.sizes||[]).filter(s => s.a).map(s => s.s);
       const sz = mine.length ? mine.map(s => inStock.includes(s) ? s.replace("FR ","FR ") : `<s style="color:#bdb6ae">${s}</s>`).join(", ") : (inStock.join(", ") || "Sold out");
-      return `<tr class="${i === 0 ? "best" : ""}"><td><img src="${esc(img(p.image,120))}" alt=""></td><td><a href="${esc(url(p))}" target="_blank" rel="noopener">${esc(p.title)}</a></td><td class="num">${fmt(finalSAR(p))} SAR</td><td>${eur(p.price)}</td><td>${pct(p)}%</td><td>${sz}</td></tr>`; }).join("")}
+      return `<tr class="${i === 0 ? "best" : ""}"><td><img src="${esc(img(p.image,120))}" alt=""></td><td>${OWNER ? `<a href="${esc(url(p))}" target="_blank" rel="noopener">${esc(p.title)}</a>` : esc(p.title)}</td><td class="num">${fmt(finalSAR(p))} SAR</td>${OWNER ? `<td>${eur(p.price)}</td>` : ""}<td>${offShown(p)}%</td><td>${sz}</td></tr>`; }).join("")}
     </tbody></table></div>
     <div class="grid" style="margin-top:30px">${favs.map(p => card(p)).join("")}</div>`;
 }
@@ -456,7 +486,7 @@ function viewAdmin(list){
   const log = (m.log || []).slice(0, 12).map(l => `<div><span>${when(l.at)}</span><span>+${l.added} new · −${l.removed} left sale · ${l.changed} changed</span></div>`).join("");
   const removed = (DATA.removed || []).slice(0, 40).map(r => `<div><a href="${esc(url(r))}" target="_blank" rel="noopener">${esc(r.title)}</a><span>${eur(r.price)} · left ${ago(r.removedAt)}</span></div>`).join("") || '<div><span>No dresses have left the sale yet.</span></div>';
   const deleted = list.length; const hidden = Object.keys(S.del).length;
-  return `<div class="section-head"><h2>Admin & settings</h2><p>Changes save instantly on this device${GH.token && GH.sync ? " and sync to your other devices" : ""}.</p></div>
+  return `<div class="section-head"><h2>Admin & settings</h2><p>Changes save instantly on this device${GH.token && GH.sync ? " and are published to customers" : ". Customers only see your edits once sync is on (Sync & publish below)"}. <button class="btn quiet" id="aLeave" style="margin-left:8px;padding:6px 12px">View as a customer</button></p></div>
 
   <section class="panel"><div><h3>Pricing</h3><p class="why">Final price = discounted € × rate + fixed amount, rounded to the nearest riyal.</p></div>
     <div class="fields">
@@ -489,11 +519,11 @@ function viewAdmin(list){
   <section class="panel"><div><h3>Left the sale</h3><p class="why">Dresses that were removed from the sale or went back to full price.</p></div>
     <div class="fields" style="max-width:none"><div class="mono-list">${removed}</div></div></section>
 
-  <section class="panel"><div><h3>Sync & backup</h3><p class="why">Your favorites, notes and edits live in this browser. Turn on sync to save them to your repo so iPhone, iPad and desktop share them.</p></div>
+  <section class="panel"><div><h3>Sync & publish</h3><p class="why">Your edits live in this browser. Turn on sync to publish price, photo, size, add and delete edits to the customer site and share them across your devices.</p></div>
     <div class="fields">
       <label class="f">GitHub fine-grained token (Contents: read & write, Actions: read & write for ${REPO})<input id="ghTok" type="password" autocomplete="off" value="${esc(GH.token)}" placeholder="github_pat_…"></label>
       <label class="row small"><input type="checkbox" id="ghSync" ${GH.sync ? "checked" : ""}> Sync my edits through the repo</label>
-      <p class="small">The token stays on this device only. The repo is public, so synced notes are publicly readable — keep personal details out of notes.</p>
+      <p class="small">The token stays on this device only. Notes and favorites never show on the customer site, but the repo is public, so keep private details out of notes.</p>
       <div class="row"><button class="btn" id="ghSave">Save sync settings</button><button class="btn quiet" id="bCopy">Copy backup</button><button class="btn quiet" id="bImport">Import backup</button></div>
     </div></section>`;
 }
@@ -579,6 +609,9 @@ function render(){
   const v = $("#view");
   if (!loaded){ v.innerHTML = '<div class="empty"><h3>Loading the collection</h3><p>One moment.</p></div>'; return; }
   const isAdmin = route === "admin";
+  $("#navAdmin").classList.toggle("hidden", !OWNER);
+  if (isAdmin && !OWNER){ $("#gate").classList.remove("hidden"); setTimeout(() => $("#pass").focus(), 50); v.innerHTML = ""; return; }
+  $("#gate").classList.add("hidden");
   v.innerHTML = route === "all" ? viewAll(list) : route === "favorites" ? viewFav(list) : route === "recent" ? viewRecent(list) : isAdmin ? viewAdmin(list) : viewHome(list);
   document.documentElement.style.setProperty("--hh", $("#top").offsetHeight + "px");
   if (route === "all") wireAll();
@@ -590,7 +623,7 @@ function wireAll(){
   const q = $("#q"); q.oninput = () => { UI.q = q.value; UI.limit = 48; const pos = q.selectionStart; render(); const n = $("#q"); n.focus(); n.setSelectionRange(pos, pos); };
   $("#sort").onchange = e => { UI.sort = e.target.value; render(); };
   $("#avail").onchange = e => { UI.avail = e.target.value; render(); };
-  $("#mine").onclick = () => { UI.mineOnly = !UI.mineOnly; render(); };
+  if ($("#mine")) $("#mine").onclick = () => { UI.mineOnly = !UI.mineOnly; render(); };
   document.querySelectorAll("[data-size]").forEach(b => b.onclick = () => { const s = b.dataset.size; UI.sizes = UI.sizes.includes(s) ? UI.sizes.filter(x => x !== s) : [...UI.sizes, s]; render(); });
   if ($("#clearSizes")) $("#clearSizes").onclick = () => { UI.sizes = []; render(); };
   if ($("#more")) $("#more").onclick = () => { UI.limit += 48; const y = scrollY; render(); scrollTo(0, y); };
@@ -603,6 +636,7 @@ function wireAdmin(list){
   $("#sPoll").onchange = e => { S.settings.poll = Number(e.target.value); save(); schedulePoll(); toast("Reloading every " + e.target.value + " minutes."); };
   $("#mySizes").onclick = e => { const b = e.target.closest("[data-my]"); if (!b) return; const s = b.dataset.my, set = new Set(S.settings.sizes); set.has(s) ? set.delete(s) : set.add(s); S.settings.sizes = [...FR, ...KNIT].filter(x => set.has(x)); save(); render(); };
   $("#aRefresh").onclick = () => loadData(true);
+  $("#aLeave").onclick = () => { store.set("sp-unlock", ""); OWNER = false; location.hash = "#home"; render(); toast("Customer view. Open #admin to sign back in."); };
   $("#aRun").onclick = runStoreCheck;
   $("#aAdd").onclick = () => openEditor(null);
   if ($("#aRestore")) $("#aRestore").onclick = () => { S.del = {}; save(); render(); toast("Deleted dresses restored."); };
@@ -625,9 +659,9 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden && lo
 
 /* ---------- gate ---------- */
 async function sha(t){ const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(t)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2,"0")).join(""); }
-function unlock(){ $("#gate").classList.add("hidden"); render(); loadData(false); schedulePoll(); window._lastLoad = Date.now(); }
-$("#gateForm").onsubmit = async e => { e.preventDefault(); const h = await sha($("#pass").value); if (h === PASS_HASH){ store.set("sp-unlock", h); unlock(); } else { $("#gateErr").textContent = "That passcode doesn't match. Try again."; } };
-if (store.get("sp-unlock") === PASS_HASH) unlock(); else setTimeout(() => $("#pass").focus(), 50);
+function start(){ render(); loadData(false); schedulePoll(); window._lastLoad = Date.now(); }
+$("#gateForm").onsubmit = async e => { e.preventDefault(); const h = await sha($("#pass").value); if (h === PASS_HASH){ store.set("sp-unlock", h); OWNER = true; $("#pass").value = ""; render(); } else { $("#gateErr").textContent = "That passcode doesn't match. Try again."; } };
+start();
 })();
 </script>
 </body>
