@@ -51,6 +51,11 @@ section.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;backgroun
 aside.filters{position:sticky;top:120px;display:flex;flex-direction:column;gap:16px;max-height:calc(100vh - 140px);overflow:auto;padding-right:4px}
 .fgroup h3{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin:0 0 8px;font-weight:700}
 .fgroup select,.fgroup input[type=search]{width:100%;padding:9px 10px;border:1px solid var(--line);background:var(--card);border-radius:0}
+.searchrow{display:flex;gap:6px}
+.searchrow input[type=search]{flex:1;min-width:0}
+.searchrow input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
+.qclear{flex:none;padding:0 12px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer;font-weight:600;font-size:12.5px}
+.qclear[hidden]{display:none}
 .pills{display:flex;flex-wrap:wrap;gap:6px}
 .pills button{border:1px solid var(--line);background:var(--card);padding:5px 10px;font-size:12.5px;cursor:pointer;border-radius:999px}
 .pills button[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
@@ -147,7 +152,9 @@ footer h4{font-family:var(--display);font-size:20px;color:var(--ink);margin:0 0 
 
   <div class="layout">
     <aside class="filters" id="filters" aria-label="Filters">
-      <div class="fgroup"><h3><label for="q">Search store or brand</label></h3><input type="search" id="q" placeholder="e.g. NARS, Namshi, Nike"></div>
+      <div class="fgroup"><h3><label for="q">Search deals</label></h3>
+        <div class="searchrow"><input type="search" id="q" placeholder="Store, website, deal or code" autocomplete="off" spellcheck="false" aria-describedby="qhint"><button type="button" id="qclear" class="qclear" aria-label="Clear search" hidden>Clear</button></div>
+        <p class="small" id="qhint" style="margin:6px 0 0">Searches store names, websites, deal text and codes. All statuses are shown while searching.</p></div>
       <div class="fgroup"><h3>Region</h3><div class="pills" data-f="region">
         <button data-v="all" aria-pressed="true">Both</button><button data-v="us">United States</button><button data-v="sa">Saudi Arabia</button></div></div>
       <div class="fgroup"><h3>Category</h3><div class="pills" data-f="category">
@@ -209,7 +216,7 @@ const CAT={makeup:"Makeup & Beauty",skincare:"Skincare & Haircare",fashion:"Clot
 const REG={us:"United States",sa:"Saudi Arabia"};
 const VIEWS={home:"All deals",us:"US deals",sa:"Saudi Arabia deals",makeup:"Makeup & Beauty",skincare:"Skincare & Haircare",fashion:"Clothing & Fashion",new:"New deals",biggest:"Biggest discounts",expiring:"Expiring soon"};
 let stores=[], sources={}, status=null, config=null, runs=[];
-const F={region:"all",category:"all",kind:"all",status:new Set(["LIVE","NEW","UPCOMING"]),q:"",minD:0,ship:"all",sort:"disc"};
+const F={region:"all",category:"all",kind:"all",status:new Set(["LIVE","NEW","UPCOMING"]),q:"",qTerms:[],minD:0,ship:"all",sort:"disc"};
 let view="home";
 const $=id=>document.getElementById(id);
 
@@ -262,13 +269,15 @@ function passes(x){
   if(F.category!=="all"&&d.category!==F.category) return false;
   if(F.kind==="brand"&&d.kind!=="brand") return false;
   if(F.kind==="multi"&&d.kind==="brand") return false;
-  if(!["new","expiring","biggest"].includes(view) && !F.status.has(e.display)) return false;
+  if(!F.q && !["new","expiring","biggest"].includes(view) && !F.status.has(e.display)) return false;
   if(F.minD>0&&!((o.discount||0)>=F.minD)) return false;
   if(F.ship==="verified"&&!o.shippingVerified) return false;
   if(F.ship!=="all"&&F.ship!=="verified"&&o.shipping!==F.ship) return false;
-  if(F.q){const q=F.q.toLowerCase(); if(!(d.name.toLowerCase().includes(q)||(d.domain||"").includes(q)||(o.promo||"").toLowerCase().includes(q)||(o.note||"").toLowerCase().includes(q))) return false;}
+  if(F.q){const hay=fold([d.name,d.domain,d.url,r==="sa"?d.saUrl:"",o.salePage,o.promo,o.note,o.code].filter(Boolean).join(" \u0001 ")); if(!F.qTerms.every(t=>hay.includes(t))) return false;}
   return true;
 }
+// Lower-case and strip accents/diacritics so "lancome" matches "Lancôme" (also folds Arabic tashkeel).
+function fold(s){return String(s==null?"":s).normalize("NFKD").replace(/[̀-ًͯ-ٰٟ]/g,"").replace(/ß/g,"ss").replace(/[øØ]/g,"o").replace(/[łŁ]/g,"l").replace(/[đĐ]/g,"d").replace(/[æÆ]/g,"ae").replace(/[œŒ]/g,"oe").toLowerCase();}
 const ORDER={LIVE:0,NEW:0,UPCOMING:1,NOT_ANNOUNCED:2,VERIFYING:3,EXPIRED:4};
 function sorter(a,b){
   const s=view==="expiring"?"ending":F.sort;
@@ -321,8 +330,8 @@ function render(){
   $("recent").innerHTML=rec.length?rec.map(x=>{const h=x.o.history[x.o.history.length-1];return `<div class="chip"><b>${esc(x.d.name)} · ${x.r==="us"?"US":"KSA"}</b><span>${esc(h.event)}${h.detail?": "+esc(h.detail):""} · ${esc(ago(h.at))}</span></div>`}).join(""):`<div class="chip"><b>Initial research</b><span>${stores.length} stores added ${status&&status.seededAt?esc(ago(status.seededAt)):""} · monitoring updates will appear here</span></div>`;
   const list=all.filter(passes).sort(sorter);
   $("viewTitle").textContent=VIEWS[view];
-  $("count").textContent=`${list.length} of ${all.length} store listings`;
-  $("grid").innerHTML=list.length?list.map(card).join(""):`<div class="empty">Nothing matches these filters. Try including more statuses or lowering the minimum discount.</div>`;
+  $("count").textContent=`${list.length} of ${all.length} store listings`+(F.q?` matching “${F.q}” · all statuses shown while searching`:"");
+  $("grid").innerHTML=list.length?list.map(card).join(""):(F.q?`<div class="empty">No store, website, deal or code matches “${esc(F.q)}”. Check the spelling or clear the search.</div>`:`<div class="empty">Nothing matches these filters. Try including more statuses or lowering the minimum discount.</div>`);
   document.querySelectorAll("#nav a").forEach(a=>a.setAttribute("aria-current",a.getAttribute("href")==="#"+view?"page":"false"));
 }
 function renderMonitor(){
@@ -344,14 +353,17 @@ document.querySelectorAll(".pills").forEach(g=>{
     else { g.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b)); F[f]=b.dataset.v; }
     render();});
 });
-$("q").addEventListener("input",e=>{F.q=e.target.value.trim();render();});
+function setQuery(v){F.q=v.trim();F.qTerms=fold(F.q).split(/\s+/).filter(Boolean);$("qclear").hidden=!v;render();}
+$("q").addEventListener("input",e=>setQuery(e.target.value));
+$("q").addEventListener("keydown",e=>{if(e.key==="Escape"&&e.target.value){e.preventDefault();e.target.value="";setQuery("");}});
+$("qclear").addEventListener("click",()=>{$("q").value="";setQuery("");$("q").focus();});
 $("minD").addEventListener("input",e=>{F.minD=+e.target.value;$("minDv").textContent=F.minD;render();});
 $("ship").addEventListener("change",e=>{F.ship=e.target.value;render();});
 $("sort").addEventListener("change",e=>{F.sort=e.target.value;render();});
 $("ftoggle").addEventListener("click",()=>{const f=$("filters");const o=f.classList.toggle("open");$("ftoggle").setAttribute("aria-expanded",o);});
 $("reset").addEventListener("click",()=>{Object.assign(F,{region:"all",category:"all",kind:"all",q:"",minD:0,ship:"all"});F.status=new Set(["LIVE","NEW","UPCOMING"]);
   document.querySelectorAll(".pills").forEach(g=>g.querySelectorAll("button").forEach(b=>b.setAttribute("aria-pressed", g.dataset.multi?F.status.has(b.dataset.v):(b.dataset.v==="all"))));
-  $("q").value="";$("minD").value=0;$("minDv").textContent=0;$("ship").value="all";render();});
+  F.qTerms=[];$("qclear").hidden=true;$("q").value="";$("minD").value=0;$("minDv").textContent=0;$("ship").value="all";render();});
 $("grid").addEventListener("click",async ev=>{const b=ev.target.closest("[data-copy]"); if(!b) return; try{await navigator.clipboard.writeText(b.dataset.copy);b.textContent="Copied";}catch(e){b.textContent="Select it";} setTimeout(()=>b.textContent="Copy",1500);});
 
 route();
