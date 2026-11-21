@@ -51,8 +51,9 @@ section.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;backgroun
 aside.filters{position:sticky;top:120px;display:flex;flex-direction:column;gap:16px;max-height:calc(100vh - 140px);overflow:auto;padding-right:4px}
 .fgroup h3{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin:0 0 8px;font-weight:700}
 .fgroup select,.fgroup input[type=search]{width:100%;padding:9px 10px;border:1px solid var(--line);background:var(--card);border-radius:0}
+.searchbar{margin-bottom:18px}
 .searchrow{display:flex;gap:6px}
-.searchrow input[type=search]{flex:1;min-width:0}
+.searchrow input[type=search]{flex:1;min-width:0;padding:11px 12px;border:1px solid var(--line);background:var(--card);border-radius:0;font-size:16px}
 .searchrow input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;display:none}
 .qclear{flex:none;padding:0 12px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer;font-weight:600;font-size:12.5px}
 .qclear[hidden]{display:none}
@@ -152,9 +153,6 @@ footer h4{font-family:var(--display);font-size:20px;color:var(--ink);margin:0 0 
 
   <div class="layout">
     <aside class="filters" id="filters" aria-label="Filters">
-      <div class="fgroup"><h3><label for="q">Search deals</label></h3>
-        <div class="searchrow"><input type="search" id="q" placeholder="Store, website, deal or code" autocomplete="off" spellcheck="false" aria-describedby="qhint"><button type="button" id="qclear" class="qclear" aria-label="Clear search" hidden>Clear</button></div>
-        <p class="small" id="qhint" style="margin:6px 0 0">Searches store names, websites, deal text and codes. All statuses are shown while searching.</p></div>
       <div class="fgroup"><h3>Region</h3><div class="pills" data-f="region">
         <button data-v="all" aria-pressed="true">Both</button><button data-v="us">United States</button><button data-v="sa">Saudi Arabia</button></div></div>
       <div class="fgroup"><h3>Category</h3><div class="pills" data-f="category">
@@ -173,7 +171,12 @@ footer h4{font-family:var(--display);font-size:20px;color:var(--ink);margin:0 0 
       <button class="muted-btn fbtn" style="display:block" id="reset">Reset filters</button>
     </aside>
 
-    <section aria-live="polite">
+    <section>
+      <div class="searchbar" role="search">
+        <label for="q" class="small" style="display:block;margin-bottom:6px;font-weight:700;letter-spacing:.06em;text-transform:uppercase">Search deals</label>
+        <div class="searchrow"><input type="search" id="q" placeholder="Store, website, deal or code" autocomplete="off" spellcheck="false" aria-describedby="qhint"><button type="button" id="qclear" class="qclear" aria-label="Clear search" hidden>Clear</button></div>
+        <p class="small" id="qhint" style="margin:6px 0 0">Searches store names, websites, deal text and codes. All statuses are shown while searching.</p>
+      </div>
       <div class="toolbar">
         <h2 id="viewTitle">All deals</h2>
         <div class="right">
@@ -186,7 +189,7 @@ footer h4{font-family:var(--display);font-size:20px;color:var(--ink);margin:0 0 
         </div>
       </div>
       <div id="notice"></div>
-      <div class="small" id="count" style="margin-bottom:10px"></div>
+      <div class="small" id="count" style="margin-bottom:10px" aria-live="polite"></div>
       <div class="grid" id="grid"></div>
     </section>
   </div>
