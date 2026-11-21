@@ -240,6 +240,8 @@ let S = Object.assign(defaults(), JSON.parse(store.get(LS) || "{}"));
 S.settings = Object.assign(defaults().settings, S.settings || {});
 let OWNER = store.get("sp-unlock") === PASS_HASH;
 let REMOTE = null;
+let SHOWCOSTS = false;
+const COSTS = () => OWNER && SHOWCOSTS;
 const C = () => OWNER ? S : (REMOTE || defaults());
 let GH = JSON.parse(store.get("sp-gh") || '{"token":"","sync":false}');
 let UI = { q:"", sort:"new", avail:"all", sizes:[], mineOnly:false, limit:48 };
@@ -248,7 +250,7 @@ let UI = { q:"", sort:"new", avail:"all", sizes:[], mineOnly:false, limit:48 };
 const rate = () => Number(C().settings && C().settings.rate) || Number(DATA.meta.rate && DATA.meta.rate.value) || 0;
 const extra = () => { const v = C().settings && C().settings.extra; return v !== undefined && v !== null && Number.isFinite(Number(v)) ? Number(v) : 450; };
 const wasSAR = p => Math.round(p.compare * rate() + extra());
-const offShown = p => OWNER ? pct(p) : (wasSAR(p) > finalSAR(p) ? Math.round((1 - finalSAR(p) / wasSAR(p)) * 100) : 0);
+const offShown = p => COSTS() ? pct(p) : (wasSAR(p) > finalSAR(p) ? Math.round((1 - finalSAR(p) / wasSAR(p)) * 100) : 0);
 const finalSAR = p => Math.round(p.price * rate() + extra());
 const pct = p => p.compare > p.price ? Math.round((1 - p.price / p.compare) * 100) : 0;
 const isAvail = p => (p.sizes || []).some(s => s.a);
@@ -341,7 +343,7 @@ function sizesHTML(p){
 }
 
 function card(p, admin){
-  if (!OWNER) return shopCard(p);
+  if (!COSTS()) return shopCard(p);
   const fav = !!S.fav[p.handle], note = S.notes[p.handle], out = !isAvail(p);
   const isNew = DATA.meta.initialImport && p.firstSeen > DATA.meta.initialImport;
   const chg = (p.changes || []).filter(c => c !== "Newly discovered on sale").slice(0, 2).join("; ");
@@ -378,6 +380,7 @@ function shopCard(p){
     <p class="sar">${fmt(finalSAR(p))}<small>SAR</small></p>
     ${off ? `<p class="eur"><s>${fmt(wasSAR(p))} SAR</s></p>` : ""}
     ${sizesHTML(p)}
+    ${OWNER ? `<div class="acts"><button data-edit="${esc(p.handle)}">Edit</button></div>` : ""}
   </article>`;
 }
 
@@ -385,14 +388,17 @@ function statusBar(){
   const m = DATA.meta, el = $("#status");
   if (!loaded){ el.innerHTML = "Loading the collection…"; return; }
   const stale = m.lastSuccess && (Date.now() - new Date(m.lastSuccess)) > 3 * 3600e3;
-  if (!OWNER){
-    el.innerHTML = `<span>Prices and sizes updated ${ago(m.lastSuccess)} · ${when(m.lastSuccess)}</span>${stale || m.lastError ? '<span class="warn">Availability may have changed — confirm your size before ordering</span>' : ""}<button id="refreshNow">Refresh</button>`;
-    $("#refreshNow").onclick = () => loadData(true); return;
+  if (!COSTS()){
+    el.innerHTML = `<span>Prices and sizes updated ${ago(m.lastSuccess)} · ${when(m.lastSuccess)}</span>${stale || m.lastError ? '<span class="warn">Availability may have changed — confirm your size before ordering</span>' : ""}<button id="refreshNow">Refresh</button>${OWNER ? '<button id="costTgl">Show my costs</button>' : ""}`;
+    $("#refreshNow").onclick = () => loadData(true);
+    if ($("#costTgl")) $("#costTgl").onclick = () => { SHOWCOSTS = true; render(); toast("Showing your € costs. Only you can see this."); };
+    return;
   }
   el.innerHTML = `<span>Last successful update: ${when(m.lastSuccess)}</span>
     <span>EUR/SAR ${rate().toFixed(3)}${S.settings.rate ? " (your manual rate)" : ""}</span>
     ${m.lastError ? `<span class="warn">Latest check couldn't reach the store — prices shown are from ${ago(m.lastSuccess)}</span>` : stale ? `<span class="warn">Not verified for ${ago(m.lastSuccess).replace(" ago","")} — check the store before buying</span>` : ""}
-    <button id="refreshNow">Refresh now</button>`;
+    <button id="refreshNow">Refresh now</button><button id="costTgl">Hide my costs</button>`;
+  $("#costTgl").onclick = () => { SHOWCOSTS = false; render(); };
   $("#refreshNow").onclick = () => { loadData(true); if (GH.token) runStoreCheck(); };
 }
 
@@ -426,7 +432,7 @@ function viewHome(list){
       <div>
         <h1>Black Friday Edit</h1>
         <p class="sub">The Midi Dress Sale Collection</p>
-        <p class="lede">${OWNER ? `Every discounted midi dress from Self-Portrait Spain, priced in riyals with your ${fmt(extra())} SAR added to each dress, and re-checked against the store every 30 minutes.` : "Every Self-Portrait midi dress in the sale, priced in Saudi riyals. Sizes and prices are refreshed every 30 minutes."}</p>
+        <p class="lede">${COSTS() ? `Every discounted midi dress from Self-Portrait Spain, priced in riyals with your ${fmt(extra())} SAR added to each dress, and re-checked against the store every 30 minutes.` : "Every Self-Portrait midi dress in the sale, priced in Saudi riyals. Sizes and prices are refreshed every 30 minutes."}</p>
         <div class="facts">
           <div><strong>${avail.length}</strong><small>dresses available now</small></div>
           <div><strong>${cheapest ? fmt(cheapest) : "—"}</strong><small>lowest final price, SAR</small></div>
@@ -443,7 +449,7 @@ function viewHome(list){
 function viewAll(list){
   const all = filtered(list), shown = all.slice(0, UI.limit);
   const sizeBtns = [...FR, ...KNIT].map(s => `<button data-size="${s}" aria-pressed="${UI.sizes.includes(s)}">${s.replace("FR ","")}</button>`).join("");
-  return `<div class="section-head"><h2>All sale dresses</h2><p>${OWNER ? `Discounted midi dresses on Self-Portrait Spain. Prices include the EUR/SAR conversion and ${fmt(extra())} SAR per dress.` : "All prices in Saudi riyals. Tap the heart to save dresses you love."}</p></div>
+  return `<div class="section-head"><h2>All sale dresses</h2><p>${COSTS() ? `Discounted midi dresses on Self-Portrait Spain. Prices include the EUR/SAR conversion and ${fmt(extra())} SAR per dress.` : "All prices in Saudi riyals. Tap the heart to save dresses you love."}</p></div>
     <div class="toolbar" id="toolbar">
       <label class="search"><input id="q" type="search" placeholder="Search by name — lace, boucle, rhinestone…" value="${esc(UI.q)}" aria-label="Search dresses"></label>
       <select id="sort" aria-label="Sort">
@@ -465,10 +471,10 @@ function viewFav(list){
   const mine = S.settings.sizes;
   const total = favs.reduce((t,p) => t + finalSAR(p), 0);
   return `<div class="section-head"><h2>My favorites</h2><p>${favs.length} saved · together ${fmt(total)} SAR</p></div>
-    <div class="table-wrap"><table class="compare"><thead><tr><th></th><th>Dress</th><th>Final price</th>${OWNER ? "<th>Sale €</th>" : ""}<th>Off</th><th>${mine.length ? "My sizes" : "Sizes in stock"}</th></tr></thead><tbody>
+    <div class="table-wrap"><table class="compare"><thead><tr><th></th><th>Dress</th><th>Final price</th>${COSTS() ? "<th>Sale €</th>" : ""}<th>Off</th><th>${mine.length ? "My sizes" : "Sizes in stock"}</th></tr></thead><tbody>
     ${favs.map((p,i) => { const inStock = (p.sizes||[]).filter(s => s.a).map(s => s.s);
       const sz = mine.length ? mine.map(s => inStock.includes(s) ? s.replace("FR ","FR ") : `<s style="color:#bdb6ae">${s}</s>`).join(", ") : (inStock.join(", ") || "Sold out");
-      return `<tr class="${i === 0 ? "best" : ""}"><td><img src="${esc(img(p.image,120))}" alt=""></td><td>${OWNER ? `<a href="${esc(url(p))}" target="_blank" rel="noopener">${esc(p.title)}</a>` : esc(p.title)}</td><td class="num">${fmt(finalSAR(p))} SAR</td>${OWNER ? `<td>${eur(p.price)}</td>` : ""}<td>${offShown(p)}%</td><td>${sz}</td></tr>`; }).join("")}
+      return `<tr class="${i === 0 ? "best" : ""}"><td><img src="${esc(img(p.image,120))}" alt=""></td><td>${COSTS() ? `<a href="${esc(url(p))}" target="_blank" rel="noopener">${esc(p.title)}</a>` : esc(p.title)}</td><td class="num">${fmt(finalSAR(p))} SAR</td>${COSTS() ? `<td>${eur(p.price)}</td>` : ""}<td>${offShown(p)}%</td><td>${sz}</td></tr>`; }).join("")}
     </tbody></table></div>
     <div class="grid" style="margin-top:30px">${favs.map(p => card(p)).join("")}</div>`;
 }
