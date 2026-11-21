@@ -1,0 +1,34 @@
+name: Self-Portrait sale check
+
+on:
+  schedule:
+    - cron: "7,37 * * * *"   # every 30 minutes
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: self-portrait-update
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Read the Spain store and the EUR/SAR rate
+        run: python3 tools/sp_update.py
+      - name: Publish new data
+        run: |
+          git config user.name "self-portrait-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add self-portrait/data.json
+          if git diff --cached --quiet; then echo "No changes"; exit 0; fi
+          git commit -m "Self-Portrait sale check $(date -u +%Y-%m-%dT%H:%MZ)"
+          for i in 1 2 3; do git pull --rebase -X theirs origin main && git push && exit 0; sleep 5; done
+          exit 1

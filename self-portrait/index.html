@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>SELF-PORTRAIT | BLACK FRIDAY EDIT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ffffff; --ivory:#f6f3ee; --ink:#000; --stone:#77716b; --rule:#e5e0d9; --sale:#9b1c1c; --mine:#efe6dc;
+  --serif:"Bodoni Moda",Didot,"Times New Roman",serif; --sans:"Jost","Helvetica Neue",Arial,sans-serif;
+  --pad:clamp(16px,4vw,48px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font:300 15px/1.55 var(--sans);letter-spacing:.01em;padding-bottom:env(safe-area-inset-bottom)}
+a{color:inherit}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0}
+:focus-visible{outline:1px solid var(--ink);outline-offset:3px}
+img{display:block;max-width:100%}
+.hidden{display:none!important}
+
+/* header */
+header.top{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.96);backdrop-filter:blur(6px);border-bottom:1px solid var(--rule);padding-top:env(safe-area-inset-top)}
+.brand{display:flex;flex-direction:column;align-items:center;padding:18px var(--pad) 10px;text-decoration:none}
+.brand b{font:400 clamp(19px,3.2vw,26px)/1 var(--serif);letter-spacing:.22em;text-transform:uppercase}
+.brand span{font:300 12px/1 var(--sans);letter-spacing:.18em;color:var(--stone);margin-top:8px;text-transform:uppercase}
+nav.tabs{display:flex;justify-content:safe center;gap:clamp(14px,3vw,36px);padding:4px var(--pad) 12px;overflow-x:auto;scrollbar-width:none;white-space:nowrap}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs a{text-decoration:none;font-size:13px;letter-spacing:.08em;padding:6px 0;border-bottom:1px solid transparent;color:var(--stone)}
+nav.tabs a[aria-current="page"]{color:var(--ink);border-color:var(--ink)}
+nav.tabs .count{font-size:11px;margin-left:3px}
+
+.status{display:flex;justify-content:center;flex-wrap:wrap;gap:6px 18px;font-size:12px;color:var(--stone);padding:9px var(--pad);background:var(--ivory);text-align:center}
+.status .warn{color:var(--sale)}
+.status button{text-decoration:underline;text-underline-offset:3px;font-size:12px;color:var(--ink)}
+
+main{padding:0 var(--pad) 80px;max-width:1500px;margin:0 auto}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.05fr 1fr;gap:clamp(18px,4vw,64px);align-items:center;padding:clamp(28px,5vw,64px) 0;border-bottom:1px solid var(--rule)}
+.hero h1{font:400 clamp(38px,6.4vw,92px)/.98 var(--serif);letter-spacing:-.01em}
+.hero .sub{font:italic 400 clamp(18px,2vw,26px)/1.3 var(--serif);margin-top:18px}
+.hero p.lede{max-width:46ch;margin-top:22px;color:#3d3a37}
+.hero .facts{display:flex;gap:36px;margin-top:30px;flex-wrap:wrap}
+.hero .facts div{border-top:1px solid var(--ink);padding-top:10px;min-width:130px}
+.hero .facts strong{display:block;font:400 34px/1 var(--serif)}
+.hero .facts small{font-size:12.5px;color:var(--stone)}
+.cta{display:inline-block;margin-top:32px;background:var(--ink);color:#fff;text-decoration:none;padding:14px 30px;font-size:13px;letter-spacing:.12em;text-transform:uppercase;transition:background .2s}
+.cta:hover{background:#333}
+.triptych{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;align-items:end}
+.triptych a{display:block;background:var(--ivory);aspect-ratio:2/3;overflow:hidden}
+.triptych a:nth-child(2){aspect-ratio:2/3.6}
+.triptych img{width:100%;height:100%;object-fit:cover}
+
+.section-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:42px 0 20px;flex-wrap:wrap}
+.section-head h2{font:400 clamp(26px,3.2vw,40px)/1.1 var(--serif)}
+.section-head p{color:var(--stone);font-size:13.5px;max-width:60ch}
+.section-head a{font-size:13px;text-underline-offset:4px}
+
+/* toolbar */
+.toolbar{position:sticky;top:var(--hh,108px);z-index:10;background:#fff;border-bottom:1px solid var(--rule);padding:12px 0;display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center}
+.search{flex:1 1 220px;display:flex;align-items:center;border-bottom:1px solid var(--ink);padding:4px 0}
+.search input{border:0;outline:0;width:100%;background:transparent;font-size:15px;padding:4px 2px}
+.toolbar select{border:1px solid var(--rule);background:#fff;padding:8px 10px;font-size:13.5px;border-radius:0}
+.toolbar .tbtn{border:1px solid var(--rule);padding:8px 12px;font-size:13.5px}
+.toolbar .tbtn[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:#fff}
+.sizebar{display:flex;flex-wrap:wrap;gap:6px;width:100%;align-items:center;font-size:12.5px;color:var(--stone)}
+.sizebar button{border:1px solid var(--rule);min-width:38px;padding:5px 8px;font-size:12.5px;color:var(--ink)}
+.sizebar button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.result-line{font-size:13px;color:var(--stone);padding:14px 0 4px}
+
+/* grid + card */
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:44px 22px;padding-top:18px}
+.card{position:relative;display:flex;flex-direction:column}
+.card .ph{position:relative;display:block;aspect-ratio:2/3;background:var(--ivory);overflow:hidden}
+.card .ph img{width:100%;height:100%;object-fit:cover;transition:transform .9s cubic-bezier(.2,.6,.2,1)}
+.card .ph:hover img{transform:scale(1.035)}
+.card.out .ph img{opacity:.45;filter:grayscale(.6)}
+.badge{position:absolute;left:0;top:12px;background:#fff;color:var(--sale);font-size:12px;font-weight:500;padding:4px 9px}
+.flag{position:absolute;left:0;bottom:12px;background:var(--ink);color:#fff;font-size:11.5px;padding:4px 9px;letter-spacing:.06em}
+.heart{position:absolute;right:8px;top:8px;width:38px;height:38px;display:grid;place-items:center;background:rgba(255,255,255,.92);border-radius:50%}
+.heart svg{width:18px;height:18px;fill:none;stroke:var(--ink);stroke-width:1.3;transition:transform .2s}
+.heart[aria-pressed="true"] svg{fill:var(--ink)}
+.heart:active svg{transform:scale(.85)}
+.card h3{font:400 15.5px/1.35 var(--sans);margin-top:14px;letter-spacing:.01em}
+.eur{font-size:13.5px;color:var(--stone);margin-top:3px}
+.eur s{margin-right:6px}
+.eur .now{color:var(--ink)}
+.eur .pct{color:var(--sale);margin-left:6px}
+.sar{font:400 27px/1.1 var(--serif);margin-top:10px}
+.sar small{font:300 12px var(--sans);letter-spacing:.1em;margin-left:5px;color:var(--stone)}
+.calc{font-size:11.5px;color:var(--stone);margin-top:3px}
+.sizes{list-style:none;display:flex;flex-wrap:wrap;margin-top:12px;font-size:12.5px;row-gap:4px}
+.sizes li{padding:0 7px;border-left:1px solid var(--rule);line-height:1.2}
+.sizes li:first-child{padding-left:0;border-left:0}
+.sizes li.off{color:#bdb6ae;text-decoration:line-through}
+.sizes li.mine{font-weight:500}
+.sizes li.mine.on{background:var(--mine);padding:1px 7px}
+.sizes .sys{color:var(--stone);margin-right:2px}
+.note{margin-top:10px;font:italic 400 13.5px/1.4 var(--serif);color:#3d3a37;border-left:1px solid var(--ink);padding-left:9px}
+.change{margin-top:8px;font-size:11.5px;color:var(--stone)}
+.acts{display:flex;gap:16px;margin-top:12px;font-size:12.5px;align-items:center}
+.acts a{text-underline-offset:3px}
+.acts button{text-decoration:underline;text-underline-offset:3px;color:var(--stone);font-size:12.5px}
+.empty{padding:70px 0;text-align:center;color:var(--stone)}
+.empty h3{font:400 26px var(--serif);color:var(--ink);margin-bottom:10px}
+.more{display:block;margin:46px auto 0;border:1px solid var(--ink);padding:13px 34px;font-size:13px;letter-spacing:.1em;text-transform:uppercase}
+
+/* compare */
+.compare{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:8px}
+.compare th{font-weight:400;color:var(--stone);text-align:left;padding:10px 8px;border-bottom:1px solid var(--ink)}
+.compare td{padding:12px 8px;border-bottom:1px solid var(--rule);vertical-align:middle}
+.compare td.num{font:400 18px var(--serif);white-space:nowrap}
+.compare tr.best td.num::after{content:" lowest";font:300 11px var(--sans);color:var(--sale)}
+.compare img{width:44px;height:66px;object-fit:cover;background:var(--ivory)}
+.table-wrap{overflow-x:auto}
+
+/* admin */
+.panel{border-top:1px solid var(--ink);padding:26px 0 34px;display:grid;grid-template-columns:260px 1fr;gap:28px}
+.panel h3{font:400 22px/1.2 var(--serif)}
+.panel .why{font-size:13px;color:var(--stone);margin-top:8px}
+.fields{display:grid;gap:16px;max-width:640px}
+label.f{display:grid;gap:5px;font-size:13px;color:var(--stone)}
+label.f input,label.f textarea,label.f select{border:1px solid var(--rule);padding:10px 11px;font-size:15px;color:var(--ink);background:#fff;border-radius:0;width:100%}
+label.f textarea{min-height:90px;resize:vertical}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.btn{border:1px solid var(--ink);padding:10px 18px;font-size:13px;letter-spacing:.06em}
+.btn.solid{background:var(--ink);color:#fff}
+.btn.quiet{border-color:var(--rule)}
+.btn.danger{border-color:var(--sale);color:var(--sale)}
+.small{font-size:12.5px;color:var(--stone)}
+.mono-list{font-size:13px;display:grid;gap:6px;max-height:340px;overflow:auto;border:1px solid var(--rule);padding:10px}
+.mono-list div{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--rule);padding-bottom:6px}
+.edit-list{display:grid;gap:0;max-height:520px;overflow:auto;border:1px solid var(--rule)}
+.edit-list button{display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:center;text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);font-size:13.5px}
+.edit-list button:hover{background:var(--ivory)}
+.edit-list img{width:40px;height:60px;object-fit:cover;background:var(--ivory)}
+.tag{font-size:11px;color:var(--stone)}
+
+/* dialog */
+dialog{border:0;padding:0;width:min(620px,94vw);max-height:92vh;background:#fff;color:var(--ink)}
+dialog::backdrop{background:rgba(0,0,0,.35)}
+.dlg{padding:26px clamp(18px,4vw,32px)}
+.dlg h3{font:400 26px var(--serif);margin-bottom:18px}
+.size-edit{display:flex;flex-wrap:wrap;gap:6px}
+.size-edit button{border:1px solid var(--ink);padding:6px 10px;font-size:13px}
+.size-edit button.off{border-color:var(--rule);color:#bdb6ae;text-decoration:line-through}
+.dlg .foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:22px;border-top:1px solid var(--rule);padding-top:16px}
+
+/* gate */
+#gate{position:fixed;inset:0;z-index:100;background:var(--ivory);display:grid;place-items:center;padding:24px}
+#gate form{width:min(380px,100%);text-align:center}
+#gate b{font:400 24px/1.2 var(--serif);letter-spacing:.22em;display:block}
+#gate p{color:var(--stone);font-size:13.5px;margin:12px 0 26px}
+#gate input{width:100%;border:0;border-bottom:1px solid var(--ink);background:transparent;padding:10px 4px;font-size:16px;text-align:center;outline:0}
+#gate .err{color:var(--sale);font-size:13px;min-height:20px;margin-top:10px}
+
+#toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:var(--ink);color:#fff;padding:12px 20px;font-size:13.5px;opacity:0;pointer-events:none;transition:.3s;z-index:60;max-width:92vw;text-align:center}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+footer{border-top:1px solid var(--rule);padding:26px var(--pad) 40px;font-size:12px;color:var(--stone);text-align:center;line-height:1.7}
+
+@media (max-width:1100px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:820px){
+  .hero{grid-template-columns:1fr}
+  .triptych{order:-1}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:34px 12px}
+  .sar{font-size:22px}
+  .card h3{font-size:14px}
+  .panel{grid-template-columns:1fr;gap:14px}
+  .toolbar{position:static}
+  .brand b{letter-spacing:.12em;font-size:17px;text-align:center}
+  .brand span{font-size:10.5px}
+  nav.tabs{justify-content:flex-start}
+  .hero .facts{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .hero .facts div{min-width:0}
+  .hero .facts strong{font-size:24px}
+  .hero .facts small{font-size:11.5px;display:block;line-height:1.35}
+  .cta{display:block;text-align:center}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <form id="gateForm" autocomplete="off">
+    <b>SELF-PORTRAIT</b>
+    <p>Your private Black Friday edit. Enter your passcode.</p>
+    <input id="pass" type="password" aria-label="Passcode" placeholder="Passcode" autocomplete="current-password">
+    <div class="err" id="gateErr"></div>
+    <button class="cta" type="submit">Enter</button>
+  </form>
+</div>
+
+<header class="top" id="top">
+  <a class="brand" href="#home"><b>Self-Portrait | Black Friday Edit</b><span>The Midi Dress Sale Collection</span></a>
+  <nav class="tabs" aria-label="Sections">
+    <a href="#home">Home</a>
+    <a href="#all">All sale dresses<span class="count" id="cAll"></span></a>
+    <a href="#favorites">My favorites<span class="count" id="cFav"></span></a>
+    <a href="#recent">Recently added<span class="count" id="cNew"></span></a>
+    <a href="#admin">Admin</a>
+  </nav>
+  <div class="status" id="status"></div>
+</header>
+
+<main id="view" aria-live="polite"></main>
+
+<footer>
+  Private tracker for personal use. Product data, photos and prices come from the official Self-Portrait Spain store (eu.self-portrait.com/es-es) and link back to it.
+  Not affiliated with Self-Portrait. Final SAR prices are estimates: discounted € price × EUR/SAR rate + your fixed amount per dress.
+</footer>
+
+<dialog id="dlg"><div class="dlg" id="dlgBody"></div></dialog>
+<div id="toast" role="status"></div>
+
+<script>
+(() => {
+"use strict";
+const PASS_HASH = "3c29f0bb09f7f11433b993fb3a8d945503758c57eacb6ecfe88c49e1ef74e0ba";
+const REPO = "ranaa4117/black-friday-deals";
+const WORKFLOW = "self-portrait-update.yml";
+const LS = "sp-edit-v1";
+const FR = ["FR 32","FR 34","FR 36","FR 38","FR 40","FR 42","FR 44","FR 46"], KNIT = ["XS","S","M","L","XL"];
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
+
+let DATA = { meta:{}, products:[], removed:[] };
+let loaded = false, pollTimer = null, syncTimer = null;
+const defaults = () => ({ fav:{}, notes:{}, ov:{}, manual:[], del:{}, settings:{ extra:450, rate:null, sizes:[], poll:10 }, updatedAt:0 });
+let S = Object.assign(defaults(), JSON.parse(store.get(LS) || "{}"));
+S.settings = Object.assign(defaults().settings, S.settings || {});
+let GH = JSON.parse(store.get("sp-gh") || '{"token":"","sync":false}');
+let UI = { q:"", sort:"new", avail:"all", sizes:[], mineOnly:false, limit:48 };
+
+/* ---------- helpers ---------- */
+const rate = () => Number(S.settings.rate) || Number(DATA.meta.rate && DATA.meta.rate.value) || 0;
+const extra = () => Number.isFinite(Number(S.settings.extra)) ? Number(S.settings.extra) : 450;
+const finalSAR = p => Math.round(p.price * rate() + extra());
+const pct = p => p.compare > p.price ? Math.round((1 - p.price / p.compare) * 100) : 0;
+const isAvail = p => (p.sizes || []).some(s => s.a);
+const fmt = n => Number(n).toLocaleString("en-US");
+const eur = n => "€" + (Math.round(n * 100) / 100).toLocaleString("en-US");
+const when = iso => iso ? new Date(iso).toLocaleString("en-GB", { timeZone:"Asia/Riyadh", day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" }) + " (Riyadh)" : "—";
+const ago = iso => { if (!iso) return ""; const m = Math.round((Date.now() - new Date(iso)) / 60000); return m < 1 ? "just now" : m < 60 ? m + " min ago" : m < 1440 ? Math.round(m/60) + " h ago" : Math.round(m/1440) + " days ago"; };
+const img = (src, w) => !src ? "" : /cdn\.shopify\.com|self-portrait\.com\/cdn/.test(src) ? src + (src.includes("?") ? "&" : "?") + "width=" + w : src;
+const url = p => p.url || ("https://eu.self-portrait.com/es-es/products/" + p.handle);
+function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 3200); }
+
+function save(){
+  S.updatedAt = Date.now();
+  store.set(LS, JSON.stringify(S));
+  if (GH.token && GH.sync){ clearTimeout(syncTimer); syncTimer = setTimeout(pushSync, 2500); }
+}
+
+function products(){
+  const merge = p => { const o = S.ov[p.handle]; return o ? Object.assign({}, p, o, { edited:true }) : p; };
+  return DATA.products.filter(p => !S.del[p.handle]).map(merge)
+    .concat(S.manual.filter(p => !S.del[p.handle]).map(p => merge(Object.assign({ manual:true }, p))));
+}
+
+/* ---------- data ---------- */
+async function loadData(manual){
+  try {
+    const r = await fetch("data.json?t=" + Date.now(), { cache:"no-store" });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    DATA = await r.json(); loaded = true;
+    await pullSync();
+    if (manual) toast("Refreshed. Last store check " + ago(DATA.meta.lastCheck) + ".");
+  } catch (e) {
+    if (manual || !loaded) toast("Couldn't load the latest data (" + e.message + "). Check your connection and try again.");
+  }
+  render();
+}
+
+async function pullSync(){
+  try {
+    const r = await fetch("personal.json?t=" + Date.now(), { cache:"no-store" });
+    if (!r.ok) return;
+    const remote = await r.json();
+    if (remote && remote.updatedAt > (S.updatedAt || 0)){
+      const keep = S.settings;
+      S = Object.assign(defaults(), remote); S.settings = Object.assign(defaults().settings, remote.settings || keep);
+      store.set(LS, JSON.stringify(S));
+    }
+  } catch {}
+}
+
+async function gh(path, opts = {}){
+  const r = await fetch("https://api.github.com/repos/" + REPO + path, Object.assign({}, opts, {
+    headers: Object.assign({ "Authorization":"Bearer " + GH.token, "Accept":"application/vnd.github+json" }, opts.headers || {}) }));
+  if (!r.ok && r.status !== 404) throw new Error("GitHub said " + r.status + (r.status === 401 ? " (token not accepted)" : r.status === 403 ? " (token lacks permission)" : ""));
+  return r;
+}
+async function pushSync(){
+  try {
+    const cur = await gh("/contents/self-portrait/personal.json");
+    const sha = cur.status === 200 ? (await cur.json()).sha : undefined;
+    const body = btoa(unescape(encodeURIComponent(JSON.stringify(S))));
+    await gh("/contents/self-portrait/personal.json", { method:"PUT", body: JSON.stringify({ message:"Update personal edits", content: body, sha }) });
+    toast("Saved and synced to your other devices.");
+  } catch (e) { toast("Saved on this device. Sync failed: " + e.message); }
+}
+async function runStoreCheck(){
+  if (!GH.token){ toast("Add a GitHub token in Admin › Sync to run a store check from here."); location.hash = "#admin"; return; }
+  try {
+    const r = await gh("/actions/workflows/" + WORKFLOW + "/dispatches", { method:"POST", body: JSON.stringify({ ref:"main" }) });
+    if (r.status === 404) throw new Error("workflow not found");
+    toast("Store check started. New data usually appears within 2–4 minutes.");
+    const before = DATA.meta.lastCheck; let n = 0;
+    const iv = setInterval(async () => { n++; await loadData(false); if (DATA.meta.lastCheck !== before || n > 12){ clearInterval(iv); if (DATA.meta.lastCheck !== before) toast("Store check finished " + ago(DATA.meta.lastCheck) + "."); } }, 30000);
+  } catch (e) { toast("Couldn't start the store check: " + e.message); }
+}
+function schedulePoll(){ clearInterval(pollTimer); const m = Math.max(2, Number(S.settings.poll) || 10); pollTimer = setInterval(() => loadData(false), m * 60000); }
+
+/* ---------- rendering ---------- */
+const heartSVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.3-9.2C1.4 8 3.5 4.5 7 4.5c2.1 0 3.6 1.2 5 3 1.4-1.8 2.9-3 5-3 3.5 0 5.6 3.5 4.3 6.8-1.8 4.6-9.3 9.2-9.3 9.2z"/></svg>';
+
+function sizesHTML(p){
+  const mine = new Set(S.settings.sizes);
+  const list = p.sizes || [];
+  if (!list.length) return '<p class="small" style="margin-top:12px">Sizes not listed</p>';
+  const fr = list[0].s.startsWith("FR");
+  return '<ul class="sizes" aria-label="Sizes">' + list.map((s, i) =>
+    `<li class="${s.a ? "on" : "off"}${mine.has(s.s) ? " mine" : ""}" title="${esc(s.s)} ${s.a ? "available" : "sold out"}">${i === 0 && fr ? '<span class="sys">FR</span>' : ""}${esc(fr ? s.s.replace("FR ","") : s.s)}</li>`).join("") + "</ul>";
+}
+
+function card(p, admin){
+  const fav = !!S.fav[p.handle], note = S.notes[p.handle], out = !isAvail(p);
+  const isNew = DATA.meta.initialImport && p.firstSeen > DATA.meta.initialImport;
+  const chg = (p.changes || []).filter(c => c !== "Newly discovered on sale").slice(0, 2).join("; ");
+  return `<article class="card${out ? " out" : ""}">
+    <a class="ph" href="${esc(url(p))}" target="_blank" rel="noopener">
+      ${p.image ? `<img loading="lazy" src="${esc(img(p.image, 700))}" alt="${esc(p.title)}">` : '<span class="empty" style="display:grid;place-items:center;height:100%">No image</span>'}
+      ${pct(p) ? `<span class="badge">−${pct(p)}%</span>` : ""}
+      ${out ? '<span class="flag">Sold out</span>' : isNew ? '<span class="flag">New to sale</span>' : p.manual ? '<span class="flag">Added by you</span>' : ""}
+    </a>
+    <button class="heart" data-fav="${esc(p.handle)}" aria-pressed="${fav}" aria-label="${fav ? "Remove from" : "Save to"} favorites">${heartSVG}</button>
+    <h3>${esc(p.title)}</h3>
+    <p class="eur"><s>${eur(p.compare)}</s><span class="now">${eur(p.price)}</span><span class="pct">−${pct(p)}%</span></p>
+    <p class="sar">${fmt(finalSAR(p))}<small>SAR</small></p>
+    <p class="calc">${eur(p.price)} × ${rate().toFixed(3)} + ${fmt(extra())} SAR</p>
+    ${sizesHTML(p)}
+    ${note ? `<p class="note">${esc(note)}</p>` : ""}
+    ${chg ? `<p class="change">Updated ${ago(p.lastChanged)}: ${esc(chg)}</p>` : ""}
+    ${p.edited ? '<p class="change">Edited by you — store updates for edited fields are paused</p>' : ""}
+    <div class="acts"><a href="${esc(url(p))}" target="_blank" rel="noopener">View on Self-Portrait</a><button data-edit="${esc(p.handle)}">${admin ? "Edit" : "Note / edit"}</button></div>
+  </article>`;
+}
+
+function statusBar(){
+  const m = DATA.meta, el = $("#status");
+  if (!loaded){ el.innerHTML = "Loading the collection…"; return; }
+  const stale = m.lastSuccess && (Date.now() - new Date(m.lastSuccess)) > 3 * 3600e3;
+  el.innerHTML = `<span>Last successful update: ${when(m.lastSuccess)}</span>
+    <span>EUR/SAR ${rate().toFixed(3)}${S.settings.rate ? " (your manual rate)" : ""}</span>
+    ${m.lastError ? `<span class="warn">Latest check couldn't reach the store — prices shown are from ${ago(m.lastSuccess)}</span>` : stale ? `<span class="warn">Not verified for ${ago(m.lastSuccess).replace(" ago","")} — check the store before buying</span>` : ""}
+    <button id="refreshNow">Refresh now</button>`;
+  $("#refreshNow").onclick = () => { loadData(true); if (GH.token) runStoreCheck(); };
+}
+
+function counts(list){
+  $("#cAll").textContent = list.length ? " " + list.length : "";
+  const f = list.filter(p => S.fav[p.handle]).length; $("#cFav").textContent = f ? " " + f : "";
+  const n = recentList(list).length; $("#cNew").textContent = n ? " " + n : "";
+}
+const recentList = list => DATA.meta.initialImport ? list.filter(p => p.manual || p.firstSeen > DATA.meta.initialImport).sort((a,b) => (b.firstSeen||"").localeCompare(a.firstSeen||"")) : [];
+
+function filtered(list){
+  const q = UI.q.trim().toLowerCase(), want = UI.mineOnly ? S.settings.sizes : UI.sizes;
+  let out = list.filter(p => (!q || p.title.toLowerCase().includes(q))
+    && (UI.avail === "all" || (UI.avail === "in" ? isAvail(p) : !isAvail(p)))
+    && (!want.length || (p.sizes || []).some(s => s.a && want.includes(s.s))));
+  const by = {
+    asc: (a,b) => finalSAR(a) - finalSAR(b), desc: (a,b) => finalSAR(b) - finalSAR(a),
+    disc: (a,b) => pct(b) - pct(a) || finalSAR(a) - finalSAR(b),
+    new: (a,b) => (b.firstSeen||"").localeCompare(a.firstSeen||"") || (b.publishedAt||"").localeCompare(a.publishedAt||""),
+    upd: (a,b) => (b.lastChanged||"").localeCompare(a.lastChanged||""),
+  }[UI.sort];
+  return out.sort(by);
+}
+
+function viewHome(list){
+  const avail = list.filter(isAvail);
+  const picks = [...avail].sort((a,b) => pct(b) - pct(a)).filter(p => p.image).slice(0, 3);
+  const top = [...avail].sort((a,b) => pct(b) - pct(a)).slice(0, 4);
+  const cheapest = avail.length ? Math.min(...avail.map(finalSAR)) : 0;
+  return `<section class="hero">
+      <div>
+        <h1>Black Friday Edit</h1>
+        <p class="sub">The Midi Dress Sale Collection</p>
+        <p class="lede">Every discounted midi dress from Self-Portrait Spain, priced in riyals with your ${fmt(extra())} SAR added to each dress, and re-checked against the store every 30 minutes.</p>
+        <div class="facts">
+          <div><strong>${avail.length}</strong><small>dresses available now</small></div>
+          <div><strong>${cheapest ? fmt(cheapest) : "—"}</strong><small>lowest final price, SAR</small></div>
+          <div><strong>${ago(DATA.meta.lastSuccess) || "—"}</strong><small>last update · ${when(DATA.meta.lastSuccess).replace(" (Riyadh)","")}</small></div>
+        </div>
+        <a class="cta" href="#all">Shop all sale dresses</a>
+      </div>
+      <div class="triptych">${picks.map(p => `<a href="${esc(url(p))}" target="_blank" rel="noopener"><img src="${esc(img(p.image, 600))}" alt="${esc(p.title)}"></a>`).join("")}</div>
+    </section>
+    <div class="section-head"><h2>Deepest markdowns</h2><a href="#all" data-sort="disc">See all by discount</a></div>
+    <div class="grid">${top.map(p => card(p)).join("")}</div>`;
+}
+
+function viewAll(list){
+  const all = filtered(list), shown = all.slice(0, UI.limit);
+  const sizeBtns = [...FR, ...KNIT].map(s => `<button data-size="${s}" aria-pressed="${UI.sizes.includes(s)}">${s.replace("FR ","")}</button>`).join("");
+  return `<div class="section-head"><h2>All sale dresses</h2><p>Discounted midi dresses on Self-Portrait Spain. Prices include the EUR/SAR conversion and ${fmt(extra())} SAR per dress.</p></div>
+    <div class="toolbar" id="toolbar">
+      <label class="search"><input id="q" type="search" placeholder="Search by name — lace, boucle, rhinestone…" value="${esc(UI.q)}" aria-label="Search dresses"></label>
+      <select id="sort" aria-label="Sort">
+        <option value="new">Newly added</option><option value="upd">Recently updated</option>
+        <option value="asc">Final price: low to high</option><option value="desc">Final price: high to low</option><option value="disc">Biggest discount</option>
+      </select>
+      <select id="avail" aria-label="Availability"><option value="all">Available and sold out</option><option value="in">Available only</option><option value="out">Sold out only</option></select>
+      <button class="tbtn" id="mine" aria-pressed="${UI.mineOnly}" ${S.settings.sizes.length ? "" : "disabled title='Set your sizes in Admin'"}>In my sizes${S.settings.sizes.length ? " (" + S.settings.sizes.map(s => s.replace("FR ","")).join(", ") + ")" : ""}</button>
+      <div class="sizebar" ${UI.mineOnly ? 'style="opacity:.4;pointer-events:none"' : ""}>Available in: <span class="small">FR</span>${sizeBtns.slice(0)}${UI.sizes.length ? ' <button id="clearSizes">Clear</button>' : ""}</div>
+    </div>
+    <p class="result-line">${all.length} of ${list.length} dresses</p>
+    ${all.length ? `<div class="grid">${shown.map(p => card(p)).join("")}</div>${all.length > shown.length ? `<button class="more" id="more">Show more (${all.length - shown.length})</button>` : ""}`
+      : `<div class="empty"><h3>No dresses match</h3><p>Try fewer sizes or clear the search.</p></div>`}`;
+}
+
+function viewFav(list){
+  const favs = list.filter(p => S.fav[p.handle]).sort((a,b) => finalSAR(a) - finalSAR(b));
+  if (!favs.length) return `<div class="section-head"><h2>My favorites</h2></div><div class="empty"><h3>No favorites yet</h3><p>Tap the heart on any dress to keep it here and compare final prices.</p><a class="cta" href="#all">Browse the sale</a></div>`;
+  const mine = S.settings.sizes;
+  const total = favs.reduce((t,p) => t + finalSAR(p), 0);
+  return `<div class="section-head"><h2>My favorites</h2><p>${favs.length} saved · together ${fmt(total)} SAR</p></div>
+    <div class="table-wrap"><table class="compare"><thead><tr><th></th><th>Dress</th><th>Final price</th><th>Sale €</th><th>Off</th><th>${mine.length ? "My sizes" : "Sizes in stock"}</th></tr></thead><tbody>
+    ${favs.map((p,i) => { const inStock = (p.sizes||[]).filter(s => s.a).map(s => s.s);
+      const sz = mine.length ? mine.map(s => inStock.includes(s) ? s.replace("FR ","FR ") : `<s style="color:#bdb6ae">${s}</s>`).join(", ") : (inStock.join(", ") || "Sold out");
+      return `<tr class="${i === 0 ? "best" : ""}"><td><img src="${esc(img(p.image,120))}" alt=""></td><td><a href="${esc(url(p))}" target="_blank" rel="noopener">${esc(p.title)}</a></td><td class="num">${fmt(finalSAR(p))} SAR</td><td>${eur(p.price)}</td><td>${pct(p)}%</td><td>${sz}</td></tr>`; }).join("")}
+    </tbody></table></div>
+    <div class="grid" style="margin-top:30px">${favs.map(p => card(p)).join("")}</div>`;
+}
+
+function viewRecent(list){
+  const r = recentList(list);
+  const head = `<div class="section-head"><h2>Recently added</h2><p>Dresses that joined the sale after tracking began on ${when(DATA.meta.initialImport)}, newest first.</p></div>`;
+  if (r.length) return head + `<div class="grid">${r.map(p => `${card(p)}`).join("")}</div>`;
+  const fresh = [...list].sort((a,b) => (b.publishedAt||"").localeCompare(a.publishedAt||"")).slice(0, 8);
+  return head + `<div class="empty" style="padding:40px 0"><h3>Nothing new since tracking began</h3><p>The store is checked every 30 minutes; newly discounted dresses will appear here. Meanwhile, these were published most recently by the store:</p></div><div class="grid">${fresh.map(p => card(p)).join("")}</div>`;
+}
+
+function viewAdmin(list){
+  const m = DATA.meta, sizes = new Set(S.settings.sizes);
+  const log = (m.log || []).slice(0, 12).map(l => `<div><span>${when(l.at)}</span><span>+${l.added} new · −${l.removed} left sale · ${l.changed} changed</span></div>`).join("");
+  const removed = (DATA.removed || []).slice(0, 40).map(r => `<div><a href="${esc(url(r))}" target="_blank" rel="noopener">${esc(r.title)}</a><span>${eur(r.price)} · left ${ago(r.removedAt)}</span></div>`).join("") || '<div><span>No dresses have left the sale yet.</span></div>';
+  const deleted = list.length; const hidden = Object.keys(S.del).length;
+  return `<div class="section-head"><h2>Admin & settings</h2><p>Changes save instantly on this device${GH.token && GH.sync ? " and sync to your other devices" : ""}.</p></div>
+
+  <section class="panel"><div><h3>Pricing</h3><p class="why">Final price = discounted € × rate + fixed amount, rounded to the nearest riyal.</p></div>
+    <div class="fields">
+      <label class="f">Fixed amount added to every dress (SAR)<input id="sExtra" type="number" inputmode="decimal" step="1" value="${extra()}"></label>
+      <label class="f">EUR → SAR rate<input id="sRate" type="number" inputmode="decimal" step="0.0001" placeholder="Live: ${Number(m.rate && m.rate.value || 0).toFixed(4)}" value="${S.settings.rate || ""}"></label>
+      <p class="small">Live rate ${Number(m.rate && m.rate.value || 0).toFixed(4)} from ${esc(m.rate && m.rate.source || "—")}${m.rate && m.rate.asOf ? ", " + esc(m.rate.asOf) : ""}. Leave the field empty to use the live rate.</p>
+      <p class="small">Example: €200 × ${rate().toFixed(3)} = ${fmt(Math.round(200 * rate()))} SAR, + ${fmt(extra())} = <b>${fmt(Math.round(200 * rate() + extra()))} SAR</b>.</p>
+    </div></section>
+
+  <section class="panel"><div><h3>My sizes</h3><p class="why">Your sizes are highlighted on every card and power the “In my sizes” filter.</p></div>
+    <div class="fields"><div class="size-edit" id="mySizes">${[...FR, ...KNIT].map(s => `<button data-my="${s}" class="${sizes.has(s) ? "" : "off"}" aria-pressed="${sizes.has(s)}">${s}</button>`).join("")}</div>
+    <p class="small">Self-Portrait uses French sizes for woven dresses (FR 34 ≈ UK 6, FR 36 ≈ UK 8, FR 38 ≈ UK 10) and XS–XL for knits.</p></div></section>
+
+  <section class="panel"><div><h3>Refresh & updates</h3><p class="why">A GitHub Action reads the Spain store every 30 minutes and publishes new data. This page reloads that data automatically.</p></div>
+    <div class="fields">
+      <div class="row"><button class="btn solid" id="aRefresh">Reload data now</button><button class="btn" id="aRun">Run a store check now</button></div>
+      <p class="small">Last store check ${when(m.lastCheck)} · last successful ${when(m.lastSuccess)} · ${m.count || 0} sale midi dresses found.${m.lastError ? `<br><span style="color:var(--sale)">${esc(m.lastError)}</span>` : ""}</p>
+      <label class="f">Reload this page's data every<select id="sPoll">${[5,10,15,30,60].map(n => `<option value="${n}" ${Number(S.settings.poll) === n ? "selected" : ""}>${n} minutes</option>`).join("")}</select></label>
+      <p class="small">Store checks run every 30 minutes on GitHub's schedule (GitHub can delay scheduled runs by a few minutes at busy times).</p>
+      <div class="mono-list">${log || "<div>No runs logged yet.</div>"}</div>
+    </div></section>
+
+  <section class="panel"><div><h3>Products</h3><p class="why">Edit names, photos, prices, sizes and notes, or add a dress by hand. ${hidden ? hidden + " deleted." : ""}</p></div>
+    <div class="fields" style="max-width:none">
+      <div class="row"><button class="btn solid" id="aAdd">Add a dress</button><label class="search" style="flex:1"><input id="aQ" type="search" placeholder="Find a dress to edit"></label></div>
+      <div class="edit-list" id="editList"></div>
+      ${hidden ? `<div class="row"><button class="btn quiet" id="aRestore">Restore ${hidden} deleted</button></div>` : ""}
+    </div></section>
+
+  <section class="panel"><div><h3>Left the sale</h3><p class="why">Dresses that were removed from the sale or went back to full price.</p></div>
+    <div class="fields" style="max-width:none"><div class="mono-list">${removed}</div></div></section>
+
+  <section class="panel"><div><h3>Sync & backup</h3><p class="why">Your favorites, notes and edits live in this browser. Turn on sync to save them to your repo so iPhone, iPad and desktop share them.</p></div>
+    <div class="fields">
+      <label class="f">GitHub fine-grained token (Contents: read & write, Actions: read & write for ${REPO})<input id="ghTok" type="password" autocomplete="off" value="${esc(GH.token)}" placeholder="github_pat_…"></label>
+      <label class="row small"><input type="checkbox" id="ghSync" ${GH.sync ? "checked" : ""}> Sync my edits through the repo</label>
+      <p class="small">The token stays on this device only. The repo is public, so synced notes are publicly readable — keep personal details out of notes.</p>
+      <div class="row"><button class="btn" id="ghSave">Save sync settings</button><button class="btn quiet" id="bCopy">Copy backup</button><button class="btn quiet" id="bImport">Import backup</button></div>
+    </div></section>`;
+}
+
+function editList(list){
+  const q = ($("#aQ") && $("#aQ").value || "").toLowerCase();
+  $("#editList").innerHTML = list.filter(p => !q || p.title.toLowerCase().includes(q)).slice(0, 120).map(p =>
+    `<button data-edit="${esc(p.handle)}"><img loading="lazy" src="${esc(img(p.image,100))}" alt=""><span>${esc(p.title)}<br><span class="tag">${eur(p.price)} · ${fmt(finalSAR(p))} SAR${p.edited ? " · edited" : ""}${p.manual ? " · added by you" : ""}${S.fav[p.handle] ? " · ♥" : ""}</span></span><span class="tag">Edit</span></button>`).join("");
+}
+
+/* ---------- edit dialog ---------- */
+function openEditor(handle){
+  const list = products();
+  let p = handle ? list.find(x => x.handle === handle) : null;
+  const isNewItem = !p;
+  if (!p) p = { handle:"manual-" + Date.now(), title:"", image:"", price:0, compare:0, sizes: FR.slice(0,7).map(s => ({ s, a:true })), url:"", manual:true, firstSeen:new Date().toISOString(), lastChanged:new Date().toISOString(), changes:[] };
+  let sizes = (p.sizes || []).map(s => Object.assign({}, s));
+  const body = $("#dlgBody");
+  body.innerHTML = `<h3>${isNewItem ? "Add a dress" : "Edit dress"}</h3>
+    <div class="fields">
+      <label class="f">Name<input id="eT" value="${esc(p.title)}"></label>
+      <label class="f">Image URL<input id="eI" value="${esc(p.image)}" placeholder="https://…jpg"></label>
+      ${p.manual ? `<label class="f">Product page link<input id="eU" value="${esc(p.url || "")}" placeholder="https://eu.self-portrait.com/es-es/products/…"></label>` : ""}
+      <div class="row"><label class="f" style="flex:1">Original price (€)<input id="eC" type="number" step="0.01" inputmode="decimal" value="${p.compare || ""}"></label>
+      <label class="f" style="flex:1">Discounted price (€)<input id="eP" type="number" step="0.01" inputmode="decimal" value="${p.price || ""}"></label></div>
+      <div><p class="small" style="margin-bottom:6px">Sizes — tap to mark available or sold out</p><div class="size-edit" id="eS"></div>
+        <div class="row" style="margin-top:8px"><button class="btn quiet" id="eSys">${sizes[0] && sizes[0].s.startsWith("FR") ? "Use XS–XL sizes" : "Use FR sizes"}</button></div></div>
+      <label class="f">Personal note<textarea id="eN" placeholder="Fit, colour, occasion…">${esc(S.notes[p.handle] || "")}</textarea></label>
+      <label class="row small"><input type="checkbox" id="eF" ${S.fav[p.handle] ? "checked" : ""}> Favorite</label>
+      <p class="small" id="eErr" style="color:var(--sale)"></p>
+    </div>
+    <div class="foot">
+      <div class="row">${!isNewItem ? `<button class="btn danger" id="eDel">Delete</button>` : ""}${S.ov[p.handle] && !p.manual ? `<button class="btn quiet" id="eReset">Reset to store data</button>` : ""}</div>
+      <div class="row"><button class="btn quiet" id="eCancel">Cancel</button><button class="btn solid" id="eSave">${isNewItem ? "Add dress" : "Save changes"}</button></div>
+    </div>`;
+  const drawSizes = () => { $("#eS").innerHTML = sizes.map((s,i) => `<button data-i="${i}" class="${s.a ? "" : "off"}" aria-pressed="${s.a}">${esc(s.s)}</button>`).join(""); };
+  drawSizes();
+  $("#eS").onclick = e => { const b = e.target.closest("button"); if (!b) return; const s = sizes[b.dataset.i]; s.a = !s.a; drawSizes(); };
+  $("#eSys").onclick = () => { const fr = sizes[0] && sizes[0].s.startsWith("FR"); sizes = (fr ? KNIT : FR).map(s => ({ s, a:true })); $("#eSys").textContent = fr ? "Use FR sizes" : "Use XS–XL sizes"; drawSizes(); };
+  $("#eCancel").onclick = () => $("#dlg").close();
+  $("#eSave").onclick = () => {
+    const t = $("#eT").value.trim(), price = Number($("#eP").value), compare = Number($("#eC").value);
+    if (!t) return $("#eErr").textContent = "Add a name for the dress.";
+    if (!(price > 0)) return $("#eErr").textContent = "Enter the discounted price in euros.";
+    if (compare && compare < price) return $("#eErr").textContent = "The original price should be higher than the discounted price.";
+    const fields = { title:t, image:$("#eI").value.trim(), price, compare: compare || price, sizes };
+    if (p.manual){
+      const rec = Object.assign({}, p, fields, { url: ($("#eU") && $("#eU").value.trim()) || "", lastChanged:new Date().toISOString() });
+      delete rec.edited; delete rec.manual;
+      const i = S.manual.findIndex(x => x.handle === p.handle); if (i >= 0) S.manual[i] = rec; else S.manual.push(rec);
+    } else {
+      const base = DATA.products.find(x => x.handle === p.handle) || {};
+      const ov = {}; for (const k of Object.keys(fields)) if (JSON.stringify(fields[k]) !== JSON.stringify(base[k])) ov[k] = fields[k];
+      if (Object.keys(ov).length) S.ov[p.handle] = ov; else delete S.ov[p.handle];
+    }
+    const n = $("#eN").value.trim(); if (n) S.notes[p.handle] = n; else delete S.notes[p.handle];
+    if ($("#eF").checked) S.fav[p.handle] = Date.now(); else delete S.fav[p.handle];
+    save(); $("#dlg").close(); toast(isNewItem ? "Dress added." : "Changes saved."); render();
+  };
+  if ($("#eDel")) $("#eDel").onclick = () => {
+    const b = $("#eDel");
+    if (b.dataset.sure){ S.del[p.handle] = Date.now(); delete S.fav[p.handle]; save(); $("#dlg").close(); toast("Dress deleted. Restore it from Admin › Products."); render(); }
+    else { b.dataset.sure = 1; b.textContent = "Tap again to delete"; }
+  };
+  if ($("#eReset")) $("#eReset").onclick = () => { delete S.ov[p.handle]; save(); $("#dlg").close(); toast("Back to the store's data."); render(); };
+  $("#dlg").showModal();
+}
+
+function textDialog(title, value, onOk, okLabel){
+  $("#dlgBody").innerHTML = `<h3>${title}</h3><label class="f"><textarea id="tA" style="min-height:220px;font-size:12px">${esc(value)}</textarea></label><p class="small" id="tErr" style="color:var(--sale)"></p>
+    <div class="foot"><span></span><div class="row"><button class="btn quiet" id="tC">Close</button>${onOk ? `<button class="btn solid" id="tO">${okLabel}</button>` : ""}</div></div>`;
+  $("#tC").onclick = () => $("#dlg").close();
+  if (onOk) $("#tO").onclick = () => onOk($("#tA").value);
+  $("#dlg").showModal();
+}
+
+/* ---------- router ---------- */
+function render(){
+  const route = (location.hash || "#home").slice(1);
+  document.querySelectorAll("nav.tabs a").forEach(a => { if (a.getAttribute("href") === "#" + route) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+  statusBar();
+  const list = products(); counts(list);
+  const v = $("#view");
+  if (!loaded){ v.innerHTML = '<div class="empty"><h3>Loading the collection</h3><p>One moment.</p></div>'; return; }
+  const isAdmin = route === "admin";
+  v.innerHTML = route === "all" ? viewAll(list) : route === "favorites" ? viewFav(list) : route === "recent" ? viewRecent(list) : isAdmin ? viewAdmin(list) : viewHome(list);
+  document.documentElement.style.setProperty("--hh", $("#top").offsetHeight + "px");
+  if (route === "all") wireAll();
+  if (isAdmin) wireAdmin(list);
+}
+
+function wireAll(){
+  $("#sort").value = UI.sort; $("#avail").value = UI.avail;
+  const q = $("#q"); q.oninput = () => { UI.q = q.value; UI.limit = 48; const pos = q.selectionStart; render(); const n = $("#q"); n.focus(); n.setSelectionRange(pos, pos); };
+  $("#sort").onchange = e => { UI.sort = e.target.value; render(); };
+  $("#avail").onchange = e => { UI.avail = e.target.value; render(); };
+  $("#mine").onclick = () => { UI.mineOnly = !UI.mineOnly; render(); };
+  document.querySelectorAll("[data-size]").forEach(b => b.onclick = () => { const s = b.dataset.size; UI.sizes = UI.sizes.includes(s) ? UI.sizes.filter(x => x !== s) : [...UI.sizes, s]; render(); });
+  if ($("#clearSizes")) $("#clearSizes").onclick = () => { UI.sizes = []; render(); };
+  if ($("#more")) $("#more").onclick = () => { UI.limit += 48; const y = scrollY; render(); scrollTo(0, y); };
+}
+
+function wireAdmin(list){
+  editList(list); $("#aQ").oninput = () => editList(products());
+  $("#sExtra").onchange = e => { const v = Number(e.target.value); if (!Number.isFinite(v) || v < 0) return toast("Enter a number of riyals, 0 or more."); S.settings.extra = v; save(); render(); toast("Every dress now adds " + fmt(v) + " SAR."); };
+  $("#sRate").onchange = e => { const v = Number(e.target.value); S.settings.rate = v > 0 ? v : null; save(); render(); toast(v > 0 ? "Using your rate " + v + "." : "Using the live rate."); };
+  $("#sPoll").onchange = e => { S.settings.poll = Number(e.target.value); save(); schedulePoll(); toast("Reloading every " + e.target.value + " minutes."); };
+  $("#mySizes").onclick = e => { const b = e.target.closest("[data-my]"); if (!b) return; const s = b.dataset.my, set = new Set(S.settings.sizes); set.has(s) ? set.delete(s) : set.add(s); S.settings.sizes = [...FR, ...KNIT].filter(x => set.has(x)); save(); render(); };
+  $("#aRefresh").onclick = () => loadData(true);
+  $("#aRun").onclick = runStoreCheck;
+  $("#aAdd").onclick = () => openEditor(null);
+  if ($("#aRestore")) $("#aRestore").onclick = () => { S.del = {}; save(); render(); toast("Deleted dresses restored."); };
+  $("#ghSave").onclick = () => { GH = { token: $("#ghTok").value.trim(), sync: $("#ghSync").checked }; store.set("sp-gh", JSON.stringify(GH)); toast(GH.sync && GH.token ? "Sync on. Saving now…" : "Sync settings saved."); if (GH.sync && GH.token) pushSync(); render(); };
+  $("#bCopy").onclick = async () => { const txt = JSON.stringify(S); try { await navigator.clipboard.writeText(txt); toast("Backup copied. Paste it somewhere safe."); } catch { textDialog("Your backup", txt); } };
+  $("#bImport").onclick = () => textDialog("Import backup", "", txt => { try { const d = JSON.parse(txt); if (!d || typeof d !== "object" || !("fav" in d)) throw 0; S = Object.assign(defaults(), d); S.settings = Object.assign(defaults().settings, d.settings || {}); save(); $("#dlg").close(); render(); toast("Backup imported."); } catch { $("#tErr").textContent = "That isn't a backup from this site. Paste the full text you copied."; } }, "Import");
+}
+
+document.addEventListener("click", e => {
+  const f = e.target.closest("[data-fav]");
+  if (f){ const h = f.dataset.fav; if (S.fav[h]) delete S.fav[h]; else S.fav[h] = Date.now(); save(); const on = !!S.fav[h];
+    document.querySelectorAll(`[data-fav="${CSS.escape(h)}"]`).forEach(b => { b.setAttribute("aria-pressed", on); b.setAttribute("aria-label", (on ? "Remove from" : "Save to") + " favorites"); });
+    counts(products()); toast(on ? "Saved to favorites." : "Removed from favorites."); if ((location.hash || "") === "#favorites") render(); return; }
+  const ed = e.target.closest("[data-edit]"); if (ed){ openEditor(ed.dataset.edit); return; }
+  const so = e.target.closest("[data-sort]"); if (so){ UI.sort = so.dataset.sort; }
+});
+window.addEventListener("hashchange", () => { scrollTo(0, 0); render(); });
+window.addEventListener("resize", () => document.documentElement.style.setProperty("--hh", $("#top").offsetHeight + "px"));
+document.addEventListener("visibilitychange", () => { if (!document.hidden && loaded && Date.now() - (window._lastLoad || 0) > 120000){ window._lastLoad = Date.now(); loadData(false); } });
+
+/* ---------- gate ---------- */
+async function sha(t){ const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(t)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2,"0")).join(""); }
+function unlock(){ $("#gate").classList.add("hidden"); render(); loadData(false); schedulePoll(); window._lastLoad = Date.now(); }
+$("#gateForm").onsubmit = async e => { e.preventDefault(); const h = await sha($("#pass").value); if (h === PASS_HASH){ store.set("sp-unlock", h); unlock(); } else { $("#gateErr").textContent = "That passcode doesn't match. Try again."; } };
+if (store.get("sp-unlock") === PASS_HASH) unlock(); else setTimeout(() => $("#pass").focus(), 50);
+})();
+</script>
+</body>
+</html>
