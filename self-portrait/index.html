@@ -444,7 +444,7 @@ const PASS_HASH = "3c29f0bb09f7f11433b993fb3a8d945503758c57eacb6ecfe88c49e1ef74e
 const REPO = "ranaa4117/black-friday-deals";
 const WORKFLOW = "self-portrait-update.yml";
 const LS = "sp-edit-v1";
-const APP_VERSION = "13";
+const APP_VERSION = "14";
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
@@ -573,7 +573,17 @@ const url = p => p.url || ("https://eu.self-portrait.com/es-es/products/" + p.ha
 const img2 = (src, w) => !src ? "" : /cdn\.shopify\.com|self-portrait\.com\/cdn|macduggal\.com\/cdn/.test(src) ? src + (src.includes("?") ? "&" : "?") + "width=" + w : src;
 const plink = p => "#item-" + p.handle;
 function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 3400); }
-const dimsOf = p => { const t = (p.guide || []).find(g => g.kind === "Dimensions"); if (!t) return ""; return t.rows.map(r => r[0].charAt(0) + " " + r[1]).join(" × ") + " cm"; };
+/* extras (all photos, details, size guides) live in more.json and load only when a product or guide is opened */
+let MORE = null, moreLoading = null;
+function ensureMore(){
+  if (MORE) return Promise.resolve(MORE);
+  if (!moreLoading) moreLoading = fetch("more.json?t=" + Date.now(), { cache:"no-store" }).then(r => r.ok ? r.json() : {}).catch(() => ({})).then(m => (MORE = m || {}));
+  return moreLoading;
+}
+const withMore = p => p && MORE && MORE[p.handle] ? Object.assign({}, MORE[p.handle], p) : p;
+const PHONE = matchMedia("(max-width: 600px)").matches, TOUCH = matchMedia("(hover: none)").matches;
+const W = { card: PHONE ? 360 : 700, hero: PHONE ? 520 : 900, tile: PHONE ? 420 : 800, item: PHONE ? 800 : 1200 };
+const dimsOf = p => { if (p.dims) return p.dims; const t = (p.guide || []).find(g => g.kind === "Dimensions"); if (!t) return ""; return t.rows.map(r => r[0].charAt(0) + " " + r[1]).join(" × ") + " cm"; };
 
 function save(){
   S.updatedAt = Date.now();
@@ -672,42 +682,32 @@ function favLine(p){
   return `<p class="favsize">Your size: <b>${esc(f.size)}</b></p>${favSizeOk(p) ? "" : `<p class="warnline">${esc(f.size)} is no longer available</p>`}`;
 }
 let showPop = false;
-function promoTags(p){
-  const t = [];
-  if (p.markdown) t.push(`<span class="ptag">${p.bf ? "Black Friday" : "Sale"} −${pct(p)}%</span>`);
-  if (p.extra25) t.push(`<span class="ptag ptag-x">Extra 25% off in cart</span>`);
-  return t.length ? `<p class="ptags">${t.join("")}</p>` : "";
-}
-function mdPriceLines(p){
-  return `${promoTags(p)}
-    <p class="sar">${fmt(finalSAR(p))}<small>SAR</small></p>
-    <p class="eur"><s>${fmt(wasSAR(p))} SAR</s>${p.markdown && p.extra25 ? ` <span class="now">${p.bf ? "Black Friday" : "Sale"} price ${fmt(saleSAR(p))} SAR</span>` : ""}</p>
-    ${p.extra25 ? '<p class="calc">Estimated final price — the extra 25% is taken by Mac Duggal at checkout</p>' : ""}
-    ${COSTS() ? `<p class="calc">${money(p, p.price)}${p.markdown ? " (was " + money(p, p.compare) + ")" : ""}${p.extra25 ? " × 0.75" : ""} × ${usdRate().toFixed(3)} + ${fmt(extraFor(p))} SAR</p>` : ""}`;
-}
 function card(p, showCat){
-  const fav = !!S.fav[p.handle], out = !isAvail(p), off = isMD(p) ? pct(p) : offShown(p);
+  const fav = !!S.fav[p.handle], out = !isAvail(p), off = offShown(p);
   const isNew = DATA.meta.initialImport && (p.firstSeen || "") > DATA.meta.initialImport;
-  const nPics = (p.images || []).length, dims = dimsOf(p);
+  const nPics = p.nImg || (p.images || []).length, dims = dimsOf(p), alt2 = p.img2 || (p.images || [])[1];
   return `<article class="card${out ? " out" : ""}">
     <a class="ph" href="${plink(p)}" aria-label="View ${esc(p.title)}">
-      ${p.image ? `<img loading="lazy" src="${esc(img(p.image, 700))}" alt="${esc(p.title)}">` : '<span class="empty" style="display:grid;place-items:center;height:100%">No image</span>'}
-      ${nPics > 1 ? `<img class="alt" loading="lazy" src="${esc(img(p.images[1], 700))}" alt="">` : ""}
-      ${off ? `<span class="badge">−${off}%</span>` : isMD(p) && p.extra25 ? '<span class="badge">+25%</span>' : ""}
+      ${p.image ? `<img loading="lazy" decoding="async" src="${esc(img(p.image, W.card))}" alt="${esc(p.title)}">` : '<span class="empty" style="display:grid;place-items:center;height:100%">No image</span>'}
+      ${alt2 && !TOUCH ? `<img class="alt" loading="lazy" decoding="async" src="${esc(img(alt2, W.card))}" alt="">` : ""}
+      ${off ? `<span class="badge">−${off}%</span>` : ""}
       ${out ? '<span class="flag">Sold out</span>' : isNew ? '<span class="flag">New to sale</span>' : nPics > 1 ? `<span class="flag light">${nPics} photos</span>` : ""}
       ${showPop && favCount(p.handle) ? `<span class="popcount">♥ ${favCount(p.handle)}</span>` : ""}
     </a>
     <button class="heart" data-fav="${esc(p.handle)}" aria-pressed="${fav}" aria-label="${fav ? "Remove from" : "Save to"} favorites">${heartSVG}</button>
     ${showCat ? `<p class="cat-tag">${esc(kindOf(p))}</p>` : ""}
     <h3><a href="${plink(p)}" class="plain">${esc(p.title)}</a></h3>
-    ${isMD(p) ? mdPriceLines(p) : `
+    ${isMD(p) ? `
+    <p class="sar">${fmt(finalSAR(p))}<small>SAR</small></p>
+    ${off ? `<p class="eur"><s>${fmt(wasSAR(p))} SAR</s></p>` : ""}
+    ${COSTS() ? `<p class="calc">${money(p, p.price)}${p.markdown ? " (was " + money(p, p.compare) + ")" : ""}${p.extra25 ? " × 0.75" : ""} × ${usdRate().toFixed(3)} + ${fmt(extraFor(p))} SAR</p>` : ""}` : `
     ${COSTS() ? `<p class="eur"><s>${eur(p.compare)}</s><span class="now">${eur(p.price)}</span><span class="pct">−${pct(p)}%</span></p>` : ""}
     <p class="sar">${fmt(finalSAR(p))}<small>SAR</small></p>
     ${off && !COSTS() ? `<p class="eur"><s>${fmt(wasSAR(p))} SAR</s></p>` : ""}
     ${COSTS() ? `<p class="calc">${eur(p.price)} × ${rate().toFixed(3)} + ${fmt(extraFor(p))} SAR</p>` : ""}`}
     ${sizesHTML(p)}
     ${!isDress(p) && dims ? `<p class="dims">${esc(dims)}</p>` : ""}
-    ${isMD(p) ? "" : `<button class="guide-btn" data-guide="${esc(p.handle)}">${isDress(p) ? "View size guide" : "View dimensions"}</button>`}
+    <button class="guide-btn" data-guide="${esc(p.handle)}">${isDress(p) ? "View size guide" : "View dimensions"}</button>
     ${favLine(p)}
     ${OWNER ? `<div class="acts"><button data-edit="${esc(p.handle)}">Edit</button>${COSTS() ? `<a href="${esc(url(p))}" target="_blank" rel="noopener">Store page</a>` : ""}</div>` : ""}
     ${waLink(p)}
@@ -763,7 +763,7 @@ function viewList(route, all){
   const res = applyFilters(base, u), shown = res.slice(0, u.limit);
   const fams = COLOR_FAMS.filter(([k]) => base.some(p => colorFams(p).includes(k)));
   const sub = { all:"Every discounted piece from Self-Portrait and Mac Duggal, in one place.", sp:"Discounted Self-Portrait pieces from the official Spain store.", midi:"Discounted Self-Portrait midi dresses.", maxi:"Discounted Self-Portrait maxi dresses.", bags:"Discounted Self-Portrait bags.",
-    md:"Every eligible Mac Duggal maxi dress from the official US store — Black Friday markdowns and the extra 25% in cart, together in one collection.",
+    md:"Mac Duggal maxi dresses on sale, from the official US store.",
     recent:"Pieces that joined the sale since tracking began, newest first.", discounts:"The deepest markdowns across every brand.", popular:"Ranked by how many times each piece has been added to favorites." }[route];
   const subnav = SP_ROUTES.includes(route) ? `<nav class="subnav" dir="rtl" aria-label="Self-Portrait categories"><a href="#midi" lang="ar" ${route === "midi" ? 'aria-current="page"' : ""}>فساتين ميدي</a><a href="#maxi" lang="ar" ${route === "maxi" ? 'aria-current="page"' : ""}>فساتين ماكسي</a><a href="#bags" lang="ar" ${route === "bags" ? 'aria-current="page"' : ""}>شنط</a></nav>`
     : route === "md" ? `<nav class="subnav" dir="rtl" aria-label="Mac Duggal categories"><a href="#md" lang="ar" aria-current="page">فساتين ماكسي</a></nav>` : "";
@@ -781,7 +781,7 @@ function viewList(route, all){
   }
   return `<div class="list-head"><div><h2>${TITLES[route]}</h2><p>${sub}</p></div></div>
     ${subnav}
-    ${route === "md" ? '<p class="promo-note">Extra 25% off in cart: Mac Duggal takes it automatically at checkout on the styles it labels “+25% Off In Cart” (shown on each dress), after any Black Friday markdown. Prices that include it are estimates — the retailer charges the final amount.</p>' : ""}
+    ${route === "md" && false ? '<p class="promo-note">Extra 25% off in cart: Mac Duggal takes it automatically at checkout on the styles it labels “+25% Off In Cart” (shown on each dress), after any Black Friday markdown. Prices that include it are estimates — the retailer charges the final amount.</p>' : ""}
     <div class="toolbar ar-filters" id="toolbar" dir="rtl" lang="ar">
       <div class="fhead"><h3>الفلاتر</h3>${filtered ? '<button class="linkish" id="clearAll">مسح الكل</button>' : ""}</div>
       <label class="search"><input id="q" type="search" placeholder="ابحث باسم المنتج" value="${esc(u.q)}" aria-label="ابحث باسم المنتج" dir="auto"></label>
@@ -820,21 +820,21 @@ function viewHome(all){
   const AR = { midi:"فساتين ميدي", maxi:"فساتين ماكسي", bags:"شنط", popular:"الأكثر تفضيلاً" };
   const tile = (key, topP, fallback) => {
     const p = topP || fallback, href = topP ? plink(topP) : "#" + key;
-    return `<div class="banner"><a class="imgl" href="${href}" aria-label="${topP ? esc(topP.title) : AR[key]}">${p ? `<img loading="lazy" src="${esc(img(p.image, 800))}" alt="">` : ""}</a><span class="cap"><a href="#${key}"><b lang="ar">${AR[key]}</b></a></span></div>`;
+    return `<div class="banner"><a class="imgl" href="${href}" aria-label="${topP ? esc(topP.title) : AR[key]}">${p ? `<img loading="lazy" src="${esc(img(p.image, W.tile))}" alt="">` : ""}</a><span class="cap"><a href="#${key}"><b lang="ar">${AR[key]}</b></a></span></div>`;
   };
   const spCover = pop.find(p => !isMD(p) && isDress(p) && p.image) || byDisc(sp).find(p => isDress(p) && p.image);
   const mdCover = pop.find(p => isMD(p) && p.image) || byDisc(md).find(p => p.image);
-  const brandCard = (href, name, p, note) => `<a class="brandcard" href="${href}">${p ? `<img loading="lazy" src="${esc(img(p.image, 900))}" alt="">` : ""}<span class="bc-cap"><b>${name}</b><span>${note}</span></span></a>`;
+  const brandCard = (href, name, p, note) => `<a class="brandcard" href="${href}">${p ? `<img loading="lazy" src="${esc(img(p.image, W.hero))}" alt="">` : ""}<span class="bc-cap"><b>${name}</b><span>${note}</span></span></a>`;
   const mdTop = byDisc(md).slice(0, 8);
   const featured = []; const a = byDisc(sp).slice(0, 4), b = byDisc(md).slice(0, 4);
   for (let i = 0; i < 4; i++){ if (a[i]) featured.push(a[i]); if (b[i]) featured.push(b[i]); }
   return `<section class="bf-hero">
       <p class="bf-kicker">Black Friday 2026</p>
       <h2 class="bf-title">Up to ${maxOff}% off</h2>
-      <p class="bf-sub">Self-Portrait &nbsp;·&nbsp; Mac Duggal &nbsp;·&nbsp; prices in Saudi riyals</p>
+      <p class="bf-sub">Self-Portrait &nbsp;·&nbsp; Mac Duggal</p>
       <a class="cta light" href="#discounts">Shop the offers</a>
     </section>
-    <section class="home-pics triptych">${picks.map(p => `<a href="${plink(p)}" aria-label="${esc(p.title)}"><img src="${esc(img(p.image, 900))}" alt="${esc(p.title)}"></a>`).join("")}</section>
+    <section class="home-pics triptych">${picks.map(p => `<a href="${plink(p)}" aria-label="${esc(p.title)}"><img src="${esc(img(p.image, W.hero))}" alt="${esc(p.title)}"></a>`).join("")}</section>
     <div class="section-head"><h2>Shop by brand</h2></div>
     <section class="brands" aria-label="Shop by brand">
       ${brandCard("#sp", "Self-Portrait", spCover, "Midi · Maxi · Bags")}
@@ -844,7 +844,6 @@ function viewHome(all){
     <div class="section-head"><h2>Self-Portrait</h2><a href="#sp">Shop Self-Portrait</a></div>
     <section class="banners" aria-label="Self-Portrait categories">${["midi","maxi","bags"].map(c => tile(c, pop.find(p => !isMD(p) && catOf(p) === c && p.image), coverDefault(c))).join("")}${tile("popular", null, pop.find(p => p.image) || byDisc(sp)[1])}</section>
     ${md.length ? `<div class="section-head"><h2>Mac Duggal Maxi Dresses</h2><a href="#md">View all Mac Duggal maxi dresses</a></div>
-    <p class="promo-note">Black Friday markdowns and the extra 25% off in cart, shown on each dress.</p>
     <div class="grid">${mdTop.map(p => card(p, false)).join("")}</div>` : ""}
     <div class="section-head"><h2>Featured offers</h2><a href="#discounts">See all</a></div>
     <div class="grid">${featured.map(p => card(p, true)).join("")}</div>
@@ -868,7 +867,8 @@ function viewFav(all){
 }
 
 function viewItem(all, handle){
-  const p = all.find(x => x.handle === handle);
+  if (!MORE) ensureMore().then(() => { if (routeOf() === "item-" + handle) render(); });
+  const p = withMore(all.find(x => x.handle === handle));
   if (!p) return `<div class="empty"><h3>This piece is no longer in the sale</h3><p>It may have sold out or gone back to full price.</p><a class="cta" href="#all">See all sale pieces</a></div>`;
   const pics = (p.images && p.images.length ? p.images : [p.image]).filter(Boolean);
   const fav = !!S.fav[p.handle], off = offShown(p), out = !isAvail(p), dims = dimsOf(p);
@@ -877,21 +877,15 @@ function viewItem(all, handle){
   return `<nav class="crumbs"><a href="${isMD(p) ? "#md" : "#" + catOf(p)}" id="backLink">${isMD(p) ? "Mac Duggal Maxi Dresses" : "Self-Portrait · " + CATS[catOf(p)]}</a></nav>
   <section class="pdp">
     <div class="gallery">
-      <div class="slides" id="slides" tabindex="0" aria-label="Photos of ${esc(p.title)}">${pics.map((src, n) => `<figure><img ${n > 1 ? 'loading="lazy"' : ""} src="${esc(img(src, 1200))}" alt="${esc(p.title)}, photo ${n + 1} of ${pics.length}"></figure>`).join("")}</div>
+      <div class="slides" id="slides" tabindex="0" aria-label="Photos of ${esc(p.title)}">${pics.map((src, n) => `<figure><img ${n > 1 ? 'loading="lazy"' : ""} src="${esc(img(src, W.item))}" alt="${esc(p.title)}, photo ${n + 1} of ${pics.length}"></figure>`).join("")}</div>
       ${pics.length > 1 ? `<div class="gnav"><button id="gPrev" aria-label="Previous photo">‹</button><span id="gCount">1 / ${pics.length}</span><button id="gNext" aria-label="Next photo">›</button></div>
       <div class="thumbs" id="thumbs">${pics.map((src, n) => `<button data-shot="${n}" aria-label="Photo ${n + 1}" ${n === 0 ? 'aria-current="true"' : ""}><img loading="lazy" src="${esc(img(src, 200))}" alt=""></button>`).join("")}</div>` : ""}
     </div>
     <div class="info">
       <p class="cat-tag">${esc(kindOf(p))}</p>
       <h1>${esc(p.title)}</h1>
-      ${isMD(p) ? `${promoTags(p)}<p class="sar big">${fmt(finalSAR(p))}<small>SAR</small></p>
-      <ul class="breakdown">
-        <li><span>Original price</span><b>${fmt(wasSAR(p))} SAR</b></li>
-        ${p.markdown ? `<li><span>${p.bf ? "Black Friday" : "Sale"} price (−${pct(p)}%)</span><b>${fmt(saleSAR(p))} SAR</b></li>` : ""}
-        ${p.extra25 ? `<li><span>Extra 25% off in cart</span><b>−${fmt(saleSAR(p) - finalSAR(p))} SAR</b></li>` : ""}
-        <li class="tot"><span>${p.extra25 ? "Estimated final price" : "Final price"}</span><b>${fmt(finalSAR(p))} SAR</b></li>
-      </ul>
-      ${p.extra25 ? '<p class="calc">The extra 25% is a Mac Duggal checkout promotion, applied by the retailer in the cart after any markdown. This price is an estimate; Mac Duggal charges the final amount.</p>' : ""}
+      ${isMD(p) ? `<p class="sar big">${fmt(finalSAR(p))}<small>SAR</small></p>
+      ${off ? `<p class="eur"><s>${fmt(wasSAR(p))} SAR</s><span class="pct">−${off}%</span></p>` : ""}
       ${(p.colors || []).length ? `<p class="small" style="margin-top:10px">Colours: ${esc(p.colors.join(", "))}</p>` : ""}
       ${COSTS() ? `<p class="calc">${money(p, p.price)}${p.markdown ? " (was " + money(p, p.compare) + ")" : ""}${p.extra25 ? " × 0.75" : ""} × ${usdRate().toFixed(3)} + ${fmt(extraFor(p))} SAR</p>` : ""}`
       : `<p class="sar big">${fmt(finalSAR(p))}<small>SAR</small></p>
@@ -900,7 +894,7 @@ function viewItem(all, handle){
       <div class="pdp-sizes">${isDress(p) ? `<p class="small">${out ? "Sold out in every size" : isMD(p) ? "Available US sizes" : "Available UK sizes"}</p>${sizesHTML(p)}
         ${!out && !isMD(p) && S.settings.sizes.length ? `<p class="small" style="margin-top:8px">${avail.some(s => anyFits(s, S.settings.sizes)) ? "In your size" : "Not available in your saved sizes"}</p>` : ""}`
         : `<p class="small">${out ? "Sold out" : "In stock"}</p>${dims ? `<p class="dims">Dimensions: ${esc(dims)}</p>` : ""}`}
-        ${isMD(p) ? "" : `<button class="guide-btn" data-guide="${esc(p.handle)}">${isDress(p) ? "View size guide" : "View dimensions"}</button>`}</div>
+        <button class="guide-btn" data-guide="${esc(p.handle)}">${isDress(p) ? "View size guide" : "View dimensions"}</button></div>
       <button class="btn ${fav ? "" : "solid"} favbtn" data-fav="${esc(p.handle)}" aria-pressed="${fav}">${fav ? (isDress(p) && favOf(p.handle).size ? "Saved · " + esc(favOf(p.handle).size) + " — change" : "Saved to favorites") : "Save to favorites"}</button>
       ${fav && isDress(p) && favOf(p.handle).size && !favSizeOk(p) ? `<p class="warnline">${esc(favOf(p.handle).size)} is no longer available</p>` : ""}
       ${waLink(p)}
@@ -921,7 +915,9 @@ function guideTable(t, unit, availSizes){
   return `<div class="sgt-wrap"><table class="sgt"><thead><tr><th scope="col">${isFR ? "FR" : t.system || "Size"}</th>${head}</tr></thead><tbody>${ukRow}${t.rows.map(r => `<tr><td>${esc(r[0])}</td>${r.slice(1).map(v => `<td>${esc(conv(v))}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
 }
 function openGuide(handle, tab){
-  const p = products().find(x => x.handle === handle); if (!p) return;
+  if (!MORE){ ensureMore().then(() => openGuide(handle, tab)); return; }
+  const p = withMore(products().find(x => x.handle === handle)); if (!p) return;
+  if (isMD(p)) return openMDChart(p);
   const guide = p.guide || [], dress = isDress(p);
   const garment = guide.filter(g => g.kind === "Garment measurements"), body = guide.filter(g => g.kind === "Body measurements"), dims = guide.filter(g => g.kind === "Dimensions");
   const tabs = dress ? [["garment","Garment measurements"]] : [["dims","Dimensions"]];
@@ -950,6 +946,17 @@ function openGuide(handle, tab){
   $("#sgClose").onclick = () => $("#guide").close();
   $("#guideBody").querySelectorAll("[data-sgtab]").forEach(b => b.onclick = () => openGuide(handle, b.dataset.sgtab));
   $("#guideBody").querySelectorAll("[data-unit]").forEach(b => b.onclick = () => { GUIDE_UNIT = b.dataset.unit; openGuide(handle, tab); });
+  if (!$("#guide").open) $("#guide").showModal();
+}
+function openMDChart(p){
+  const ch = DATA.meta.mdChart;
+  const tables = ch && ch.tables && ch.tables.length ? ch.tables : null;
+  $("#guideBody").innerHTML = `<div class="sg-top"><h3>Size guide</h3><button id="sgClose">Close</button></div>
+    <h4>${esc(p.title)}</h4><p class="who">Mac Duggal · US sizes</p>
+    ${tables ? tables.map(t => `<div class="sgt-wrap" style="margin-top:16px"><table class="sgt"><thead><tr>${t[0].map(c => `<th scope="col">${esc(c)}</th>`).join("")}</tr></thead><tbody>${t.slice(1).map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`).join("")
+      : '<p class="small" style="margin-top:14px">Mac Duggal\'s official size chart hasn\'t been collected yet — it\'s read from macduggal.com automatically and appears here shortly.</p>'}
+    <p class="src">Source: Mac Duggal's official size chart (macduggal.com).</p>`;
+  $("#sgClose").onclick = () => $("#guide").close();
   if (!$("#guide").open) $("#guide").showModal();
 }
 $("#guide").addEventListener("click", e => { if (e.target === $("#guide")) $("#guide").close(); });
@@ -1015,7 +1022,8 @@ function editList(all){
 const FR = ["FR 32","FR 34","FR 36","FR 38","FR 40","FR 42","FR 44"], KNIT = ["XS","S","M","L","XL"];
 function openEditor(handle){
   const list = products();
-  let p = handle ? list.find(x => x.handle === handle) : null;
+  if (handle && !MORE){ ensureMore().then(() => openEditor(handle)); return; }
+  let p = handle ? withMore(list.find(x => x.handle === handle)) : null;
   const isNewItem = !p;
   if (!p) p = { handle:"manual-" + Date.now(), cat:"midi", title:"", image:"", images:[], price:0, compare:0, sizes: FR.map(s => ({ s, a:true })), url:"", manual:true, firstSeen:new Date().toISOString(), lastChanged:new Date().toISOString(), changes:[] };
   let sizes = (p.sizes || []).map(s => Object.assign({}, s));

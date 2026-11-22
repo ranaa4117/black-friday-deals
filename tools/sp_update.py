@@ -25,7 +25,9 @@ from html.parser import HTMLParser
 STORE = "https://eu.self-portrait.com/es-es"
 CATEGORIES = [("midi", "sale-midi-dresses"), ("maxi", "sale-maxi-dresses"), ("bags", "sale-handbags")]
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT = os.path.join(HERE, "..", "self-portrait", "data.json")
+OUT = os.path.join(HERE, "..", "self-portrait", "data.json")      # light file the site loads first
+MORE = os.path.join(HERE, "..", "self-portrait", "more.json")     # photos, details, size guides (loaded on demand)
+FULL = os.path.join(HERE, "..", "self-portrait", "full.json")     # complete state, used only by this script
 UA = "Mozilla/5.0 (personal sale tracker; github.com/ranaa4117/black-friday-deals)"
 SG_LIMIT = int(os.environ.get("SG_LIMIT", "60"))       # size guides read per run
 SG_MAX_AGE = 3 * 24 * 3600                              # re-read a guide every 3 days
@@ -133,6 +135,8 @@ def fetch_md_collection(handle):
 def normalize_md(p, bf_handles):
     title = (p.get("title") or "").strip()
     ptype = (p.get("product_type") or "").upper()
+    if (p.get("vendor") or "").strip().lower() != "mac duggal":
+        return None  # only Mac Duggal's own label (not other labels sold on the site)
     if MD_NOT_MAXI.search(title) or ptype in ("KIDS", "HANDBAGS", "READY TO WEAR", "SAMPLES"):
         return None
     variants = p.get("variants") or []
@@ -189,6 +193,25 @@ def fetch_md():
         if n:
             out[n["handle"]] = n
     return list(out.values()), len(maxi)
+
+
+def fetch_md_chart():
+    """Mac Duggal's official size chart page (tables as published)."""
+    page = fetch(f"{MD_STORE}/pages/size-chart", accept="text/html")
+    tp = TableParser()
+    tp.feed(page)
+    tables = []
+    for t in tp.tables:
+        rows = [[c for c in r] for r in t if any(c.strip() for c in r)]
+        if len(rows) >= 2 and len(rows[0]) >= 2:
+            tables.append(rows)
+    titles = [re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", m))).strip()
+              for m in re.findall(r"<h[1-4][^>]*>(.*?)</h[1-4]>", page, re.S)]
+    if DEBUG or os.environ.get("MD_CHART_DEBUG"):
+        print("md chart tables:", len(tables), [len(t) for t in tables], "headings:", titles[:15])
+        for t in tables[:4]:
+            print("   ", t[:4])
+    return {"tables": tables[:8], "headings": [x for x in titles if x][:12], "url": f"{MD_STORE}/pages/size-chart", "at": now_iso()}
 
 
 def fetch_usd_rate():
@@ -339,7 +362,7 @@ def fetch_rate():
 
 def load_prev():
     try:
-        with open(OUT, encoding="utf-8") as f:
+        with open(FULL if os.path.exists(FULL) else OUT, encoding="utf-8") as f:
             return json.load(f)
     except (OSError, ValueError):
         return {"meta": {}, "products": [], "removed": []}
@@ -350,11 +373,37 @@ def size_msgs(old, new):
     return [f"{x['s']} {'back in stock' if x['a'] else 'sold out'}" for x in new if x["s"] in o and o[x["s"]] != x["a"]]
 
 
-def write(data):
-    os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    with open(OUT, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
+HEAVY = ("images", "details", "guide", "guideImg", "guideAt", "changes", "verifiedAt")
+
+
+def _dump(path, obj):
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(obj, f, ensure_ascii=False, separators=(",", ":"))
         f.write("\n")
+
+
+def write(data):
+    """full.json keeps everything; data.json is the light list; more.json holds per-product extras."""
+    os.makedirs(os.path.dirname(OUT), exist_ok=True)
+    _dump(FULL, data)
+    light, more = [], {}
+    for p in data.get("products", []):
+        q = {k: v for k, v in p.items() if k not in HEAVY}
+        imgs = p.get("images") or []
+        if len(imgs) > 1:
+            q["img2"] = imgs[1]
+        q["nImg"] = len(imgs)
+        dims = next((t for t in (p.get("guide") or []) if t.get("kind") == "Dimensions"), None)
+        if dims:
+            q["dims"] = " × ".join(r[0][:1] + " " + r[1] for r in dims["rows"]) + " cm"
+        light.append(q)
+        extra = {k: p[k] for k in ("images", "details", "guide", "guideImg", "guideAt") if p.get(k)}
+        if extra.get("guideImg"):
+            extra["guideImg"] = {k: v for k, v in extra["guideImg"].items() if k != "all"}
+        more[p["handle"]] = extra
+    removed = [{k: r.get(k) for k in ("handle", "title", "cat", "brand", "price", "url", "removedAt")} for r in data.get("removed", [])]
+    _dump(OUT, {"meta": data.get("meta", {}), "products": light, "removed": removed})
+    _dump(MORE, more)
 
 
 def probe_illustration(handle):
@@ -390,6 +439,13 @@ def main():
     if rate:
         meta["rate"] = rate
     meta["usdRate"] = fetch_usd_rate()
+    if os.environ.get("MD_ENABLE", "1") == "1":
+        try:
+            chart = fetch_md_chart()
+            if chart["tables"]:
+                meta["mdChart"] = chart
+        except Exception as e:  # noqa: BLE001
+            print("md size chart failed:", e)
 
     old = {p["handle"]: dict(p, cat=p.get("cat", "midi")) for p in prev.get("products", [])}
     grp = lambda p: p.get("brand", "sp") + ":" + p["cat"]
