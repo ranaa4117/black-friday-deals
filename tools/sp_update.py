@@ -13,6 +13,8 @@ Usage:
 Standard library only.
 """
 import datetime as dt
+import html
+import re
 import json
 import os
 import sys
@@ -57,11 +59,15 @@ def normalize(p):
     price, compare = min(prices), max(comps)
     if compare <= price or not is_midi(p.get("title", "")):
         return None  # full price, or not a midi dress
-    imgs = p.get("images") or []
+    imgs = [i["src"] for i in (p.get("images") or []) if i.get("src")]
+    text = html.unescape(re.sub(r"<[^>]+>", " ", p.get("body_html") or ""))
+    text = re.sub(r"\s+", " ", text).strip()
     return {
         "handle": p["handle"],
         "title": p["title"].strip(),
-        "image": imgs[0]["src"] if imgs else "",
+        "image": imgs[0] if imgs else "",
+        "images": imgs[:12],
+        "details": text[:900],
         "price": round(price, 2),
         "compare": round(compare, 2),
         "sizes": [{"s": (v.get("option1") or v.get("title") or "").strip(), "a": bool(v.get("available"))} for v in variants],
