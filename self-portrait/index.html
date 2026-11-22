@@ -52,6 +52,7 @@ main{padding:0 var(--pad) 80px;max-width:1500px;margin:0 auto}
 .hero .facts small{font-size:12.5px;color:var(--stone)}
 .cta{display:inline-block;margin-top:32px;background:var(--ink);color:#fff;text-decoration:none;padding:14px 30px;font-size:13px;letter-spacing:.12em;text-transform:uppercase;transition:background .2s}
 .cta:hover{background:#333}
+.home-pics{padding-top:clamp(14px,2.5vw,28px)}
 .triptych{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;align-items:end}
 .triptych a{display:block;background:var(--ivory);aspect-ratio:2/3;overflow:hidden}
 .triptych a:nth-child(2){aspect-ratio:2/3.6}
@@ -233,7 +234,8 @@ a.plain{text-decoration:none}
 <header class="top" id="top">
   <a class="brand" href="#home"><b>Black Friday-Raghad Outlet 2026</b><span>Self-Portrait midi dresses · prices in SAR</span></a>
   <nav class="tabs" aria-label="Sections">
-    <a href="#home">All dresses<span class="count" id="cAll"></span></a>
+    <a href="#home">Home</a>
+    <a href="#all">All dresses<span class="count" id="cAll"></span></a>
     <a href="#favorites">Favorites<span class="count" id="cFav"></span></a>
     <a href="#recent">New in<span class="count" id="cNew"></span></a>
     <a href="#admin" id="navAdmin" class="hidden">Admin</a>
@@ -461,6 +463,16 @@ function filtered(list){
   return out.sort(by);
 }
 
+function viewHome(list){
+  const avail = list.filter(isAvail);
+  const picks = [...avail].sort((a,b) => pct(b) - pct(a)).filter(p => p.image).slice(0, 3);
+  const top = [...avail].sort((a,b) => pct(b) - pct(a)).slice(0, 8);
+  return `<section class="home-pics triptych">${picks.map(p => `<a href="#dress-${esc(p.handle)}" aria-label="${esc(p.title)}"><img src="${esc(img(p.image, 900))}" alt="${esc(p.title)}"></a>`).join("")}</section>
+    <div class="section-head"><h2>Deepest markdowns</h2><a href="#all" data-sort="disc">See all dresses</a></div>
+    <div class="grid">${top.map(p => card(p)).join("")}</div>
+    <a class="more" href="#all" style="text-align:center;text-decoration:none;width:max-content">Shop all ${list.length} dresses</a>`;
+}
+
 function viewAll(list){
   const all = filtered(list), shown = all.slice(0, UI.limit);
   const sizeBtns = UKS.map(n => `<button data-size="${n}" aria-pressed="${UI.sizes.includes(n)}">${n}</button>`).join("");
@@ -482,7 +494,7 @@ function viewAll(list){
 
 function viewFav(list){
   const favs = list.filter(p => S.fav[p.handle]).sort((a,b) => finalSAR(a) - finalSAR(b));
-  if (!favs.length) return `<div class="section-head"><h2>Favorites</h2></div><div class="empty"><h3>No favorites yet</h3><p>Tap the heart on any dress to keep it here and compare final prices.</p><a class="cta" href="#home">Browse the sale</a></div>`;
+  if (!favs.length) return `<div class="section-head"><h2>Favorites</h2></div><div class="empty"><h3>No favorites yet</h3><p>Tap the heart on any dress to keep it here and compare final prices.</p><a class="cta" href="#all">Browse the sale</a></div>`;
   const mine = S.settings.sizes;
   const total = favs.reduce((t,p) => t + finalSAR(p), 0);
   return `<div class="section-head"><h2>Favorites</h2><p>${favs.length} saved · together ${fmt(total)} SAR</p></div>
@@ -624,12 +636,12 @@ function textDialog(title, value, onOk, okLabel){
 /* ---------- dress page ---------- */
 function viewDress(list, handle){
   const p = list.find(x => x.handle === handle);
-  if (!p) return `<div class="empty"><h3>This dress is no longer in the sale</h3><p>It may have sold out or gone back to full price.</p><a class="cta" href="#home">See all sale dresses</a></div>`;
+  if (!p) return `<div class="empty"><h3>This dress is no longer in the sale</h3><p>It may have sold out or gone back to full price.</p><a class="cta" href="#all">See all sale dresses</a></div>`;
   const pics = (p.images && p.images.length ? p.images : [p.image]).filter(Boolean);
   const fav = !!S.fav[p.handle], off = offShown(p), out = !isAvail(p);
   const avail = (p.sizes || []).filter(s => s.a).map(s => s.s);
   const i = list.indexOf(p), prev = list[i - 1], next = list[i + 1];
-  return `<nav class="crumbs"><a href="#home" id="backLink">All sale dresses</a></nav>
+  return `<nav class="crumbs"><a href="#all" id="backLink">All sale dresses</a></nav>
   <section class="pdp">
     <div class="gallery">
       <div class="slides" id="slides" tabindex="0" aria-label="Photos of ${esc(p.title)}">${pics.map((src, n) => `<figure><img ${n > 1 ? 'loading="lazy"' : ""} src="${esc(img(src, 1200))}" alt="${esc(p.title)}, photo ${n + 1} of ${pics.length}"></figure>`).join("")}</div>
@@ -670,7 +682,7 @@ function wireDress(){
 /* ---------- router ---------- */
 function render(){
   const route = (location.hash || "#home").slice(1);
-  const navRoute = route === "all" ? "home" : route;
+  const navRoute = route;
   document.querySelectorAll("nav.tabs a").forEach(a => { if (a.getAttribute("href") === "#" + navRoute) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
   statusBar();
   const list = products(); counts(list);
@@ -681,9 +693,9 @@ function render(){
   if (isAdmin && !OWNER){ $("#gate").classList.remove("hidden"); setTimeout(() => $("#pass").focus(), 50); v.innerHTML = ""; return; }
   $("#gate").classList.add("hidden");
   if (route.startsWith("dress-") && $("#slides")) window._galleryAt = Math.round($("#slides").scrollLeft / $("#slides").clientWidth);
-  v.innerHTML = route.startsWith("dress-") ? viewDress(list, route.slice(6)) : route === "all" || route === "home" ? viewAll(list) : route === "favorites" ? viewFav(list) : route === "recent" ? viewRecent(list) : isAdmin ? viewAdmin(list) : viewAll(list);
+  v.innerHTML = route.startsWith("dress-") ? viewDress(list, route.slice(6)) : route === "all" ? viewAll(list) : route === "favorites" ? viewFav(list) : route === "recent" ? viewRecent(list) : isAdmin ? viewAdmin(list) : viewHome(list);
   document.documentElement.style.setProperty("--hh", $("#top").offsetHeight + "px");
-  if (route === "all" || route === "home") wireAll();
+  if (route === "all") wireAll();
   if (route.startsWith("dress-")) wireDress();
   if (isAdmin) wireAdmin(list);
 }
@@ -740,7 +752,7 @@ function start(){ render(); loadData(false); schedulePoll(); window._lastLoad = 
 $("#gateForm").onsubmit = async e => { e.preventDefault(); const h = await sha($("#pass").value); if (h === PASS_HASH){ store.set("sp-unlock", h); OWNER = true; $("#pass").value = ""; render(); } else { $("#gateErr").textContent = "That passcode doesn't match. Try again."; } };
 start();
 /* load the newest version of the site when it changes (browsers may keep an old copy for 10 min) */
-const APP_VERSION = "6";
+const APP_VERSION = "7";
 fetch("version.txt?t=" + Date.now(), { cache:"no-store" }).then(r => r.ok ? r.text() : "").then(v => {
   v = v.trim();
   if (v && v !== APP_VERSION && new URLSearchParams(location.search).get("v") !== v) location.replace(location.pathname + "?v=" + v + location.hash);
