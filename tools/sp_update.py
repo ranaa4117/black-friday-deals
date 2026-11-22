@@ -408,7 +408,11 @@ def main():
         except Exception as e:  # noqa: BLE001
             errors.append(f"{cat}: {e}")
         time.sleep(1.5)
+    if os.environ.get("MD_ENABLE", "1") != "1":
+        md_items = None
     try:
+        if os.environ.get("MD_ENABLE", "1") != "1":
+            raise RuntimeError("Mac Duggal disabled")
         md_items, raw_counts["md"] = fetch_md()
         for n in md_items:
             fresh[n["handle"]] = n
