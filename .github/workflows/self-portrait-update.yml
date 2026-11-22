@@ -2,8 +2,17 @@ name: Self-Portrait sale check
 
 on:
   schedule:
-    - cron: "7,37 * * * *"   # every 30 minutes
-  workflow_dispatch: {}
+    - cron: "4,19,34,49 * * * *"   # every 15 minutes
+  workflow_dispatch:
+    inputs:
+      sg_limit:
+        description: "Size guides to read this run"
+        required: false
+        default: "60"
+      debug:
+        description: "Print size-guide diagnostics (1 = yes)"
+        required: false
+        default: "0"
 
 permissions:
   contents: write
@@ -15,13 +24,16 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Read the Spain store and the EUR/SAR rate
+      - name: Read the Spain store (midi, maxi, bags), size guides and EUR/SAR rate
+        env:
+          SG_LIMIT: ${{ github.event.inputs.sg_limit || '60' }}
+          SG_DEBUG: ${{ github.event.inputs.debug || '0' }}
         run: python3 tools/sp_update.py
       - name: Publish new data
         run: |
