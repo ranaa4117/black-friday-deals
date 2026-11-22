@@ -336,6 +336,68 @@ nav.tabs .dot{display:inline-block;width:6px;height:6px;border-radius:50%;backgr
 .banner .imgl{display:block;width:100%;height:100%}
 .banner .cap a{color:#fff;text-decoration:none}
 @media (max-width:820px){.banners{grid-template-columns:1fr 1fr}}
+
+/* ---- v4: brands, Arabic filters, Black Friday home ---- */
+nav.tabs .brandlink{font-family:var(--serif);font-size:15px;letter-spacing:.06em}
+nav.tabs .soonlink small{font:300 10px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--sale);margin-inline-start:4px}
+.subnav{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 4px}
+.subnav a{border:1px solid var(--rule);padding:8px 16px;text-decoration:none;font-size:15px}
+.subnav a[aria-current="page"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.ar-filters{font-family:"Tajawal",var(--sans);direction:rtl;border:1px solid var(--rule);padding:14px 16px;margin-top:14px;gap:12px 18px}
+.ar-filters *{letter-spacing:0}
+.ar-filters .fhead{display:flex;justify-content:space-between;align-items:center;width:100%}
+.ar-filters .fhead h3{font:500 17px "Tajawal",sans-serif}
+.ar-filters .search{flex:1 1 100%}
+.ar-filters .search input{font-family:"Tajawal",var(--sans);text-align:right}
+.ar-filters .frow{display:flex;flex-wrap:wrap;gap:12px 22px;align-items:flex-end;width:100%}
+.ar-filters .fld{display:flex;flex-direction:column;gap:5px;font-size:13.5px;color:var(--stone);border:0;padding:0;margin:0}
+.ar-filters .fld select,.ar-filters .fld input{border:1px solid var(--rule);background:#fff;padding:8px 10px;font:400 14px "Tajawal",var(--sans);color:var(--ink);border-radius:0}
+.ar-filters .fprice{flex-direction:row;flex-wrap:wrap;align-items:flex-end;gap:8px}
+.ar-filters .fprice legend{font-size:13.5px;color:var(--ink);margin-bottom:4px;width:100%;float:right}
+.ar-filters .fprice label{display:flex;flex-direction:column;gap:4px;font-size:12.5px;position:relative}
+.ar-filters .fprice input{width:110px;padding-left:34px}
+.ar-filters .fprice i{position:absolute;left:9px;bottom:9px;font-style:normal;font-size:12px;color:var(--stone)}
+.ar-filters .btn{font-family:"Tajawal",var(--sans);padding:9px 16px;font-size:14px}
+.ar-filters .ferr{color:var(--sale);font-size:13px;width:100%;min-height:0}
+.ar-filters .ferr:empty{display:none}
+.empty[lang="ar"]{font-family:"Tajawal",var(--sans)}
+.empty[lang="ar"] h3{font:500 24px "Tajawal",sans-serif}
+.ptags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.ptag{font-size:11px;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--sale);color:var(--sale);padding:3px 7px}
+.ptag-x{background:var(--sale);color:#fff}
+.promo-note{font-size:13px;color:#3d3a37;margin:6px 0 2px;max-width:80ch}
+ul.breakdown{list-style:none;margin:14px 0 4px;border-top:1px solid var(--rule)}
+ul.breakdown li{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--rule);font-size:14px}
+ul.breakdown li b{font-weight:500}
+ul.breakdown li.tot{font-size:16px}
+.bf-hero{background:var(--ink);color:#fff;text-align:center;padding:clamp(34px,6vw,72px) var(--pad);margin:clamp(18px,3vw,30px) calc(var(--pad) * -1) 0}
+.bf-kicker{font-size:12.5px;letter-spacing:.32em;text-transform:uppercase;opacity:.8}
+.bf-title{font:400 clamp(44px,8vw,104px)/1 var(--serif);margin:12px 0 10px;letter-spacing:.02em}
+.bf-sub{font-size:14px;letter-spacing:.08em;opacity:.85}
+.cta.light{background:#fff;color:var(--ink);margin-top:24px}
+.cta.light:hover{background:var(--ivory)}
+.brands{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.brandcard{position:relative;display:block;aspect-ratio:4/5;overflow:hidden;background:var(--ivory);color:#fff;text-decoration:none}
+.brandcard img{width:100%;height:100%;object-fit:cover;transition:transform 1.1s cubic-bezier(.2,.6,.2,1)}
+.brandcard:hover img{transform:scale(1.04)}
+.brandcard::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.6),rgba(0,0,0,0) 55%)}
+.bc-cap{position:absolute;left:clamp(14px,2vw,26px);right:12px;bottom:clamp(14px,2vw,26px);z-index:1}
+.bc-cap b{display:block;font:400 clamp(24px,3vw,40px)/1.05 var(--serif)}
+.bc-cap span{font-size:13px;letter-spacing:.1em;text-transform:uppercase;opacity:.9}
+.soon-card{background:#111;display:grid;place-items:center;text-align:center}
+.soon-card::after{display:none}
+.soon-card .bc-cap{position:static}
+.soon-card .bc-cap span{display:inline-block;margin-top:12px;border:1px solid rgba(255,255,255,.6);padding:5px 12px}
+.soon{text-align:center;padding:clamp(60px,10vw,140px) 0}
+.soon-brand{font:400 clamp(40px,7vw,84px)/1 var(--serif)}
+.soon-tag{display:inline-block;margin:20px 0 16px;border:1px solid var(--ink);padding:7px 18px;letter-spacing:.24em;text-transform:uppercase;font-size:13px}
+.soon .small{max-width:46ch;margin:0 auto 26px}
+@media (max-width:820px){
+  .brands{grid-template-columns:1fr 1fr;gap:8px}
+  .brands .soon-card{grid-column:1 / -1;aspect-ratio:auto;padding:38px 16px}
+  .ar-filters .fprice input{width:96px}
+  .ar-filters .frow{gap:12px}
+}
 </style>
 </head>
 <body>
@@ -355,13 +417,13 @@ nav.tabs .dot{display:inline-block;width:6px;height:6px;border-radius:50%;backgr
   <a class="brand" href="#home" aria-label="SELF PORTRAIT BLACK FRIDAY 2026, Raghad outlet, home"><b class="mainhead"><span class="hl">SELF PORTRAIT</span> <span class="hl">BLACK FRIDAY 2026</span></b><small class="subhead">Raghad outlet</small></a>
   <nav class="tabs" aria-label="Sections">
     <a href="#home" lang="ar">الرئيسية</a>
-    <a href="#all" lang="ar">جميع المنتجات<span class="count" id="c-all"></span></a>
-    <a href="#midi" lang="ar">فساتين ميدي<span class="count" id="c-midi"></span></a>
-    <a href="#maxi" lang="ar">فساتين ماكسي<span class="count" id="c-maxi"></span></a>
-    <a href="#bags" lang="ar">شنط<span class="count" id="c-bags"></span></a>
-    <a href="#favorites" lang="ar">المفضلة<span class="count" id="c-fav"></span></a>
-    <a href="#popular" lang="ar">الأكثر تفضيلاً<span class="count" id="c-pop"></span></a>
-    <a href="#recent" lang="ar">وصل حديثاً<span class="count" id="c-new"></span></a>
+    <a href="#sp" class="brandlink" dir="ltr">Self-Portrait</a>
+    <a href="#md" class="brandlink" dir="ltr">Mac Duggal</a>
+    <a href="#vs" class="brandlink soonlink" dir="ltr">Victoria's Secret <small>Coming Soon</small></a>
+    <a href="#all" lang="ar">جميع المنتجات</a>
+    <a href="#favorites" lang="ar">المفضلة<span id="c-fav"></span></a>
+    <a href="#popular" lang="ar">الأكثر تفضيلاً</a>
+    <a href="#recent" lang="ar">وصل حديثاً</a>
     <a href="#discounts" lang="ar">أعلى الخصومات</a>
     <a href="#admin" id="navAdmin" class="hidden" dir="ltr">Admin</a>
   </nav>
@@ -382,7 +444,7 @@ const PASS_HASH = "3c29f0bb09f7f11433b993fb3a8d945503758c57eacb6ecfe88c49e1ef74e
 const REPO = "ranaa4117/black-friday-deals";
 const WORKFLOW = "self-portrait-update.yml";
 const LS = "sp-edit-v1";
-const APP_VERSION = "12";
+const APP_VERSION = "13";
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
@@ -391,10 +453,37 @@ const store = { get(k){ try { return localStorage.getItem(k); } catch { return n
 const CATS = { midi:"Midi dresses", maxi:"Maxi dresses", bags:"Bags" };
 const CAT1 = { midi:"Midi dress", maxi:"Maxi dress", bags:"Bag" };
 const catOf = p => p.cat || "midi";
+const BRANDS = { sp:"Self-Portrait", md:"Mac Duggal" };
+const brandOf = p => p.brand || "sp";
+const isMD = p => brandOf(p) === "md";
+const kindOf = p => BRANDS[brandOf(p)] + " · " + CAT1[catOf(p)];
 const isDress = p => catOf(p) !== "bags";
 const BAG_STYLES = [["clutch","Clutch"],["tote","Tote"],["crossbody","Crossbody"],["cross body","Crossbody"],["shoulder","Shoulder bag"],["top handle","Top handle"],["bucket","Bucket bag"],["baguette","Baguette"],["pouch","Pouch"],["micro","Mini bag"],["mini","Mini bag"],["bow","Bow bag"]];
 const bagStyle = p => { const t = p.title.toLowerCase(); const m = BAG_STYLES.find(([k]) => t.includes(k)); return m ? m[1] : "Other bags"; };
 const colorOf = p => { const w = p.title.split(/\s+/); return /^(off|light|dark|pale|hot|baby|burnt)$/i.test(w[0]) ? w[0] + " " + w[1] : w[0]; };
+
+/* ---------- colours ---------- */
+const COLOR_FAMS = [
+  ["black","أسود","black onyx jet"],["white","أبيض","white"],["ivory","عاجي وكريمي","ivory cream ecru"],
+  ["beige","بيج ونود","beige nude taupe sand camel tan mocha latte oatmeal rattan stone khaki"],
+  ["brown","بني","brown chocolate coffee espresso cocoa nutmeg chestnut cognac"],
+  ["red","أحمر","red scarlet cherry crimson ruby"],["burgundy","عنابي","burgundy wine bordeaux plum berry merlot oxblood maroon"],
+  ["pink","وردي","pink blush rose fuchsia magenta raspberry candy petal"],["purple","بنفسجي","purple lilac lavender violet mauve orchid amethyst grape"],
+  ["navy","كحلي","navy midnight"],["blue","أزرق","blue cobalt ocean sky royal indigo denim periwinkle turquoise aqua cornflower sapphire"],
+  ["green","أخضر","green sage olive emerald mint seafoam lime teal jade hunter forest pistachio"],
+  ["yellow","أصفر","yellow lemon butter mustard canary citrus"],["orange","برتقالي","orange coral peach apricot rust tangerine terracotta"],
+  ["gold","ذهبي","gold champagne bronze copper brass"],["silver","فضي ورمادي","silver grey gray gunmetal charcoal platinum pewter"],
+  ["multi","متعدد الألوان","multi multicolor floral print houndstooth polka check stripe leopard"]];
+const COLOR_WORD = {}; COLOR_FAMS.forEach(([k,, w]) => w.split(" ").forEach(x => COLOR_WORD[x] = k));
+const COLOR_AR = Object.fromEntries(COLOR_FAMS.map(([k, a]) => [k, a]));
+const famOf = name => { for (const w of String(name).toLowerCase().split(/[\s\-\/&,]+/)) if (COLOR_WORD[w]) return COLOR_WORD[w]; return ""; };
+const famCache = new Map();
+function colorFams(p){
+  if (famCache.has(p.handle + p.title)) return famCache.get(p.handle + p.title);
+  let f = isMD(p) ? [...new Set((p.colors || []).map(famOf).filter(Boolean))] : [];
+  if (!f.length){ const t = famOf(p.title); if (t) f = [t]; }
+  famCache.set(p.handle + p.title, f); return f;
+}
 
 /* ---------- UK sizes (Self-Portrait conversion chart) ---------- */
 const UKS = [4,6,8,10,12,14,16,18];
@@ -410,7 +499,7 @@ const CONVERSION = [["UK",["4","6","8","10","12","14","16"]],["Letter",["XS",">S
 /* ---------- state ---------- */
 let DATA = { meta:{}, products:[], removed:[] };
 let loaded = false, pollTimer = null, syncTimer = null;
-const defaults = () => ({ fav:{}, notes:{}, ov:{}, manual:[], del:{}, settings:{ extra:450, extraBags:450, rate:null, sizes:[], poll:5 }, updatedAt:0 });
+const defaults = () => ({ fav:{}, notes:{}, ov:{}, manual:[], del:{}, settings:{ extra:450, extraBags:450, extraMD:450, rate:null, sizes:[], poll:5 }, updatedAt:0 });
 let S = Object.assign(defaults(), JSON.parse(store.get(LS) || "{}"));
 S.settings = Object.assign(defaults().settings, S.settings || {});
 S.settings.sizes = [...new Set((S.settings.sizes || []).map(x => typeof x === "number" ? x : (ukRange(x) || [null])[0]).filter(n => UKS.includes(n)))].sort((a,b) => a - b);
@@ -455,24 +544,33 @@ function favTime(h){ if (TOTALS && TOTALS[h]) return TOTALS[h].t; const b = favO
 const popular = list => list.filter(p => favCount(p.handle) > 0).sort((a,b) => favCount(b.handle) - favCount(a.handle) || favTime(b.handle) - favTime(a.handle));
 let GH = JSON.parse(store.get("sp-gh") || '{"token":"","sync":false}');
 const UI = {};
-const ui = r => UI[r] || (UI[r] = { q:"", sort: r === "discounts" ? "disc" : r === "popular" ? "pop" : "new", avail:"all", sizes:[], mine:false, type:"", price:"", disc:"", style:"", color:"", limit:48 });
+const ui = r => UI[r] || (UI[r] = { q:"", sort: r === "discounts" ? "disc" : r === "popular" ? "pop" : "new", pmin:"", pmax:"", color:"", limit:48 });
 
 /* ---------- helpers ---------- */
 const rate = () => Number(C().settings && C().settings.rate) || Number(DATA.meta.rate && DATA.meta.rate.value) || 0;
 const extra = () => { const v = C().settings && C().settings.extra; return v !== undefined && v !== null && v !== "" && Number.isFinite(Number(v)) ? Number(v) : 450; };
 const extraBags = () => { const v = C().settings && C().settings.extraBags; return v !== undefined && v !== null && v !== "" && Number.isFinite(Number(v)) ? Number(v) : 450; };
-const extraFor = p => catOf(p) === "bags" ? extraBags() : extra();
-const finalSAR = p => Math.round(p.price * rate() + extraFor(p));
-const wasSAR = p => Math.round(p.compare * rate() + extraFor(p));
+const extraMD = () => { const v = C().settings && C().settings.extraMD; return v !== undefined && v !== null && v !== "" && Number.isFinite(Number(v)) ? Number(v) : 450; };
+const usdRate = () => Number(C().settings && C().settings.usdRate) || Number(DATA.meta.usdRate && DATA.meta.usdRate.value) || 3.75;
+const rateFor = p => isMD(p) ? usdRate() : rate();
+const extraFor = p => isMD(p) ? extraMD() : catOf(p) === "bags" ? extraBags() : extra();
+/* Mac Duggal's extra 25% is taken in the cart from the current (sale) price, so it applies after any markdown */
+const netPrice = p => isMD(p) && p.extra25 ? p.price * 0.75 : p.price;
+const finalSAR = p => Math.round(netPrice(p) * rateFor(p) + extraFor(p));
+const saleSAR = p => Math.round(p.price * rateFor(p) + extraFor(p));
+const wasSAR = p => Math.round(p.compare * rateFor(p) + extraFor(p));
 const pct = p => p.compare > p.price ? Math.round((1 - p.price / p.compare) * 100) : 0;
-const offShown = p => COSTS() ? pct(p) : (wasSAR(p) > finalSAR(p) ? Math.round((1 - finalSAR(p) / wasSAR(p)) * 100) : 0);
+const offShown = p => COSTS() && !isMD(p) ? pct(p) : (wasSAR(p) > finalSAR(p) ? Math.round((1 - finalSAR(p) / wasSAR(p)) * 100) : 0);
+const money = (p, n) => isMD(p) ? "$" + (Math.round(n * 100) / 100).toLocaleString("en-US") : eur(n);
+const sizeLabel = (p, raw) => isMD(p) ? raw : "UK " + ukLabel(raw);
 const isAvail = p => (p.sizes || []).some(s => s.a);
 const fmt = n => Number(n).toLocaleString("en-US");
 const eur = n => "€" + (Math.round(n * 100) / 100).toLocaleString("en-US");
 const when = iso => iso ? new Date(iso).toLocaleString("en-GB", { timeZone:"Asia/Riyadh", day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" }) : "—";
 const ago = iso => { if (!iso) return ""; const m = Math.round((Date.now() - new Date(iso)) / 60000); return m < 1 ? "just now" : m < 60 ? m + " min ago" : m < 1440 ? Math.round(m/60) + " h ago" : Math.round(m/1440) + " days ago"; };
-const img = (src, w) => !src ? "" : /cdn\.shopify\.com|self-portrait\.com\/cdn/.test(src) ? src + (src.includes("?") ? "&" : "?") + "width=" + w : src;
+const img = (src, w) => !src ? "" : /cdn\.shopify\.com|self-portrait\.com\/cdn|macduggal\.com\/cdn/.test(src) ? src + (src.includes("?") ? "&" : "?") + "width=" + w : src;
 const url = p => p.url || ("https://eu.self-portrait.com/es-es/products/" + p.handle);
+const img2 = (src, w) => !src ? "" : /cdn\.shopify\.com|self-portrait\.com\/cdn|macduggal\.com\/cdn/.test(src) ? src + (src.includes("?") ? "&" : "?") + "width=" + w : src;
 const plink = p => "#item-" + p.handle;
 function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 3400); }
 const dimsOf = p => { const t = (p.guide || []).find(g => g.kind === "Dimensions"); if (!t) return ""; return t.rows.map(r => r[0].charAt(0) + " " + r[1]).join(" × ") + " cm"; };
@@ -559,8 +657,11 @@ const heartSVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s
 
 function sizesHTML(p){
   if (!isDress(p)) return "";
-  const mine = S.settings.sizes, list = p.sizes || [];
+  const list = p.sizes || [];
   if (!list.length) return '<p class="small" style="margin-top:12px">Sizes not listed</p>';
+  if (isMD(p)) return '<ul class="sizes" aria-label="US sizes">' + list.map((s, i) =>
+    `<li class="${s.a ? "on" : "off"}" title="${esc(s.s)} ${s.a ? "available" : "sold out"}">${i === 0 ? '<span class="sys">US</span>' : ""}${esc(s.s.replace(/^US\s*/, ""))}</li>`).join("") + "</ul>";
+  const mine = S.settings.sizes;
   return '<ul class="sizes" aria-label="UK sizes">' + list.map((s, i) =>
     `<li class="${s.a ? "on" : "off"}${anyFits(s.s, mine) ? " mine" : ""}" title="UK ${esc(ukLabel(s.s))} ${s.a ? "available" : "sold out"}">${i === 0 ? '<span class="sys">UK</span>' : ""}${esc(ukLabel(s.s))}</li>`).join("") + "</ul>";
 }
@@ -571,28 +672,42 @@ function favLine(p){
   return `<p class="favsize">Your size: <b>${esc(f.size)}</b></p>${favSizeOk(p) ? "" : `<p class="warnline">${esc(f.size)} is no longer available</p>`}`;
 }
 let showPop = false;
+function promoTags(p){
+  const t = [];
+  if (p.markdown) t.push(`<span class="ptag">${p.bf ? "Black Friday" : "Sale"} −${pct(p)}%</span>`);
+  if (p.extra25) t.push(`<span class="ptag ptag-x">Extra 25% off in cart</span>`);
+  return t.length ? `<p class="ptags">${t.join("")}</p>` : "";
+}
+function mdPriceLines(p){
+  return `${promoTags(p)}
+    <p class="sar">${fmt(finalSAR(p))}<small>SAR</small></p>
+    <p class="eur"><s>${fmt(wasSAR(p))} SAR</s>${p.markdown && p.extra25 ? ` <span class="now">${p.bf ? "Black Friday" : "Sale"} price ${fmt(saleSAR(p))} SAR</span>` : ""}</p>
+    ${p.extra25 ? '<p class="calc">Estimated final price — the extra 25% is taken by Mac Duggal at checkout</p>' : ""}
+    ${COSTS() ? `<p class="calc">${money(p, p.price)}${p.markdown ? " (was " + money(p, p.compare) + ")" : ""}${p.extra25 ? " × 0.75" : ""} × ${usdRate().toFixed(3)} + ${fmt(extraFor(p))} SAR</p>` : ""}`;
+}
 function card(p, showCat){
-  const fav = !!S.fav[p.handle], out = !isAvail(p), off = offShown(p);
+  const fav = !!S.fav[p.handle], out = !isAvail(p), off = isMD(p) ? pct(p) : offShown(p);
   const isNew = DATA.meta.initialImport && (p.firstSeen || "") > DATA.meta.initialImport;
   const nPics = (p.images || []).length, dims = dimsOf(p);
   return `<article class="card${out ? " out" : ""}">
     <a class="ph" href="${plink(p)}" aria-label="View ${esc(p.title)}">
       ${p.image ? `<img loading="lazy" src="${esc(img(p.image, 700))}" alt="${esc(p.title)}">` : '<span class="empty" style="display:grid;place-items:center;height:100%">No image</span>'}
       ${nPics > 1 ? `<img class="alt" loading="lazy" src="${esc(img(p.images[1], 700))}" alt="">` : ""}
-      ${off ? `<span class="badge">−${off}%</span>` : ""}
+      ${off ? `<span class="badge">−${off}%</span>` : isMD(p) && p.extra25 ? '<span class="badge">+25%</span>' : ""}
       ${out ? '<span class="flag">Sold out</span>' : isNew ? '<span class="flag">New to sale</span>' : nPics > 1 ? `<span class="flag light">${nPics} photos</span>` : ""}
       ${showPop && favCount(p.handle) ? `<span class="popcount">♥ ${favCount(p.handle)}</span>` : ""}
     </a>
     <button class="heart" data-fav="${esc(p.handle)}" aria-pressed="${fav}" aria-label="${fav ? "Remove from" : "Save to"} favorites">${heartSVG}</button>
-    ${showCat ? `<p class="cat-tag">${CAT1[catOf(p)]}</p>` : ""}
+    ${showCat ? `<p class="cat-tag">${esc(kindOf(p))}</p>` : ""}
     <h3><a href="${plink(p)}" class="plain">${esc(p.title)}</a></h3>
+    ${isMD(p) ? mdPriceLines(p) : `
     ${COSTS() ? `<p class="eur"><s>${eur(p.compare)}</s><span class="now">${eur(p.price)}</span><span class="pct">−${pct(p)}%</span></p>` : ""}
     <p class="sar">${fmt(finalSAR(p))}<small>SAR</small></p>
     ${off && !COSTS() ? `<p class="eur"><s>${fmt(wasSAR(p))} SAR</s></p>` : ""}
-    ${COSTS() ? `<p class="calc">${eur(p.price)} × ${rate().toFixed(3)} + ${fmt(extraFor(p))} SAR</p>` : ""}
+    ${COSTS() ? `<p class="calc">${eur(p.price)} × ${rate().toFixed(3)} + ${fmt(extraFor(p))} SAR</p>` : ""}`}
     ${sizesHTML(p)}
     ${!isDress(p) && dims ? `<p class="dims">${esc(dims)}</p>` : ""}
-    <button class="guide-btn" data-guide="${esc(p.handle)}">${isDress(p) ? "View size guide" : "View dimensions"}</button>
+    ${isMD(p) ? "" : `<button class="guide-btn" data-guide="${esc(p.handle)}">${isDress(p) ? "View size guide" : "View dimensions"}</button>`}
     ${favLine(p)}
     ${OWNER ? `<div class="acts"><button data-edit="${esc(p.handle)}">Edit</button>${COSTS() ? `<a href="${esc(url(p))}" target="_blank" rel="noopener">Store page</a>` : ""}</div>` : ""}
     ${waLink(p)}
@@ -614,34 +729,21 @@ function statusBar(){
 }
 
 function counts(list){
-  $("#c-all").textContent = " " + list.length;
-  for (const c of Object.keys(CATS)) $("#c-" + c).textContent = " " + list.filter(p => catOf(p) === c).length;
-  const favs = list.filter(p => S.fav[p.handle]), f = favs.length;
-  const warn = favs.some(p => isDress(p) && !favSizeOk(p));
-  $("#c-fav").innerHTML = (f ? " " + f : "") + (warn ? '<span class="dot" title="A saved size is no longer available"></span>' : "");
-  const pc = popular(list).length; $("#c-pop").textContent = pc ? " " + pc : "";
-  const n = recentList(list).length; $("#c-new").textContent = n ? " " + n : "";
+  const warn = list.some(p => S.fav[p.handle] != null && isDress(p) && !favSizeOk(p));
+  $("#c-fav").innerHTML = warn ? '<span class="dot" title="A saved size is no longer available"></span>' : "";
 }
 
-/* ---------- filtering ---------- */
-const PRICE_BANDS = [["0-999","Under 1,000 SAR"],["1000-1499","1,000–1,499 SAR"],["1500-1999","1,500–1,999 SAR"],["2000-2499","2,000–2,499 SAR"],["2500-1e9","2,500 SAR and up"]];
-const DISC_BANDS = [["30","30% off or more"],["40","40% off or more"],["50","50% off or more"],["60","60% off or more"]];
+/* ---------- filtering (price + colour only) ---------- */
 function applyFilters(list, u){
-  const q = u.q.trim().toLowerCase(), want = u.mine ? S.settings.sizes : u.sizes;
-  const [lo, hi] = u.price ? u.price.split("-").map(Number) : [0, Infinity];
+  const q = u.q.trim().toLowerCase();
+  const lo = u.pmin === "" || u.pmin == null ? -Infinity : Number(u.pmin), hi = u.pmax === "" || u.pmax == null ? Infinity : Number(u.pmax);
   let out = list.filter(p => (!q || p.title.toLowerCase().includes(q))
-    && (!u.type || (u.type === "popular" ? favCount(p.handle) > 0 : catOf(p) === u.type))
-    && (u.avail === "all" || (u.avail === "in" ? isAvail(p) : !isAvail(p)))
-    && (!want.length || (isDress(p) && (p.sizes || []).some(s => s.a && anyFits(s.s, want))))
-    && (!u.price || (finalSAR(p) >= lo && finalSAR(p) <= hi))
-    && (!u.disc || offShown(p) >= Number(u.disc))
-    && (!u.style || bagStyle(p) === u.style)
-    && (!u.color || colorOf(p) === u.color));
+    && finalSAR(p) >= lo && finalSAR(p) <= hi
+    && (!u.color || colorFams(p).includes(u.color)));
   const by = {
     asc: (a,b) => finalSAR(a) - finalSAR(b), desc: (a,b) => finalSAR(b) - finalSAR(a),
     disc: (a,b) => offShown(b) - offShown(a) || finalSAR(a) - finalSAR(b),
     new: (a,b) => (b.firstSeen||"").localeCompare(a.firstSeen||"") || (b.publishedAt||"").localeCompare(a.publishedAt||""),
-    upd: (a,b) => (b.lastChanged||"").localeCompare(a.lastChanged||""),
     pop: (a,b) => favCount(b.handle) - favCount(a.handle) || favTime(b.handle) - favTime(a.handle),
     fav: (a,b) => (S.fav[b.handle] ? 1 : 0) - (S.fav[a.handle] ? 1 : 0) || (b.firstSeen||"").localeCompare(a.firstSeen||""),
   }[u.sort] || (() => 0);
@@ -649,65 +751,104 @@ function applyFilters(list, u){
 }
 
 const opt = (v, label, cur) => `<option value="${esc(v)}" ${String(cur) === String(v) ? "selected" : ""}>${esc(label)}</option>`;
+const SP_ROUTES = ["sp","midi","maxi","bags"];
 
 function viewList(route, all){
   const u = ui(route);
-  const TITLES = { all:"All products", midi:"Midi dresses", maxi:"Maxi dresses", bags:"Bags", recent:"Newly added", discounts:"Biggest discounts", popular:"Most favorited" };
-  let base = route === "midi" || route === "maxi" || route === "bags" ? all.filter(p => catOf(p) === route) : route === "recent" ? recentList(all) : route === "popular" ? popular(all) : all;
-  const kind = route === "bags" ? "bags" : route === "midi" || route === "maxi" ? "dress" : "mixed";
-  const shownCat = kind === "mixed";
+  const TITLES = { all:"All products", sp:"Self-Portrait", midi:"Self-Portrait", maxi:"Self-Portrait", bags:"Self-Portrait", md:"Mac Duggal Maxi Dresses", recent:"Newly added", discounts:"Biggest discounts", popular:"Most favorited" };
+  const sp = all.filter(p => !isMD(p));
+  let base = route === "sp" ? sp : route === "midi" || route === "maxi" || route === "bags" ? sp.filter(p => catOf(p) === route)
+    : route === "md" ? all.filter(isMD) : route === "recent" ? recentList(all) : route === "popular" ? popular(all) : all;
+  const shownCat = !SP_ROUTES.includes(route) && route !== "md";
   const res = applyFilters(base, u), shown = res.slice(0, u.limit);
-  const styles = [...new Set(base.filter(p => !isDress(p)).map(bagStyle))].sort();
-  const colors = [...new Set(base.filter(p => !isDress(p)).map(colorOf))].sort();
-  const sub = { all:"Every discounted midi dress, maxi dress and bag in the Self-Portrait sale.", midi:"Discounted Self-Portrait midi dresses.", maxi:"Discounted Self-Portrait maxi dresses.", bags:"Discounted Self-Portrait bags.", recent:"Pieces that joined the sale since tracking began, newest first.", discounts:"The deepest markdowns across every category.", popular:"Ranked by how many times each piece has been added to favorites." }[route];
-  const sizeChips = kind !== "bags" ? `<div class="chips">UK size${S.settings.sizes.length && OWNER ? ` <button id="mine" aria-pressed="${u.mine}">My sizes</button>` : ""} ${UKS.map(n => `<button data-size="${n}" aria-pressed="${u.sizes.includes(n)}" ${u.mine ? "disabled" : ""}>${n}</button>`).join("")}${u.sizes.length ? ' <button id="clearSizes">Clear</button>' : ""}</div>` : "";
+  const fams = COLOR_FAMS.filter(([k]) => base.some(p => colorFams(p).includes(k)));
+  const sub = { all:"Every discounted piece from Self-Portrait and Mac Duggal, in one place.", sp:"Discounted Self-Portrait pieces from the official Spain store.", midi:"Discounted Self-Portrait midi dresses.", maxi:"Discounted Self-Portrait maxi dresses.", bags:"Discounted Self-Portrait bags.",
+    md:"Every eligible Mac Duggal maxi dress from the official US store — Black Friday markdowns and the extra 25% in cart, together in one collection.",
+    recent:"Pieces that joined the sale since tracking began, newest first.", discounts:"The deepest markdowns across every brand.", popular:"Ranked by how many times each piece has been added to favorites." }[route];
+  const subnav = SP_ROUTES.includes(route) ? `<nav class="subnav" dir="rtl" aria-label="Self-Portrait categories"><a href="#midi" lang="ar" ${route === "midi" ? 'aria-current="page"' : ""}>فساتين ميدي</a><a href="#maxi" lang="ar" ${route === "maxi" ? 'aria-current="page"' : ""}>فساتين ماكسي</a><a href="#bags" lang="ar" ${route === "bags" ? 'aria-current="page"' : ""}>شنط</a></nav>`
+    : route === "md" ? `<nav class="subnav" dir="rtl" aria-label="Mac Duggal categories"><a href="#md" lang="ar" aria-current="page">فساتين ماكسي</a></nav>` : "";
   let body;
   showPop = route === "popular" || u.sort === "pop";
+  const filtered = u.q || u.color || (u.pmin !== "" && u.pmin != null) || (u.pmax !== "" && u.pmax != null);
   if (route === "popular" && !base.length){
     body = `<div class="empty"><h3>No favorites yet</h3><p>Pieces appear here, ranked, as soon as they are added to favorites.</p><a class="cta" href="#all">Browse the sale</a></div>`;
   } else if (route === "recent" && !base.length){
     const fresh = [...all].sort((a,b) => (b.publishedAt||"").localeCompare(a.publishedAt||"")).slice(0, 8);
-    body = `<div class="empty" style="padding:40px 0"><h3>Nothing new since tracking began</h3><p>Newly discounted pieces appear here. These were published most recently by Self-Portrait:</p></div><div class="grid">${fresh.map(p => card(p, true)).join("")}</div>`;
+    body = `<div class="empty" style="padding:40px 0"><h3>Nothing new since tracking began</h3><p>Newly discounted pieces appear here. These were published most recently:</p></div><div class="grid">${fresh.map(p => card(p, true)).join("")}</div>`;
   } else {
-    body = res.length ? `<div class="grid">${shown.map(p => card(p, shownCat)).join("")}</div>${res.length > shown.length ? `<button class="more" id="more">Show more (${res.length - shown.length})</button>` : ""}`
-      : `<div class="empty"><h3>Nothing matches these filters</h3><p>Try a wider price range, fewer sizes, or clear the search.</p><button class="btn" id="resetF" style="margin-top:14px">Clear all filters</button></div>`;
+    body = res.length ? `<div class="grid">${shown.map(p => card(p, shownCat)).join("")}</div>${res.length > shown.length ? `<button class="more" id="more">Show more</button>` : ""}`
+      : `<div class="empty" dir="rtl" lang="ar"><h3>لا توجد نتائج</h3>${filtered ? '<button class="btn" id="resetF" style="margin-top:14px">مسح الكل</button>' : ""}</div>`;
   }
-  return `<div class="list-head"><div><h2>${TITLES[route]}</h2><p>${sub}</p></div><p>${fmt(res.length)} of ${fmt(base.length)}</p></div>
-    <div class="toolbar" id="toolbar">
-      <label class="search"><input id="q" type="search" placeholder="${kind === "bags" ? "Search bags — clutch, crystal, satin…" : "Search by name — lace, boucle, rhinestone…"}" value="${esc(u.q)}" aria-label="Search"></label>
-      <div class="filters">
-        <select id="f-sort" aria-label="Sort">${opt("new","Recently added",u.sort)}${opt("upd","Recently updated",u.sort)}${opt("asc","Lowest final price",u.sort)}${opt("desc","Highest final price",u.sort)}${opt("disc","Biggest discount",u.sort)}${opt("fav","Favorites first",u.sort)}${opt("pop","Most favorited",u.sort)}</select>
-        ${kind === "mixed" ? `<select id="f-type" aria-label="Category / dress length">${opt("","All categories",u.type)}${opt("midi","Midi dresses",u.type)}${opt("maxi","Maxi dresses",u.type)}${opt("bags","Bags",u.type)}${opt("popular","Most favorited",u.type)}</select>` : ""}
-        ${kind === "bags" ? `<select id="f-style" aria-label="Bag style">${opt("","All styles",u.style)}${styles.map(s => opt(s, s, u.style)).join("")}</select><select id="f-color" aria-label="Colour">${opt("","All colours",u.color)}${colors.map(s => opt(s, s, u.color)).join("")}</select>` : ""}
-        <select id="f-price" aria-label="Price range">${opt("","Any price",u.price)}${PRICE_BANDS.map(([v,l]) => opt(v,l,u.price)).join("")}</select>
-        <select id="f-disc" aria-label="Discount">${opt("","Any discount",u.disc)}${DISC_BANDS.map(([v,l]) => opt(v,l,u.disc)).join("")}</select>
-        <select id="f-avail" aria-label="Availability">${opt("all","In stock and sold out",u.avail)}${opt("in","In stock only",u.avail)}${opt("out","Sold out only",u.avail)}</select>
+  return `<div class="list-head"><div><h2>${TITLES[route]}</h2><p>${sub}</p></div></div>
+    ${subnav}
+    ${route === "md" ? '<p class="promo-note">Extra 25% off in cart: Mac Duggal takes it automatically at checkout on the styles it labels “+25% Off In Cart” (shown on each dress), after any Black Friday markdown. Prices that include it are estimates — the retailer charges the final amount.</p>' : ""}
+    <div class="toolbar ar-filters" id="toolbar" dir="rtl" lang="ar">
+      <div class="fhead"><h3>الفلاتر</h3>${filtered ? '<button class="linkish" id="clearAll">مسح الكل</button>' : ""}</div>
+      <label class="search"><input id="q" type="search" placeholder="ابحث باسم المنتج" value="${esc(u.q)}" aria-label="ابحث باسم المنتج" dir="auto"></label>
+      <div class="frow">
+        <label class="fld"><span>الترتيب</span><select id="f-sort">${opt("new","الأحدث",u.sort)}${opt("asc","السعر: من الأقل إلى الأعلى",u.sort)}${opt("desc","السعر: من الأعلى إلى الأقل",u.sort)}${opt("disc","أعلى خصم",u.sort)}${opt("fav","المفضلة أولاً",u.sort)}${opt("pop","الأكثر تفضيلاً",u.sort)}</select></label>
+        <fieldset class="fld fprice"><legend>السعر</legend>
+          <label><span>أقل سعر</span><input id="pmin" type="number" inputmode="numeric" min="0" step="1" value="${esc(u.pmin ?? "")}" placeholder="0"><i>ر.س</i></label>
+          <label><span>أعلى سعر</span><input id="pmax" type="number" inputmode="numeric" min="0" step="1" value="${esc(u.pmax ?? "")}" placeholder="—"><i>ر.س</i></label>
+          <button class="btn solid" id="pApply">تطبيق</button><button class="btn quiet" id="pReset">إعادة تعيين</button>
+        </fieldset>
+        <label class="fld"><span>اللون</span><select id="f-color">${opt("","جميع الألوان",u.color)}${fams.map(([k, a]) => opt(k, a, u.color)).join("")}</select></label>
       </div>
-      ${sizeChips}
+      <p class="ferr" id="fErr" role="alert"></p>
     </div>
     ${body}`;
+}
+
+function viewVS(){
+  return `<section class="soon"><p class="soon-brand">Victoria's Secret</p><p class="soon-tag">Coming Soon</p>
+    <p class="small">This brand isn't live yet. Offers will be added here only after they're checked against the official store.</p>
+    <a class="cta" href="#home">Back to home</a></section>`;
 }
 
 function viewHome(all){
   showPop = false;
   const avail = all.filter(isAvail);
-  const byDisc = [...avail].sort((a,b) => offShown(b) - offShown(a));
-  const defaults3 = byDisc.filter(p => p.image && isDress(p)).slice(0, 3);
+  const sp = avail.filter(p => !isMD(p)), md = avail.filter(isMD);
+  const byDisc = list => [...list].sort((a,b) => offShown(b) - offShown(a));
+  const defaults3 = byDisc(sp).filter(p => p.image && isDress(p)).slice(0, 3);
   const pop = popular(all);
   const heroP = pop.find(p => isDress(p) && p.image);
   let picks = defaults3;
   if (heroP){ const rest = defaults3.filter(p => p.handle !== heroP.handle); picks = [rest[0], heroP, rest[1]].filter(Boolean); }
-  const coverDefault = c => [...avail].filter(x => catOf(x) === c && x.image).sort((a,b) => offShown(b) - offShown(a))[c === "bags" ? 0 : 3] || avail.find(x => catOf(x) === c);
+  const maxOff = Math.max(0, ...avail.map(pct));
+  const coverDefault = c => byDisc(sp.filter(x => catOf(x) === c && x.image))[c === "bags" ? 0 : 3] || sp.find(x => catOf(x) === c);
   const AR = { midi:"فساتين ميدي", maxi:"فساتين ماكسي", bags:"شنط", popular:"الأكثر تفضيلاً" };
   const tile = (key, topP, fallback) => {
     const p = topP || fallback, href = topP ? plink(topP) : "#" + key;
     return `<div class="banner"><a class="imgl" href="${href}" aria-label="${topP ? esc(topP.title) : AR[key]}">${p ? `<img loading="lazy" src="${esc(img(p.image, 800))}" alt="">` : ""}</a><span class="cap"><a href="#${key}"><b lang="ar">${AR[key]}</b></a></span></div>`;
   };
-  return `<section class="home-pics triptych">${picks.map(p => `<a href="${plink(p)}" aria-label="${esc(p.title)}"><img src="${esc(img(p.image, 900))}" alt="${esc(p.title)}"></a>`).join("")}</section>
-    <section class="banners" aria-label="Shop by category">${["midi","maxi","bags"].map(c => tile(c, pop.find(p => catOf(p) === c && p.image), coverDefault(c))).join("")}${tile("popular", null, pop.find(p => p.image) || byDisc[1])}</section>
-    <div class="section-head"><h2>Biggest discounts</h2><a href="#discounts">See all</a></div>
-    <div class="grid">${byDisc.slice(0, 8).map(p => card(p, true)).join("")}</div>
-    <a class="more" href="#all" style="text-align:center;text-decoration:none;width:max-content">Shop all ${all.length} pieces</a>`;
+  const spCover = pop.find(p => !isMD(p) && isDress(p) && p.image) || byDisc(sp).find(p => isDress(p) && p.image);
+  const mdCover = pop.find(p => isMD(p) && p.image) || byDisc(md).find(p => p.image);
+  const brandCard = (href, name, p, note) => `<a class="brandcard" href="${href}">${p ? `<img loading="lazy" src="${esc(img(p.image, 900))}" alt="">` : ""}<span class="bc-cap"><b>${name}</b><span>${note}</span></span></a>`;
+  const mdTop = byDisc(md).slice(0, 8);
+  const featured = []; const a = byDisc(sp).slice(0, 4), b = byDisc(md).slice(0, 4);
+  for (let i = 0; i < 4; i++){ if (a[i]) featured.push(a[i]); if (b[i]) featured.push(b[i]); }
+  return `<section class="bf-hero">
+      <p class="bf-kicker">Black Friday 2026</p>
+      <h2 class="bf-title">Up to ${maxOff}% off</h2>
+      <p class="bf-sub">Self-Portrait &nbsp;·&nbsp; Mac Duggal &nbsp;·&nbsp; prices in Saudi riyals</p>
+      <a class="cta light" href="#discounts">Shop the offers</a>
+    </section>
+    <section class="home-pics triptych">${picks.map(p => `<a href="${plink(p)}" aria-label="${esc(p.title)}"><img src="${esc(img(p.image, 900))}" alt="${esc(p.title)}"></a>`).join("")}</section>
+    <div class="section-head"><h2>Shop by brand</h2></div>
+    <section class="brands" aria-label="Shop by brand">
+      ${brandCard("#sp", "Self-Portrait", spCover, "Midi · Maxi · Bags")}
+      ${brandCard("#md", "Mac Duggal", mdCover, "Maxi dresses")}
+      <div class="brandcard soon-card" aria-label="Victoria's Secret, coming soon"><span class="bc-cap"><b>Victoria's Secret</b><span>Coming Soon</span></span></div>
+    </section>
+    <div class="section-head"><h2>Self-Portrait</h2><a href="#sp">Shop Self-Portrait</a></div>
+    <section class="banners" aria-label="Self-Portrait categories">${["midi","maxi","bags"].map(c => tile(c, pop.find(p => !isMD(p) && catOf(p) === c && p.image), coverDefault(c))).join("")}${tile("popular", null, pop.find(p => p.image) || byDisc(sp)[1])}</section>
+    ${md.length ? `<div class="section-head"><h2>Mac Duggal Maxi Dresses</h2><a href="#md">View all Mac Duggal maxi dresses</a></div>
+    <p class="promo-note">Black Friday markdowns and the extra 25% off in cart, shown on each dress.</p>
+    <div class="grid">${mdTop.map(p => card(p, false)).join("")}</div>` : ""}
+    <div class="section-head"><h2>Featured offers</h2><a href="#discounts">See all</a></div>
+    <div class="grid">${featured.map(p => card(p, true)).join("")}</div>
+    <a class="more" href="#all" style="text-align:center;text-decoration:none;width:max-content">Shop all pieces</a>`;
 }
 
 function viewFav(all){
@@ -719,9 +860,9 @@ function viewFav(all){
     ${gone.length ? `<p class="warnline" style="font-size:14px;margin:6px 0 14px">${gone.length === 1 ? "1 saved size is" : gone.length + " saved sizes are"} no longer available: ${gone.map(p => esc(p.title) + " (" + esc(favOf(p.handle).size) + ")").join(", ")}. Your choice is kept — change it or remove the piece below.</p>` : ""}
     <div class="table-wrap"><table class="compare"><thead><tr><th></th><th>Piece</th><th>Selected size</th><th>Final price</th>${COSTS() ? "<th>Sale €</th>" : ""}<th>Off</th><th>${mine.length ? "My sizes" : "In stock"}</th><th></th></tr></thead><tbody>
     ${favs.map((p,i) => { const inStock = (p.sizes||[]).filter(s => s.a).map(s => s.s);
-      const sz = !isDress(p) ? (inStock.length ? "In stock" : "Sold out") : mine.length ? mine.map(n => inStock.some(s => fitsUK(s, n)) ? "UK " + n : `<s style="color:#bdb6ae">UK ${n}</s>`).join(", ") : (inStock.length ? "UK " + inStock.map(ukLabel).join(", ") : "Sold out");
+      const sz = !isDress(p) ? (inStock.length ? "In stock" : "Sold out") : isMD(p) ? (inStock.join(", ") || "Sold out") : mine.length ? mine.map(n => inStock.some(s => fitsUK(s, n)) ? "UK " + n : `<s style="color:#bdb6ae">UK ${n}</s>`).join(", ") : (inStock.length ? "UK " + inStock.map(ukLabel).join(", ") : "Sold out");
       const f = favOf(p.handle), mySize = !isDress(p) ? "—" : f && f.size ? `<b>${esc(f.size)}</b>${favSizeOk(p) ? "" : '<br><span class="warnline">No longer available</span>'}` : '<span class="small">Not chosen</span>';
-      return `<tr class="${i === 0 ? "best" : ""}"><td><img src="${esc(img(p.image,120))}" alt=""></td><td><a href="${plink(p)}">${esc(p.title)}</a><br><span class="tag">${CAT1[catOf(p)]}</span></td><td>${mySize}</td><td class="num">${fmt(finalSAR(p))} SAR</td>${COSTS() ? `<td>${eur(p.price)}</td>` : ""}<td>${offShown(p)}%</td><td>${sz}</td><td><div class="acts" style="margin:0;flex-direction:column;align-items:flex-start;gap:6px">${isDress(p) ? `<button data-fav="${esc(p.handle)}">Change size</button>` : ""}<button data-unfav="${esc(p.handle)}">Remove</button></div></td></tr>`; }).join("")}
+      return `<tr class="${i === 0 ? "best" : ""}"><td><img src="${esc(img(p.image,120))}" alt=""></td><td><a href="${plink(p)}">${esc(p.title)}</a><br><span class="tag">${esc(kindOf(p))}</span></td><td>${mySize}</td><td class="num">${fmt(finalSAR(p))} SAR</td>${COSTS() ? `<td>${money(p, p.price)}</td>` : ""}<td>${offShown(p)}%</td><td>${sz}</td><td><div class="acts" style="margin:0;flex-direction:column;align-items:flex-start;gap:6px">${isDress(p) ? `<button data-fav="${esc(p.handle)}">Change size</button>` : ""}<button data-unfav="${esc(p.handle)}">Remove</button></div></td></tr>`; }).join("")}
     </tbody></table></div>
     <div class="grid" style="margin-top:30px">${favs.map(p => card(p, true)).join("")}</div>`;
 }
@@ -732,8 +873,8 @@ function viewItem(all, handle){
   const pics = (p.images && p.images.length ? p.images : [p.image]).filter(Boolean);
   const fav = !!S.fav[p.handle], off = offShown(p), out = !isAvail(p), dims = dimsOf(p);
   const avail = (p.sizes || []).filter(s => s.a).map(s => s.s);
-  const sib = all.filter(x => catOf(x) === catOf(p)), i = sib.indexOf(p), prev = sib[i - 1], next = sib[i + 1];
-  return `<nav class="crumbs"><a href="#${catOf(p)}" id="backLink">${CATS[catOf(p)]}</a></nav>
+  const sib = all.filter(x => catOf(x) === catOf(p) && brandOf(x) === brandOf(p)), i = sib.indexOf(p), prev = sib[i - 1], next = sib[i + 1];
+  return `<nav class="crumbs"><a href="${isMD(p) ? "#md" : "#" + catOf(p)}" id="backLink">${isMD(p) ? "Mac Duggal Maxi Dresses" : "Self-Portrait · " + CATS[catOf(p)]}</a></nav>
   <section class="pdp">
     <div class="gallery">
       <div class="slides" id="slides" tabindex="0" aria-label="Photos of ${esc(p.title)}">${pics.map((src, n) => `<figure><img ${n > 1 ? 'loading="lazy"' : ""} src="${esc(img(src, 1200))}" alt="${esc(p.title)}, photo ${n + 1} of ${pics.length}"></figure>`).join("")}</div>
@@ -741,15 +882,25 @@ function viewItem(all, handle){
       <div class="thumbs" id="thumbs">${pics.map((src, n) => `<button data-shot="${n}" aria-label="Photo ${n + 1}" ${n === 0 ? 'aria-current="true"' : ""}><img loading="lazy" src="${esc(img(src, 200))}" alt=""></button>`).join("")}</div>` : ""}
     </div>
     <div class="info">
-      <p class="cat-tag">${CAT1[catOf(p)]}</p>
+      <p class="cat-tag">${esc(kindOf(p))}</p>
       <h1>${esc(p.title)}</h1>
-      <p class="sar big">${fmt(finalSAR(p))}<small>SAR</small></p>
+      ${isMD(p) ? `${promoTags(p)}<p class="sar big">${fmt(finalSAR(p))}<small>SAR</small></p>
+      <ul class="breakdown">
+        <li><span>Original price</span><b>${fmt(wasSAR(p))} SAR</b></li>
+        ${p.markdown ? `<li><span>${p.bf ? "Black Friday" : "Sale"} price (−${pct(p)}%)</span><b>${fmt(saleSAR(p))} SAR</b></li>` : ""}
+        ${p.extra25 ? `<li><span>Extra 25% off in cart</span><b>−${fmt(saleSAR(p) - finalSAR(p))} SAR</b></li>` : ""}
+        <li class="tot"><span>${p.extra25 ? "Estimated final price" : "Final price"}</span><b>${fmt(finalSAR(p))} SAR</b></li>
+      </ul>
+      ${p.extra25 ? '<p class="calc">The extra 25% is a Mac Duggal checkout promotion, applied by the retailer in the cart after any markdown. This price is an estimate; Mac Duggal charges the final amount.</p>' : ""}
+      ${(p.colors || []).length ? `<p class="small" style="margin-top:10px">Colours: ${esc(p.colors.join(", "))}</p>` : ""}
+      ${COSTS() ? `<p class="calc">${money(p, p.price)}${p.markdown ? " (was " + money(p, p.compare) + ")" : ""}${p.extra25 ? " × 0.75" : ""} × ${usdRate().toFixed(3)} + ${fmt(extraFor(p))} SAR</p>` : ""}`
+      : `<p class="sar big">${fmt(finalSAR(p))}<small>SAR</small></p>
       ${off ? `<p class="eur"><s>${fmt(wasSAR(p))} SAR</s><span class="pct">−${off}%</span></p>` : ""}
-      ${COSTS() ? `<p class="calc">${eur(p.price)} (was ${eur(p.compare)}, −${pct(p)}%) × ${rate().toFixed(3)} + ${fmt(extraFor(p))} SAR</p>` : ""}
-      <div class="pdp-sizes">${isDress(p) ? `<p class="small">${out ? "Sold out in every size" : "Available UK sizes"}</p>${sizesHTML(p)}
-        ${!out && S.settings.sizes.length ? `<p class="small" style="margin-top:8px">${avail.some(s => anyFits(s, S.settings.sizes)) ? "In your size" : "Not available in your saved sizes"}</p>` : ""}`
+      ${COSTS() ? `<p class="calc">${eur(p.price)} (was ${eur(p.compare)}, −${pct(p)}%) × ${rate().toFixed(3)} + ${fmt(extraFor(p))} SAR</p>` : ""}`}
+      <div class="pdp-sizes">${isDress(p) ? `<p class="small">${out ? "Sold out in every size" : isMD(p) ? "Available US sizes" : "Available UK sizes"}</p>${sizesHTML(p)}
+        ${!out && !isMD(p) && S.settings.sizes.length ? `<p class="small" style="margin-top:8px">${avail.some(s => anyFits(s, S.settings.sizes)) ? "In your size" : "Not available in your saved sizes"}</p>` : ""}`
         : `<p class="small">${out ? "Sold out" : "In stock"}</p>${dims ? `<p class="dims">Dimensions: ${esc(dims)}</p>` : ""}`}
-        <button class="guide-btn" data-guide="${esc(p.handle)}">${isDress(p) ? "View size guide" : "View dimensions"}</button></div>
+        ${isMD(p) ? "" : `<button class="guide-btn" data-guide="${esc(p.handle)}">${isDress(p) ? "View size guide" : "View dimensions"}</button>`}</div>
       <button class="btn ${fav ? "" : "solid"} favbtn" data-fav="${esc(p.handle)}" aria-pressed="${fav}">${fav ? (isDress(p) && favOf(p.handle).size ? "Saved · " + esc(favOf(p.handle).size) + " — change" : "Saved to favorites") : "Save to favorites"}</button>
       ${fav && isDress(p) && favOf(p.handle).size && !favSizeOk(p) ? `<p class="warnline">${esc(favOf(p.handle).size)} is no longer available</p>` : ""}
       ${waLink(p)}
@@ -816,7 +967,7 @@ function viewAdmin(all){
   <section class="panel"><div><h3>Updates</h3><p class="why">GitHub checks the Spain store every 15 minutes: new sale items, prices, discounts, sizes, stock, photos and the exchange rate.</p></div>
     <div class="fields">
       <div class="row"><button class="btn solid" id="aRefreshAll">Refresh all products</button><button class="btn" id="aNewDeals">Check for new deals</button></div>
-      <p class="small">Last store check ${when(m.lastCheck)} · last successful ${when(m.lastSuccess)} (Riyadh).<br>Tracked now: ${cnt.midi || 0} midi · ${cnt.maxi || 0} maxi · ${cnt.bags || 0} bags. Store sale lists: ${sc.midi ?? "—"} · ${sc.maxi ?? "—"} · ${sc.bags ?? "—"}. Size guides collected: ${withGuide} of ${all.length}.${m.lastError ? `<br><span style="color:var(--sale)">${esc(m.lastError)}</span>` : ""}</p>
+      <p class="small">Last store check ${when(m.lastCheck)} · last successful ${when(m.lastSuccess)} (Riyadh).<br>Tracked now: Self-Portrait ${cnt.midi || 0} midi · ${cnt.maxi || 0} maxi · ${cnt.bags || 0} bags · Mac Duggal ${cnt.md || 0} maxi. Store sale lists: ${sc.midi ?? "—"} · ${sc.maxi ?? "—"} · ${sc.bags ?? "—"}. Size guides collected: ${withGuide} of ${all.length}.${m.lastError ? `<br><span style="color:var(--sale)">${esc(m.lastError)}</span>` : ""}</p>
       <label class="f">Reload this page's data every<select id="sPoll">${[2,5,10,15,30].map(n => `<option value="${n}" ${Number(S.settings.poll) === n ? "selected" : ""}>${n} minutes</option>`).join("")}</select></label>
       <div class="mono-list">${log || "<div>No runs logged yet.</div>"}</div>
     </div></section>
@@ -825,6 +976,8 @@ function viewAdmin(all){
     <div class="fields">
       <label class="f">Clothing — fixed amount added to every dress (SAR)<input id="sExtra" type="number" inputmode="decimal" step="1" value="${extra()}"></label>
       <label class="f">Bags — fixed amount added to every bag (SAR)<input id="sExtraBags" type="number" inputmode="decimal" step="1" value="${extraBags()}"></label>
+      <label class="f">Mac Duggal — fixed amount added to every dress (SAR)<input id="sExtraMD" type="number" inputmode="decimal" step="1" value="${extraMD()}"></label>
+      <p class="small">Mac Duggal: US price, less any Black Friday markdown, less the extra 25% where Mac Duggal labels it “+25% Off In Cart”, × USD/SAR ${usdRate().toFixed(4)} (${esc(m.usdRate && m.usdRate.source || "peg 3.75")}) + the fixed amount.</p>
       <label class="f">EUR → SAR rate<input id="sRate" type="number" inputmode="decimal" step="0.0001" placeholder="Live: ${Number(m.rate && m.rate.value || 0).toFixed(4)}" value="${S.settings.rate || ""}"></label>
       <p class="small">Live rate ${Number(m.rate && m.rate.value || 0).toFixed(4)} from ${esc(m.rate && m.rate.source || "—")}${m.rate && m.rate.asOf ? ", " + esc(m.rate.asOf) : ""}. Leave empty to use the live rate.</p>
       <p class="small">Example: €200 × ${rate().toFixed(3)} = ${fmt(Math.round(200 * rate()))} SAR, + ${fmt(extra())} = <b>${fmt(Math.round(200 * rate() + extra()))} SAR</b> for a dress, ${fmt(Math.round(200 * rate() + extraBags()))} SAR for a bag.</p>
@@ -855,7 +1008,7 @@ function viewAdmin(all){
 function editList(all){
   const q = ($("#aQ") && $("#aQ").value || "").toLowerCase();
   $("#editList").innerHTML = all.filter(p => !q || p.title.toLowerCase().includes(q)).slice(0, 150).map(p =>
-    `<button data-edit="${esc(p.handle)}"><img loading="lazy" src="${esc(img(p.image,100))}" alt=""><span>${esc(p.title)}<br><span class="tag">${CAT1[catOf(p)]} · ${eur(p.price)} · ${fmt(finalSAR(p))} SAR${p.edited ? " · edited" : ""}${p.manual ? " · added by you" : ""}${S.fav[p.handle] ? " · ♥" : ""}</span></span><span class="tag">Edit</span></button>`).join("");
+    `<button data-edit="${esc(p.handle)}"><img loading="lazy" src="${esc(img(p.image,100))}" alt=""><span>${esc(p.title)}<br><span class="tag">${esc(kindOf(p))} · ${money(p, p.price)} · ${fmt(finalSAR(p))} SAR${p.edited ? " · edited" : ""}${p.manual ? " · added by you" : ""}${S.fav[p.handle] ? " · ♥" : ""}</span></span><span class="tag">Edit</span></button>`).join("");
 }
 
 /* ---------- editor ---------- */
@@ -872,8 +1025,8 @@ function openEditor(handle){
       <label class="f">Name<input id="eT" value="${esc(p.title)}"></label>
       <label class="f">Image URL<input id="eI" value="${esc(p.image)}" placeholder="https://…jpg"></label>
       ${p.manual ? `<label class="f">Product page link<input id="eU" value="${esc(p.url || "")}" placeholder="https://eu.self-portrait.com/es-es/products/…"></label>` : ""}
-      <div class="row"><label class="f" style="flex:1">Original price (€)<input id="eC" type="number" step="0.01" inputmode="decimal" value="${p.compare || ""}"></label>
-      <label class="f" style="flex:1">Discounted price (€)<input id="eP" type="number" step="0.01" inputmode="decimal" value="${p.price || ""}"></label></div>
+      <div class="row"><label class="f" style="flex:1">Original price (${isMD(p) ? "$" : "€"})<input id="eC" type="number" step="0.01" inputmode="decimal" value="${p.compare || ""}"></label>
+      <label class="f" style="flex:1">Discounted price (${isMD(p) ? "$" : "€"})<input id="eP" type="number" step="0.01" inputmode="decimal" value="${p.price || ""}"></label></div>
       <div><p class="small" style="margin-bottom:6px">Sizes — tap to mark in stock or sold out</p><div class="size-edit" id="eS"></div>
         <div class="row" style="margin-top:8px"><button class="btn quiet" id="eSys">Switch size set</button></div></div>
       <label class="f">Personal note (only you see this)<textarea id="eN" placeholder="Fit, colour, occasion…">${esc(S.notes[p.handle] || "")}</textarea></label>
@@ -945,15 +1098,15 @@ function openSizePicker(p){
   const sizes = p.sizes || [];
   $("#dlgBody").innerHTML = `<h3>${cur ? "Your saved size" : "Choose your size"}</h3>
     <p class="small" style="margin-bottom:10px">${esc(p.title)} · ${fmt(finalSAR(p))} SAR</p>
-    <div class="pick" id="pick">${sizes.map(s => `<button data-raw="${esc(s.s)}" aria-pressed="${chosen === s.s}" ${s.a || chosen === s.s ? "" : "disabled"} title="${s.a ? "Available" : "Sold out"}">UK ${esc(ukLabel(s.s))}</button>`).join("")}</div>
+    <div class="pick" id="pick">${sizes.map(s => `<button data-raw="${esc(s.s)}" aria-pressed="${chosen === s.s}" ${s.a || chosen === s.s ? "" : "disabled"} title="${s.a ? "Available" : "Sold out"}">${esc(sizeLabel(p, s.s))}</button>`).join("")}</div>
     <p class="small">Crossed-out sizes are sold out.${cur && cur.raw && !favSizeOk(p) ? ` <span class="warnline">Your saved ${esc(cur.size)} is no longer available.</span>` : ""}</p>
     <p class="small" id="pErr" style="color:var(--sale)"></p>
     <div class="foot"><div class="row">${cur ? '<button class="btn danger" id="pRemove">Remove from favorites</button>' : ""}</div>
       <div class="row"><button class="btn quiet" id="pCancel">Cancel</button><button class="btn solid" id="pSave">${cur ? "Save size" : "Add to favorites"}</button></div></div>`;
   $("#pick").onclick = e => { const b = e.target.closest("[data-raw]"); if (!b || b.disabled) return; chosen = b.dataset.raw; $("#pick").querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b)); $("#pErr").textContent = ""; };
   $("#pCancel").onclick = () => $("#dlg").close();
-  $("#pSave").onclick = () => { if (!chosen) return $("#pErr").textContent = "Choose a UK size first.";
-    setFav(p.handle, { t: cur && cur.t || Date.now(), size: "UK " + ukLabel(chosen), raw: chosen }); $("#dlg").close(); };
+  $("#pSave").onclick = () => { if (!chosen) return $("#pErr").textContent = "Choose a size first.";
+    setFav(p.handle, { t: cur && cur.t || Date.now(), size: sizeLabel(p, chosen), raw: chosen }); $("#dlg").close(); };
   if ($("#pRemove")) $("#pRemove").onclick = () => { setFav(p.handle, null); $("#dlg").close(); };
   $("#dlg").showModal();
 }
@@ -980,11 +1133,13 @@ function wireItem(){
 }
 
 /* ---------- router ---------- */
-const LISTS = ["all","midi","maxi","bags","recent","discounts","popular"];
+const LISTS = ["all","sp","midi","maxi","bags","md","recent","discounts","popular"];
 function routeOf(){ let r = (location.hash || "#home").slice(1); if (r.startsWith("dress-")) r = "item-" + r.slice(6); return r; }
 function render(){
   const route = routeOf();
-  document.querySelectorAll("nav.tabs a").forEach(a => { if (a.getAttribute("href") === "#" + route) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+  let navRoute = SP_ROUTES.includes(route) ? "sp" : route;
+  if (route.startsWith("item-")){ const it = products().find(x => x.handle === route.slice(5)); if (it) navRoute = isMD(it) ? "md" : "sp"; }
+  document.querySelectorAll("nav.tabs a").forEach(a => { if (a.getAttribute("href") === "#" + navRoute) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
   $("#top").classList.toggle("home", route === "home");
   $("#navAdmin").classList.toggle("hidden", !OWNER);
   statusBar();
@@ -995,7 +1150,7 @@ function render(){
   $("#gate").classList.add("hidden");
   if (route.startsWith("item-") && $("#slides")) window._galleryAt = Math.round($("#slides").scrollLeft / $("#slides").clientWidth);
   v.innerHTML = route.startsWith("item-") ? viewItem(list, route.slice(5)) : LISTS.includes(route) ? viewList(route, list)
-    : route === "favorites" ? viewFav(list) : route === "admin" ? viewAdmin(list) : viewHome(list);
+    : route === "favorites" ? viewFav(list) : route === "admin" ? viewAdmin(list) : route === "vs" ? viewVS() : viewHome(list);
   document.documentElement.style.setProperty("--hh", $("#top").offsetHeight + "px");
   if (LISTS.includes(route)) wireList(route);
   if (route.startsWith("item-")) wireItem();
@@ -1005,14 +1160,23 @@ function render(){
 function wireList(route){
   const u = ui(route);
   const q = $("#q"); q.oninput = () => { u.q = q.value; u.limit = 48; const pos = q.selectionStart; render(); const n = $("#q"); n.focus(); n.setSelectionRange(pos, pos); };
-  const bind = (id, key) => { const el = $("#" + id); if (el) el.onchange = () => { u[key] = el.value; u.limit = 48; render(); }; };
-  bind("f-sort","sort"); bind("f-type","type"); bind("f-style","style"); bind("f-color","color"); bind("f-price","price"); bind("f-disc","disc"); bind("f-avail","avail");
-  if ($("#mine")) $("#mine").onclick = () => { u.mine = !u.mine; render(); };
-  document.querySelectorAll("[data-size]").forEach(b => b.onclick = () => { const s = Number(b.dataset.size); u.sizes = u.sizes.includes(s) ? u.sizes.filter(x => x !== s) : [...u.sizes, s]; u.limit = 48; render(); });
-  if ($("#clearSizes")) $("#clearSizes").onclick = () => { u.sizes = []; render(); };
-  if ($("#resetF")) $("#resetF").onclick = () => { delete UI[route]; render(); };
+  $("#f-sort").onchange = e => { u.sort = e.target.value; u.limit = 48; render(); };
+  $("#f-color").onchange = e => { u.color = e.target.value; u.limit = 48; render(); };
+  const applyPrice = () => {
+    const a = $("#pmin").value.trim(), b = $("#pmax").value.trim();
+    if ((a !== "" && !(Number(a) >= 0)) || (b !== "" && !(Number(b) >= 0))) return $("#fErr").textContent = "أدخلي أرقاماً صحيحة بالريال.";
+    if (a !== "" && b !== "" && Number(a) > Number(b)) return $("#fErr").textContent = "أقل سعر يجب أن يكون أقل من أعلى سعر.";
+    u.pmin = a; u.pmax = b; u.limit = 48; render();
+  };
+  $("#pApply").onclick = applyPrice;
+  ["#pmin","#pmax"].forEach(id => $(id).onkeydown = e => { if (e.key === "Enter") applyPrice(); });
+  $("#pReset").onclick = () => { u.pmin = ""; u.pmax = ""; render(); };
+  const clear = () => { const keepSort = u.sort; delete UI[route]; ui(route).sort = keepSort; render(); };
+  if ($("#clearAll")) $("#clearAll").onclick = clear;
+  if ($("#resetF")) $("#resetF").onclick = clear;
   if ($("#more")) $("#more").onclick = () => { u.limit += 48; const y = scrollY; render(); scrollTo(0, y); };
 }
+
 function wireAdmin(list){
   editList(list); $("#aQ").oninput = () => editList(products());
   $("#aCosts").onclick = () => { SHOWCOSTS = !SHOWCOSTS; render(); toast(SHOWCOSTS ? "Showing your € costs on every page. Only you can see this." : "Costs hidden."); };
@@ -1020,6 +1184,7 @@ function wireAdmin(list){
   $("#aRefreshAll").onclick = () => runCheck("all");
   $("#aNewDeals").onclick = () => runCheck("new");
   $("#sExtra").onchange = e => { const v = Number(e.target.value); if (!Number.isFinite(v) || v < 0) return toast("Enter a number of riyals, 0 or more."); S.settings.extra = v; save(); render(); toast("Every dress now adds " + fmt(v) + " SAR."); };
+  $("#sExtraMD").onchange = e => { const v = Number(e.target.value); if (!Number.isFinite(v) || v < 0) return toast("Enter a number of riyals, 0 or more."); S.settings.extraMD = v; save(); render(); toast("Every Mac Duggal dress now adds " + fmt(v) + " SAR."); };
   $("#sExtraBags").onchange = e => { const v = Number(e.target.value); if (!Number.isFinite(v) || v < 0) return toast("Enter a number of riyals, 0 or more."); S.settings.extraBags = v; save(); render(); toast("Every bag now adds " + fmt(v) + " SAR."); };
   $("#sRate").onchange = e => { const v = Number(e.target.value); S.settings.rate = v > 0 ? v : null; save(); render(); toast(v > 0 ? "Using your rate " + v + "." : "Using the live rate."); };
   $("#sPoll").onchange = e => { S.settings.poll = Number(e.target.value); save(); schedulePoll(); toast("Reloading every " + e.target.value + " minutes."); };
