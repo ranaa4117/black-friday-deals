@@ -60,8 +60,10 @@ def normalize(p):
     if compare <= price or not is_midi(p.get("title", "")):
         return None  # full price, or not a midi dress
     imgs = [i["src"] for i in (p.get("images") or []) if i.get("src")]
-    text = html.unescape(re.sub(r"<[^>]+>", " ", p.get("body_html") or ""))
-    text = re.sub(r"\s+", " ", text).strip()
+    raw = re.sub(r"(?i)<br\s*/?>|</(p|li|div|h\d)>", "\n", p.get("body_html") or "")
+    text = html.unescape(re.sub(r"<[^>]+>", " ", raw))
+    text = "\n".join(re.sub(r"[ \t\xa0]+", " ", ln).strip() for ln in text.split("\n"))
+    text = re.sub(r"\n{2,}", "\n", text).strip()
     return {
         "handle": p["handle"],
         "title": p["title"].strip(),
