@@ -13,6 +13,10 @@ on:
         description: "Print size-guide diagnostics (1 = yes)"
         required: false
         default: "0"
+      probe:
+        description: "Product handle to inspect for the size-guide illustration"
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -34,6 +38,7 @@ jobs:
         env:
           SG_LIMIT: ${{ github.event.inputs.sg_limit || '60' }}
           SG_DEBUG: ${{ github.event.inputs.debug || '0' }}
+          SG_PROBE: ${{ github.event.inputs.probe || '' }}
         run: python3 tools/sp_update.py
       - name: Publish new data
         run: |

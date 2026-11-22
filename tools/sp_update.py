@@ -237,7 +237,31 @@ def write(data):
         f.write("\n")
 
 
+def probe_illustration(handle):
+    """Debug helper: show how the size-guide illustration is embedded in a product page."""
+    page = fetch(f"{STORE}/products/{handle}", accept="text/html")
+    low = page.lower()
+    print("probe page bytes", len(page), "svg count", low.count("<svg"))
+    for m in re.finditer(r"<img[^>]+>", page):
+        tag = m.group(0)
+        if re.search(r"size|guide|measure|diagram|sketch|garment|chart", tag, re.I):
+            print("probe img:", tag[:400])
+    for key in ("garment measurement", "size-guide", "sizeguide", "size_guide"):
+        i = low.find(key)
+        if i >= 0:
+            print("probe ctx", key, ":", re.sub(r"\s+", " ", page[max(0, i - 300):i + 900])[:1200])
+    for m in re.finditer(r"(https?:)?//[^\"' )]+\.(svg|png|jpe?g|webp)", page):
+        u = m.group(0)
+        if re.search(r"size|guide|measure|diagram|sketch|garment|dress-?shape|silhouette", u, re.I):
+            print("probe url:", u)
+
+
 def main():
+    if DEBUG and os.environ.get("SG_PROBE"):
+        try:
+            probe_illustration(os.environ["SG_PROBE"])
+        except Exception as e:  # noqa: BLE001
+            print("probe failed", e)
     prev = load_prev()
     meta = prev.get("meta", {})
     ts = now_iso()
