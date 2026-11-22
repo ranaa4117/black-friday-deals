@@ -12,3 +12,13 @@ print("colors seen:", collections.Counter(c for p in items for c in p["colors"])
 for p in items[:4] + [x for x in items if x["bf"] and x["extra25"]][:2]:
     print("  sample:", p["title"], p["price"], p["compare"], "bf" if p["bf"] else "", "25" if p["extra25"] else "", p["url"])
 print("usd rate:", u.fetch_usd_rate())
+raw_items = u.fetch_md_collection(u.MD_MAXI)
+vc = collections.Counter()
+for p in raw_items:
+    v = (p.get("vendor") or "").strip()
+    promo = u.MD_PROMO_TAG in (p.get("tags") or [])
+    vs = p.get("variants") or [{}]
+    md = any(float(x.get("compare_at_price") or 0) > float(x.get("price") or 0) for x in vs)
+    vc[(v, "eligible" if promo or md else "full price")] += 1
+for k, n in sorted(vc.items(), key=lambda x: -x[1]): print("vendor:", k, n)
+print("navy 49981:", [(p.get("vendor"), p.get("product_type"), u.MD_PROMO_TAG in (p.get("tags") or [])) for p in raw_items if p["handle"].startswith("49981")])
