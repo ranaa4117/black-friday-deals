@@ -370,11 +370,6 @@ nav.tabs .dot{display:inline-block;width:6px;height:6px;border-radius:50%;backgr
 
 <main id="view" aria-live="polite"></main>
 
-<footer>
-  Independent personal shopping service — not affiliated with or endorsed by Self-Portrait. Product names, photos and size guides belong to Self-Portrait.
-  Prices are in Saudi riyals. Stock is re-checked every 15 minutes and can change quickly, so please confirm your size before ordering.
-  <br><span id="globalUpdate"></span>
-</footer>
 
 <dialog id="dlg"><div class="dlg" id="dlgBody"></div></dialog>
 <dialog id="guide" class="drawer" aria-label="Size guide"><div class="sg" id="guideBody"></div></dialog>
@@ -387,7 +382,7 @@ const PASS_HASH = "3c29f0bb09f7f11433b993fb3a8d945503758c57eacb6ecfe88c49e1ef74e
 const REPO = "ranaa4117/black-friday-deals";
 const WORKFLOW = "self-portrait-update.yml";
 const LS = "sp-edit-v1";
-const APP_VERSION = "10";
+const APP_VERSION = "11";
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
@@ -474,7 +469,7 @@ async function loadData(manual){
     if (!r.ok) throw new Error("HTTP " + r.status);
     DATA = await r.json(); loaded = true;
     await pullSync();
-    if (manual) toast("Up to date. Last store check " + ago(DATA.meta.lastCheck) + ".");
+    if (manual) toast("Up to date.");
   } catch (e) {
     if (manual || !loaded) toast("Couldn't load the latest data (" + e.message + "). Check your connection and try again.");
   }
@@ -571,7 +566,6 @@ function card(p, showCat){
     ${!isDress(p) && dims ? `<p class="dims">${esc(dims)}</p>` : ""}
     <button class="guide-btn" data-guide="${esc(p.handle)}">${isDress(p) ? "View size guide" : "View dimensions"}</button>
     ${favLine(p)}
-    <p class="verified">${p.manual ? "Added by you" : "Checked " + ago(p.verifiedAt || DATA.meta.lastSuccess)}</p>
     ${OWNER ? `<div class="acts"><button data-edit="${esc(p.handle)}">Edit</button>${COSTS() ? `<a href="${esc(url(p))}" target="_blank" rel="noopener">Store page</a>` : ""}</div>` : ""}
     ${waLink(p)}
   </article>`;
@@ -581,14 +575,12 @@ function statusBar(){
   const m = DATA.meta, el = $("#status");
   if (!loaded){ el.classList.add("hidden"); return; }
   const stale = m.lastSuccess && (Date.now() - new Date(m.lastSuccess)) > 2 * 3600e3;
-  $("#globalUpdate").textContent = m.lastSuccess ? "Collection last updated " + ago(m.lastSuccess) + " · " + when(m.lastSuccess) + " (Riyadh time)" : "";
   if (!COSTS()){
-    el.classList.toggle("hidden", !(stale || m.lastError));
-    el.innerHTML = '<span class="warn">Last successful update ' + ago(m.lastSuccess) + ' — availability may have changed, please confirm your size before ordering</span>';
+    el.classList.add("hidden");
     return;
   }
   el.classList.remove("hidden");
-  el.innerHTML = `<span>Owner view · last successful update ${when(m.lastSuccess)}</span><span>EUR/SAR ${rate().toFixed(3)}${S.settings.rate ? " (your manual rate)" : ""}</span>
+  el.innerHTML = `<span>Owner view</span><span>EUR/SAR ${rate().toFixed(3)}${S.settings.rate ? " (your manual rate)" : ""}</span>
     ${m.lastError ? `<span class="warn">${esc(m.lastError)}</span>` : ""}<button id="costTgl">Hide my costs</button>`;
   $("#costTgl").onclick = () => { SHOWCOSTS = false; render(); };
 }
@@ -647,12 +639,12 @@ function viewList(route, all){
     body = `<div class="empty"><h3>No favorites yet</h3><p>Pieces appear here, ranked, as soon as they are added to favorites.</p><a class="cta" href="#all">Browse the sale</a></div>`;
   } else if (route === "recent" && !base.length){
     const fresh = [...all].sort((a,b) => (b.publishedAt||"").localeCompare(a.publishedAt||"")).slice(0, 8);
-    body = `<div class="empty" style="padding:40px 0"><h3>Nothing new since tracking began</h3><p>The store is checked every 15 minutes; newly discounted pieces appear here. These were published most recently by Self-Portrait:</p></div><div class="grid">${fresh.map(p => card(p, true)).join("")}</div>`;
+    body = `<div class="empty" style="padding:40px 0"><h3>Nothing new since tracking began</h3><p>Newly discounted pieces appear here. These were published most recently by Self-Portrait:</p></div><div class="grid">${fresh.map(p => card(p, true)).join("")}</div>`;
   } else {
     body = res.length ? `<div class="grid">${shown.map(p => card(p, shownCat)).join("")}</div>${res.length > shown.length ? `<button class="more" id="more">Show more (${res.length - shown.length})</button>` : ""}`
       : `<div class="empty"><h3>Nothing matches these filters</h3><p>Try a wider price range, fewer sizes, or clear the search.</p><button class="btn" id="resetF" style="margin-top:14px">Clear all filters</button></div>`;
   }
-  return `<div class="list-head"><div><h2>${TITLES[route]}</h2><p>${sub}</p></div><p>${fmt(res.length)} of ${fmt(base.length)} · updated ${ago(DATA.meta.lastSuccess)}</p></div>
+  return `<div class="list-head"><div><h2>${TITLES[route]}</h2><p>${sub}</p></div><p>${fmt(res.length)} of ${fmt(base.length)}</p></div>
     <div class="toolbar" id="toolbar">
       <label class="search"><input id="q" type="search" placeholder="${kind === "bags" ? "Search bags — clutch, crystal, satin…" : "Search by name — lace, boucle, rhinestone…"}" value="${esc(u.q)}" aria-label="Search"></label>
       <div class="filters">
@@ -734,7 +726,6 @@ function viewItem(all, handle){
       ${fav && isDress(p) && favOf(p.handle).size && !favSizeOk(p) ? `<p class="warnline">${esc(favOf(p.handle).size)} is no longer available</p>` : ""}
       ${waLink(p)}
       ${p.details ? `<div class="details"><h2>Details</h2><p>${esc(p.details)}</p></div>` : ""}
-      <p class="small" style="margin-top:22px">${p.manual ? "Added by you." : "Price and stock checked " + ago(p.verifiedAt || DATA.meta.lastSuccess) + " (" + when(p.verifiedAt || DATA.meta.lastSuccess) + "). Availability can change quickly."}</p>
       ${OWNER ? `<div class="acts"><button data-edit="${esc(p.handle)}">Edit</button>${COSTS() ? `<a href="${esc(url(p))}" target="_blank" rel="noopener">Store page</a>` : ""}</div>` : ""}
       <div class="pn">${prev ? `<a href="${plink(prev)}">‹ Previous</a>` : "<span></span>"}${next ? `<a href="${plink(next)}">Next ›</a>` : ""}</div>
     </div>
@@ -754,8 +745,8 @@ function openGuide(handle, tab){
   const p = products().find(x => x.handle === handle); if (!p) return;
   const guide = p.guide || [], dress = isDress(p);
   const garment = guide.filter(g => g.kind === "Garment measurements"), body = guide.filter(g => g.kind === "Body measurements"), dims = guide.filter(g => g.kind === "Dimensions");
-  const tabs = dress ? [["garment","Garment measurements"],["body","Body measurements"],["convert","Size conversion"]] : [["dims","Dimensions"]];
-  tab = tab || tabs[0][0];
+  const tabs = dress ? [["garment","Garment measurements"]] : [["dims","Dimensions"]];
+  tab = tabs.some(t => t[0] === tab) ? tab : tabs[0][0];
   const lines = (p.details || "").split("\n").map(l => l.trim()).filter(l => l && l.length < 170);
   const fit = dress ? lines.filter(l => /\b(true to size|size up|size down|runs (small|large)|stretch|model|fit|fitted|fitting|lining|lined|zip|regular|relaxed|length)\b/i.test(l)).slice(0, 8)
                     : lines.filter(l => !/^(details|fit|composition|care)/i.test(l)).slice(1, 9);
@@ -763,7 +754,7 @@ function openGuide(handle, tab){
   const gi = p.guideImg || {};
   const ill = (src, label) => src ? `<figure class="sg-ill"><img src="${esc(src)}" alt="Official Self-Portrait ${label} illustration" onerror="this.parentNode.innerHTML='<figcaption>The official illustration could not be loaded right now.</figcaption>'"><figcaption>Official Self-Portrait ${label} illustration</figcaption></figure>`
     : `<p class="small" style="margin-top:12px">${p.guideImg ? "Self-Portrait's page has no " + label + " illustration for this item." : "The official illustration for this item hasn't been collected yet — it's read from Self-Portrait automatically."}</p>`;
-  if (tab === "garment") content = (garment.length ? '<p class="small" style="margin:4px 0 2px;color:var(--ink)">GARMENT MEASUREMENTS · UK sizes</p>' + garment.map(t => guideTable(t, GUIDE_UNIT)).join("") + '<p class="small" style="margin-top:8px">Measurements of the garment itself (not body measurements), by UK size, exactly as listed by Self-Portrait.</p>'
+  if (tab === "garment") content = (garment.length ? '<p class="small" style="margin:4px 0 2px;color:var(--ink)">GARMENT MEASUREMENTS · UK sizes</p>' + garment.map(t => guideTable(t, GUIDE_UNIT)).join("") + '<p class="small" style="margin-top:8px">Garment measurements by UK size, exactly as listed by Self-Portrait.</p>'
     : `<p class="small" style="margin-top:14px">${!p.guideAt ? "This dress's garment measurements haven't been collected yet — they're read from Self-Portrait automatically and appear here shortly." : "Self-Portrait doesn't list garment measurements for this dress."}</p>`) + ill(gi.garment, "garment measurement");
   if (tab === "body") content = body.length ? body.map(t => guideTable(t, GUIDE_UNIT)).join("") + '<p class="small" style="margin-top:8px">Body measurements by French size, with the UK equivalent.</p>' + ill(gi.body, "body measurement")
     : '<p class="small" style="margin-top:14px">Self-Portrait doesn\'t list body measurements for this item.</p>';
@@ -771,12 +762,12 @@ function openGuide(handle, tab){
   if (tab === "dims") content = dims.length ? dims.map(t => guideTable(t, GUIDE_UNIT)).join("") + (gi.garment ? ill(gi.garment, "dimensions") : "") : `<p class="small" style="margin-top:14px">${p.guideAt ? "Self-Portrait doesn't list dimensions for this bag." : "This bag's dimensions haven't been collected yet — they appear here shortly."}</p>`;
   const showUnits = tab !== "convert" && (tab !== "garment" || garment.length) && (tab !== "dims" || dims.length);
   $("#guideBody").innerHTML = `<div class="sg-top"><h3>${dress ? "Size guide" : "Dimensions"}</h3><button id="sgClose">Close</button></div>
-    <h4>${esc(p.title)}</h4><p class="who">${CAT1[catOf(p)]}${isDress(p) && (p.sizes || []).length ? " · in stock: UK " + ((p.sizes || []).filter(s => s.a).map(s => ukLabel(s.s)).join(", ") || "none") : ""}</p>
+    <h4>${esc(p.title)}</h4><p class="who">${CAT1[catOf(p)]}</p>
     ${tabs.length > 1 ? `<div class="sg-tabs" role="tablist">${tabs.map(([k, l]) => `<button role="tab" data-sgtab="${k}" aria-selected="${k === tab}">${l}</button>`).join("")}</div>` : ""}
     ${showUnits ? `<div class="units"><button data-unit="in" aria-pressed="${GUIDE_UNIT === "in"}">Inches</button><button data-unit="cm" aria-pressed="${GUIDE_UNIT === "cm"}">Centimetres</button></div>` : ""}
     ${content}
-    ${fit.length ? `<h4 style="font-size:17px">${dress ? "Fit notes" : "Product details"}</h4><ul class="fit">${fit.map(l => `<li>${esc(l)}</li>`).join("")}</ul>` : ""}
-    <p class="src">Source: Self-Portrait's official size guide on this product's page (eu.self-portrait.com) and their size conversion chart.${p.guideAt ? " Read " + ago(p.guideAt) + "." : ""}</p>`;
+    ${fit.length && !dress ? `<h4 style="font-size:17px">Product details</h4><ul class="fit">${fit.map(l => `<li>${esc(l)}</li>`).join("")}</ul>` : ""}
+    <p class="src">Source: Self-Portrait's official size guide on this product's page (eu.self-portrait.com).</p>`;
   $("#sgClose").onclick = () => $("#guide").close();
   $("#guideBody").querySelectorAll("[data-sgtab]").forEach(b => b.onclick = () => openGuide(handle, b.dataset.sgtab));
   $("#guideBody").querySelectorAll("[data-unit]").forEach(b => b.onclick = () => { GUIDE_UNIT = b.dataset.unit; openGuide(handle, tab); });
