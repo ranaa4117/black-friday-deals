@@ -362,6 +362,21 @@ nav.tabs .soonlink small{font:300 10px var(--sans);letter-spacing:.08em;text-tra
 .ar-filters .ferr:empty{display:none}
 .empty[lang="ar"]{font-family:"Tajawal",var(--sans)}
 .empty[lang="ar"] h3{font:500 24px "Tajawal",sans-serif}
+.winterlink{color:#1f3a5f}
+.winter{margin-top:clamp(36px,5vw,64px);background:#1f3a5f;color:#fff;padding:clamp(22px,4vw,44px) clamp(14px,3vw,36px)}
+.winter-head{text-align:center;margin-bottom:clamp(16px,3vw,28px)}
+.winter-head h2{font-size:clamp(26px,5vw,44px);letter-spacing:.12em;font-weight:500;margin:0}
+.winter-head p{margin:6px 0 12px;font-size:clamp(13px,1.6vw,16px);letter-spacing:.08em;opacity:.85}
+.winter-head a{color:#fff;font-size:13px;text-underline-offset:4px}
+.wtiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(6px,1.2vw,14px)}
+.wtile{position:relative;display:block;aspect-ratio:3/4;overflow:hidden;background:#2b4a72;color:#fff;text-decoration:none}
+.wtile img{width:100%;height:100%;object-fit:cover}
+.wtile::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(10,22,40,.7),rgba(0,0,0,0) 55%)}
+.wcap{position:absolute;inset:auto 0 0 0;z-index:1;padding:clamp(8px,1.6vw,16px);text-align:center;display:flex;flex-direction:column;gap:2px}
+.wcap b{font-size:clamp(15px,2.4vw,22px);font-weight:600}
+.wcap span{font-size:clamp(10px,1.3vw,13px);opacity:.85}
+.winter-brand{text-align:center;color:#1f3a5f;letter-spacing:.08em;margin:-4px 0 8px}
+a.guide-btn.macys{display:inline-block;text-decoration:underline}
 .ptags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .ptag{font-size:11px;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--sale);color:var(--sale);padding:3px 7px}
 .ptag-x{background:var(--sale);color:#fff}
@@ -419,6 +434,7 @@ ul.breakdown li.tot{font-size:16px}
     <a href="#home" lang="ar">الرئيسية</a>
     <a href="#sp" class="brandlink" dir="ltr">Self-Portrait</a>
     <a href="#md" class="brandlink" dir="ltr">Mac Duggal</a>
+    <a href="#winter" class="brandlink winterlink" dir="ltr">Winter Sale</a>
     <a href="#vs" class="brandlink soonlink" dir="ltr">Victoria's Secret <small>Coming Soon</small></a>
     <a href="#all" lang="ar">جميع المنتجات</a>
     <a href="#favorites" lang="ar">المفضلة<span id="c-fav"></span></a>
@@ -444,18 +460,22 @@ const PASS_HASH = "3c29f0bb09f7f11433b993fb3a8d945503758c57eacb6ecfe88c49e1ef74e
 const REPO = "ranaa4117/black-friday-deals";
 const WORKFLOW = "self-portrait-update.yml";
 const LS = "sp-edit-v1";
-const APP_VERSION = "15";
+const APP_VERSION = "16";
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
 
 /* ---------- categories ---------- */
-const CATS = { midi:"Midi dresses", maxi:"Maxi dresses", bags:"Bags" };
-const CAT1 = { midi:"Midi dress", maxi:"Maxi dress", bags:"Bag" };
+const CATS = { midi:"Midi dresses", maxi:"Maxi dresses", bags:"Bags", jackets:"Jackets", coats:"Coats", scarves:"Scarves" };
+const CAT1 = { midi:"Midi dress", maxi:"Maxi dress", bags:"Bag", jackets:"Jacket", coats:"Coat", scarves:"Scarf" };
 const catOf = p => p.cat || "midi";
-const BRANDS = { sp:"Self-Portrait", md:"Mac Duggal" };
+const BRANDS = { sp:"Self-Portrait", md:"Mac Duggal", rl:"Lauren Ralph Lauren" };
 const brandOf = p => p.brand || "sp";
 const isMD = p => brandOf(p) === "md";
+const isRL = p => brandOf(p) === "rl";
+const isSP = p => brandOf(p) === "sp";
+const isUS = p => isMD(p) || isRL(p);
+const WCATS = { jackets:"جاكيتات", coats:"بالطوات", scarves:"سكارفات" };
 const kindOf = p => BRANDS[brandOf(p)] + " · " + CAT1[catOf(p)];
 const isDress = p => catOf(p) !== "bags";
 const BAG_STYLES = [["clutch","Clutch"],["tote","Tote"],["crossbody","Crossbody"],["cross body","Crossbody"],["shoulder","Shoulder bag"],["top handle","Top handle"],["bucket","Bucket bag"],["baguette","Baguette"],["pouch","Pouch"],["micro","Mini bag"],["mini","Mini bag"],["bow","Bow bag"]];
@@ -480,7 +500,7 @@ const famOf = name => { for (const w of String(name).toLowerCase().split(/[\s\-\
 const famCache = new Map();
 function colorFams(p){
   if (famCache.has(p.handle + p.title)) return famCache.get(p.handle + p.title);
-  let f = isMD(p) ? [...new Set((p.colors || []).map(famOf).filter(Boolean))] : [];
+  let f = isUS(p) ? [...new Set((p.colors || []).map(famOf).filter(Boolean))] : [];
   if (!f.length){ const t = famOf(p.title); if (t) f = [t]; }
   famCache.set(p.handle + p.title, f); return f;
 }
@@ -498,6 +518,7 @@ const CONVERSION = [["UK",["4","6","8","10","12","14","16"]],["Letter",["XS",">S
 
 /* ---------- state ---------- */
 let DATA = { meta:{}, products:[], removed:[] };
+let WINTER = [];
 let loaded = false, pollTimer = null, syncTimer = null;
 const defaults = () => ({ fav:{}, notes:{}, ov:{}, manual:[], del:{}, settings:{ extra:450, extraBags:450, extraMD:450, rate:null, sizes:[], poll:5 }, updatedAt:0 });
 let S = Object.assign(defaults(), JSON.parse(store.get(LS) || "{}"));
@@ -551,24 +572,25 @@ const rate = () => Number(C().settings && C().settings.rate) || Number(DATA.meta
 const extra = () => { const v = C().settings && C().settings.extra; return v !== undefined && v !== null && v !== "" && Number.isFinite(Number(v)) ? Number(v) : 450; };
 const extraBags = () => { const v = C().settings && C().settings.extraBags; return v !== undefined && v !== null && v !== "" && Number.isFinite(Number(v)) ? Number(v) : 450; };
 const extraMD = () => { const v = C().settings && C().settings.extraMD; return v !== undefined && v !== null && v !== "" && Number.isFinite(Number(v)) ? Number(v) : 450; };
+const extraRL = () => { const v = C().settings && C().settings.extraRL; return v !== undefined && v !== null && v !== "" && Number.isFinite(Number(v)) ? Number(v) : 450; };
 const usdRate = () => Number(C().settings && C().settings.usdRate) || Number(DATA.meta.usdRate && DATA.meta.usdRate.value) || 3.75;
-const rateFor = p => isMD(p) ? usdRate() : rate();
-const extraFor = p => isMD(p) ? extraMD() : catOf(p) === "bags" ? extraBags() : extra();
+const rateFor = p => isUS(p) ? usdRate() : rate();
+const extraFor = p => isRL(p) ? extraRL() : isMD(p) ? extraMD() : catOf(p) === "bags" ? extraBags() : extra();
 /* Mac Duggal's extra 25% is taken in the cart from the current (sale) price, so it applies after any markdown */
 const netPrice = p => isMD(p) && p.extra25 ? p.price * 0.75 : p.price;
 const finalSAR = p => Math.round(netPrice(p) * rateFor(p) + extraFor(p));
 const saleSAR = p => Math.round(p.price * rateFor(p) + extraFor(p));
 const wasSAR = p => Math.round(p.compare * rateFor(p) + extraFor(p));
 const pct = p => p.compare > p.price ? Math.round((1 - p.price / p.compare) * 100) : 0;
-const offShown = p => COSTS() && !isMD(p) ? pct(p) : (wasSAR(p) > finalSAR(p) ? Math.round((1 - finalSAR(p) / wasSAR(p)) * 100) : 0);
-const money = (p, n) => isMD(p) ? "$" + (Math.round(n * 100) / 100).toLocaleString("en-US") : eur(n);
-const sizeLabel = (p, raw) => isMD(p) ? raw : "UK " + ukLabel(raw);
+const offShown = p => isRL(p) || (COSTS() && !isMD(p)) ? pct(p) : (wasSAR(p) > finalSAR(p) ? Math.round((1 - finalSAR(p) / wasSAR(p)) * 100) : 0);
+const money = (p, n) => isUS(p) ? "$" + (Math.round(n * 100) / 100).toLocaleString("en-US") : eur(n);
+const sizeLabel = (p, raw) => isUS(p) ? raw : "UK " + ukLabel(raw);
 const isAvail = p => (p.sizes || []).some(s => s.a);
 const fmt = n => Number(n).toLocaleString("en-US");
 const eur = n => "€" + (Math.round(n * 100) / 100).toLocaleString("en-US");
 const when = iso => iso ? new Date(iso).toLocaleString("en-GB", { timeZone:"Asia/Riyadh", day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" }) : "—";
 const ago = iso => { if (!iso) return ""; const m = Math.round((Date.now() - new Date(iso)) / 60000); return m < 1 ? "just now" : m < 60 ? m + " min ago" : m < 1440 ? Math.round(m/60) + " h ago" : Math.round(m/1440) + " days ago"; };
-const img = (src, w) => !src ? "" : /cdn\.shopify\.com|self-portrait\.com\/cdn|macduggal\.com\/cdn/.test(src) ? src + (src.includes("?") ? "&" : "?") + "width=" + w : src;
+const img = (src, w) => !src ? "" : /macysassets\.com/.test(src) ? src.split("?")[0] + "?wid=" + w + "&fmt=jpeg&qlt=85" : /cdn\.shopify\.com|self-portrait\.com\/cdn|macduggal\.com\/cdn/.test(src) ? src + (src.includes("?") ? "&" : "?") + "width=" + w : src;
 const url = p => p.url || ("https://eu.self-portrait.com/es-es/products/" + p.handle);
 const img2 = (src, w) => !src ? "" : /cdn\.shopify\.com|self-portrait\.com\/cdn|macduggal\.com\/cdn/.test(src) ? src + (src.includes("?") ? "&" : "?") + "width=" + w : src;
 const plink = p => "#item-" + p.handle;
@@ -593,7 +615,7 @@ function save(){
 function products(){
   const c = C(), ov = c.ov || {}, del = c.del || {};
   const merge = p => { const o = ov[p.handle]; return o ? Object.assign({}, p, o, { edited:true }) : p; };
-  return DATA.products.filter(p => !del[p.handle]).map(merge)
+  return DATA.products.concat(WINTER).filter(p => !del[p.handle]).map(merge)
     .concat((c.manual || []).filter(p => !del[p.handle]).map(p => merge(Object.assign({ manual:true, cat:"midi" }, p))));
 }
 const recentList = list => DATA.meta.initialImport ? list.filter(p => p.manual || (p.firstSeen || "") > DATA.meta.initialImport) : [];
@@ -603,7 +625,8 @@ async function loadData(manual){
   try {
     const r = await fetch("data.json?t=" + Date.now(), { cache:"no-store" });
     if (!r.ok) throw new Error("HTTP " + r.status);
-    DATA = await r.json(); loaded = true;
+    const w = WINTER.length ? null : fetch("winter.json?t=" + Date.now(), { cache:"no-store" }).then(x => x.ok ? x.json() : {}).catch(() => ({}));
+    DATA = await r.json(); if (w) WINTER = ((await w).products || []); loaded = true;
     await Promise.all([pullSync(), loadTotals()]);
     if (manual) toast("Up to date.");
   } catch (e) {
@@ -669,7 +692,8 @@ function sizesHTML(p){
   if (!isDress(p)) return "";
   const list = p.sizes || [];
   if (!list.length) return '<p class="small" style="margin-top:12px">Sizes not listed</p>';
-  if (isMD(p)) return '<ul class="sizes" aria-label="US sizes">' + list.map((s, i) =>
+  if (isRL(p) && list.length === 1 && /one size/i.test(list[0].s)) return '<p class="small" style="margin-top:12px">One size</p>';
+  if (isUS(p)) return '<ul class="sizes" aria-label="US sizes">' + list.map((s, i) =>
     `<li class="${s.a ? "on" : "off"}" title="${esc(s.s)} ${s.a ? "available" : "sold out"}">${i === 0 ? '<span class="sys">US</span>' : ""}${esc(s.s.replace(/^US\s*/, ""))}</li>`).join("") + "</ul>";
   const mine = S.settings.sizes;
   return '<ul class="sizes" aria-label="UK sizes">' + list.map((s, i) =>
@@ -697,7 +721,10 @@ function card(p, showCat){
     <button class="heart" data-fav="${esc(p.handle)}" aria-pressed="${fav}" aria-label="${fav ? "Remove from" : "Save to"} favorites">${heartSVG}</button>
     ${showCat ? `<p class="cat-tag">${esc(kindOf(p))}</p>` : ""}
     <h3><a href="${plink(p)}" class="plain">${esc(p.title)}</a></h3>
-    ${isMD(p) ? `
+    ${isRL(p) ? `
+    <p class="sar">${fmt(finalSAR(p))}<small>SAR</small></p>
+    <p class="eur"><s>${fmt(wasSAR(p))} SAR</s></p>
+    ${COSTS() ? `<p class="calc">${money(p, p.price)} (was ${money(p, p.compare)}) × ${usdRate().toFixed(3)} + ${fmt(extraFor(p))} SAR</p>` : ""}` : isMD(p) ? `
     ${p.extra25 ? '<p class="ptags"><span class="ptag ptag-x">25% OFF</span></p>' : ""}
     <p class="sar">${fmt(finalSAR(p))}<small>SAR</small></p>
     ${off ? `<p class="eur"><s>${fmt(wasSAR(p))} SAR</s></p>` : ""}
@@ -708,9 +735,9 @@ function card(p, showCat){
     ${COSTS() ? `<p class="calc">${eur(p.price)} × ${rate().toFixed(3)} + ${fmt(extraFor(p))} SAR</p>` : ""}`}
     ${sizesHTML(p)}
     ${!isDress(p) && dims ? `<p class="dims">${esc(dims)}</p>` : ""}
-    <button class="guide-btn" data-guide="${esc(p.handle)}">${isDress(p) ? "View size guide" : "View dimensions"}</button>
+    ${isRL(p) ? `<a class="guide-btn macys" href="${esc(url(p))}" target="_blank" rel="noopener">View on Macy's</a>` : `<button class="guide-btn" data-guide="${esc(p.handle)}">${isDress(p) ? "View size guide" : "View dimensions"}</button>`}
     ${favLine(p)}
-    ${OWNER ? `<div class="acts"><button data-edit="${esc(p.handle)}">Edit</button>${COSTS() ? `<a href="${esc(url(p))}" target="_blank" rel="noopener">Store page</a>` : ""}</div>` : ""}
+    ${OWNER ? `<div class="acts"><button data-edit="${esc(p.handle)}">Edit</button>${COSTS() && !isRL(p) ? `<a href="${esc(url(p))}" target="_blank" rel="noopener">Store page</a>` : ""}</div>` : ""}
     ${waLink(p)}
   </article>`;
 }
@@ -753,21 +780,23 @@ function applyFilters(list, u){
 
 const opt = (v, label, cur) => `<option value="${esc(v)}" ${String(cur) === String(v) ? "selected" : ""}>${esc(label)}</option>`;
 const SP_ROUTES = ["sp","midi","maxi","bags"];
+const WINTER_ROUTES = ["jackets","coats","scarves"];
 
 function viewList(route, all){
   const u = ui(route);
-  const TITLES = { all:"All products", sp:"Self-Portrait", midi:"Self-Portrait", maxi:"Self-Portrait", bags:"Self-Portrait", md:"Mac Duggal Maxi Dresses", recent:"Newly added", discounts:"Biggest discounts", popular:"Most favorited" };
-  const sp = all.filter(p => !isMD(p));
-  let base = route === "sp" ? sp : route === "midi" || route === "maxi" || route === "bags" ? sp.filter(p => catOf(p) === route)
+  const TITLES = { all:"All products", sp:"Self-Portrait", midi:"Self-Portrait", maxi:"Self-Portrait", bags:"Self-Portrait", md:"Mac Duggal Maxi Dresses", winter:"Winter Sale", jackets:"Winter Sale", coats:"Winter Sale", scarves:"Winter Sale", recent:"Newly added", discounts:"Biggest discounts", popular:"Most favorited" };
+  const sp = all.filter(isSP), rl = all.filter(isRL);
+  let base = route === "winter" ? rl : WINTER_ROUTES.includes(route) ? rl.filter(p => catOf(p) === route) : route === "sp" ? sp : route === "midi" || route === "maxi" || route === "bags" ? sp.filter(p => catOf(p) === route)
     : route === "md" ? all.filter(isMD) : route === "recent" ? recentList(all) : route === "popular" ? popular(all) : all;
-  const shownCat = !SP_ROUTES.includes(route) && route !== "md";
+  const shownCat = !SP_ROUTES.includes(route) && route !== "md" && route !== "winter" && !WINTER_ROUTES.includes(route);
   const res = applyFilters(base, u), shown = res.slice(0, u.limit);
   const fams = COLOR_FAMS.filter(([k]) => base.some(p => colorFams(p).includes(k)));
   const sub = { all:"Every discounted piece from Self-Portrait and Mac Duggal, in one place.", sp:"Discounted Self-Portrait pieces from the official Spain store.", midi:"Discounted Self-Portrait midi dresses.", maxi:"Discounted Self-Portrait maxi dresses.", bags:"Discounted Self-Portrait bags.",
     md:"Mac Duggal maxi dresses on sale, from the official US store.",
     recent:"Pieces that joined the sale since tracking began, newest first.", discounts:"The deepest markdowns across every brand.", popular:"Ranked by how many times each piece has been added to favorites." }[route];
   const subnav = SP_ROUTES.includes(route) ? `<nav class="subnav" dir="rtl" aria-label="Self-Portrait categories"><a href="#midi" lang="ar" ${route === "midi" ? 'aria-current="page"' : ""}>فساتين ميدي</a><a href="#maxi" lang="ar" ${route === "maxi" ? 'aria-current="page"' : ""}>فساتين ماكسي</a><a href="#bags" lang="ar" ${route === "bags" ? 'aria-current="page"' : ""}>شنط</a></nav>`
-    : route === "md" ? `<nav class="subnav" dir="rtl" aria-label="Mac Duggal categories"><a href="#md" lang="ar" aria-current="page">فساتين ماكسي</a></nav>` : "";
+    : route === "md" ? `<nav class="subnav" dir="rtl" aria-label="Mac Duggal categories"><a href="#md" lang="ar" aria-current="page">فساتين ماكسي</a></nav>`
+    : route === "winter" || WINTER_ROUTES.includes(route) ? `<p class="winter-brand">Lauren Ralph Lauren</p><nav class="subnav" dir="rtl" aria-label="Winter Sale categories">${WINTER_ROUTES.map(c => `<a href="#${c}" lang="ar" ${route === c ? 'aria-current="page"' : ""}>${WCATS[c]}</a>`).join("")}</nav>` : "";
   let body;
   showPop = route === "popular" || u.sort === "pop";
   const filtered = u.q || u.color || (u.pmin !== "" && u.pmin != null) || (u.pmax !== "" && u.pmax != null);
@@ -807,7 +836,7 @@ function viewVS(){
 function viewHome(all){
   showPop = false;
   const avail = all.filter(isAvail);
-  const sp = avail.filter(p => !isMD(p)), md = avail.filter(isMD);
+  const sp = avail.filter(isSP), md = avail.filter(isMD), rl = avail.filter(isRL);
   const byDisc = list => [...list].sort((a,b) => offShown(b) - offShown(a));
   const defaults3 = byDisc(sp).filter(p => p.image && isDress(p)).slice(0, 3);
   const pop = popular(all);
@@ -821,7 +850,9 @@ function viewHome(all){
     const p = topP || fallback, href = topP ? plink(topP) : "#" + key;
     return `<div class="banner"><a class="imgl" href="${href}" aria-label="${topP ? esc(topP.title) : AR[key]}">${p ? `<img loading="lazy" src="${esc(img(p.image, W.tile))}" alt="">` : ""}</a><span class="cap"><a href="#${key}"><b lang="ar">${AR[key]}</b></a></span></div>`;
   };
-  const spCover = pop.find(p => !isMD(p) && isDress(p) && p.image) || byDisc(sp).find(p => isDress(p) && p.image);
+  const wTile = c => { const p = pop.find(x => isRL(x) && catOf(x) === c && x.image) || [...rl].filter(x => catOf(x) === c && x.image).sort((a,b) => pct(b) - pct(a))[0];
+    return `<a class="wtile" href="#${c}">${p ? `<img loading="lazy" decoding="async" src="${esc(img(p.image, W.tile))}" alt="">` : ""}<span class="wcap"><b lang="ar">${WCATS[c]}</b><span>${CATS[c]}</span></span></a>`; };
+  const spCover = pop.find(p => isSP(p) && isDress(p) && p.image) || byDisc(sp).find(p => isDress(p) && p.image);
   const mdCover = pop.find(p => isMD(p) && p.image) || byDisc(md).find(p => p.image);
   const brandCard = (href, name, p, note) => `<a class="brandcard" href="${href}">${p ? `<img loading="lazy" src="${esc(img(p.image, W.hero))}" alt="">` : ""}<span class="bc-cap"><b>${name}</b><span>${note}</span></span></a>`;
   const mdTop = byDisc(md).slice(0, 8);
@@ -841,7 +872,11 @@ function viewHome(all){
       <div class="brandcard soon-card" aria-label="Victoria's Secret, coming soon"><span class="bc-cap"><b>Victoria's Secret</b><span>Coming Soon</span></span></div>
     </section>
     <div class="section-head"><h2>Self-Portrait</h2><a href="#sp">Shop Self-Portrait</a></div>
-    <section class="banners" aria-label="Self-Portrait categories">${["midi","maxi","bags"].map(c => tile(c, pop.find(p => !isMD(p) && catOf(p) === c && p.image), coverDefault(c))).join("")}${tile("popular", null, pop.find(p => p.image) || byDisc(sp)[1])}</section>
+    <section class="banners" aria-label="Self-Portrait categories">${["midi","maxi","bags"].map(c => tile(c, pop.find(p => isSP(p) && catOf(p) === c && p.image), coverDefault(c))).join("")}${tile("popular", null, pop.find(p => p.image) || byDisc(sp)[1])}</section>
+    ${rl.length ? `<section class="winter" aria-label="Winter Sale, Lauren Ralph Lauren">
+      <div class="winter-head"><h2>WINTER SALE</h2><p>Lauren Ralph Lauren</p><a href="#winter">Shop Winter Sale</a></div>
+      <div class="wtiles">${WINTER_ROUTES.filter(c => rl.some(p => catOf(p) === c)).map(wTile).join("")}</div>
+    </section>` : ""}
     ${md.length ? `<div class="section-head"><h2>Mac Duggal Maxi Dresses</h2><a href="#md">View all Mac Duggal maxi dresses</a></div>
     <div class="grid">${mdTop.map(p => card(p, false)).join("")}</div>` : ""}
     <div class="section-head"><h2>Featured offers</h2><a href="#discounts">See all</a></div>
@@ -858,7 +893,7 @@ function viewFav(all){
     ${gone.length ? `<p class="warnline" style="font-size:14px;margin:6px 0 14px">${gone.length === 1 ? "1 saved size is" : gone.length + " saved sizes are"} no longer available: ${gone.map(p => esc(p.title) + " (" + esc(favOf(p.handle).size) + ")").join(", ")}. Your choice is kept — change it or remove the piece below.</p>` : ""}
     <div class="table-wrap"><table class="compare"><thead><tr><th></th><th>Piece</th><th>Selected size</th><th>Final price</th>${COSTS() ? "<th>Sale €</th>" : ""}<th>Off</th><th>${mine.length ? "My sizes" : "In stock"}</th><th></th></tr></thead><tbody>
     ${favs.map((p,i) => { const inStock = (p.sizes||[]).filter(s => s.a).map(s => s.s);
-      const sz = !isDress(p) ? (inStock.length ? "In stock" : "Sold out") : isMD(p) ? (inStock.join(", ") || "Sold out") : mine.length ? mine.map(n => inStock.some(s => fitsUK(s, n)) ? "UK " + n : `<s style="color:#bdb6ae">UK ${n}</s>`).join(", ") : (inStock.length ? "UK " + inStock.map(ukLabel).join(", ") : "Sold out");
+      const sz = !isDress(p) ? (inStock.length ? "In stock" : "Sold out") : isUS(p) ? (inStock.join(", ") || "Sold out") : mine.length ? mine.map(n => inStock.some(s => fitsUK(s, n)) ? "UK " + n : `<s style="color:#bdb6ae">UK ${n}</s>`).join(", ") : (inStock.length ? "UK " + inStock.map(ukLabel).join(", ") : "Sold out");
       const f = favOf(p.handle), mySize = !isDress(p) ? "—" : f && f.size ? `<b>${esc(f.size)}</b>${favSizeOk(p) ? "" : '<br><span class="warnline">No longer available</span>'}` : '<span class="small">Not chosen</span>';
       return `<tr class="${i === 0 ? "best" : ""}"><td><img src="${esc(img(p.image,120))}" alt=""></td><td><a href="${plink(p)}">${esc(p.title)}</a><br><span class="tag">${esc(kindOf(p))}</span></td><td>${mySize}</td><td class="num">${fmt(finalSAR(p))} SAR</td>${COSTS() ? `<td>${money(p, p.price)}</td>` : ""}<td>${offShown(p)}%</td><td>${sz}</td><td><div class="acts" style="margin:0;flex-direction:column;align-items:flex-start;gap:6px">${isDress(p) ? `<button data-fav="${esc(p.handle)}">Change size</button>` : ""}<button data-unfav="${esc(p.handle)}">Remove</button></div></td></tr>`; }).join("")}
     </tbody></table></div>
@@ -873,7 +908,7 @@ function viewItem(all, handle){
   const fav = !!S.fav[p.handle], off = offShown(p), out = !isAvail(p), dims = dimsOf(p);
   const avail = (p.sizes || []).filter(s => s.a).map(s => s.s);
   const sib = all.filter(x => catOf(x) === catOf(p) && brandOf(x) === brandOf(p)), i = sib.indexOf(p), prev = sib[i - 1], next = sib[i + 1];
-  return `<nav class="crumbs"><a href="${isMD(p) ? "#md" : "#" + catOf(p)}" id="backLink">${isMD(p) ? "Mac Duggal Maxi Dresses" : "Self-Portrait · " + CATS[catOf(p)]}</a></nav>
+  return `<nav class="crumbs"><a href="${isMD(p) ? "#md" : "#" + catOf(p)}" id="backLink">${isMD(p) ? "Mac Duggal Maxi Dresses" : isRL(p) ? "Winter Sale · " + CATS[catOf(p)] : "Self-Portrait · " + CATS[catOf(p)]}</a></nav>
   <section class="pdp">
     <div class="gallery">
       <div class="slides" id="slides" tabindex="0" aria-label="Photos of ${esc(p.title)}">${pics.map((src, n) => `<figure><img ${n > 1 ? 'loading="lazy"' : ""} src="${esc(img(src, W.item))}" alt="${esc(p.title)}, photo ${n + 1} of ${pics.length}"></figure>`).join("")}</div>
@@ -883,22 +918,26 @@ function viewItem(all, handle){
     <div class="info">
       <p class="cat-tag">${esc(kindOf(p))}</p>
       <h1>${esc(p.title)}</h1>
-      ${isMD(p) ? `${p.extra25 ? '<p class="ptags"><span class="ptag ptag-x">25% OFF</span></p>' : ""}<p class="sar big">${fmt(finalSAR(p))}<small>SAR</small></p>
+      ${isRL(p) ? `<p class="sar big">${fmt(finalSAR(p))}<small>SAR</small></p>
+      <p class="eur"><s>${fmt(wasSAR(p))} SAR</s><span class="pct">−${off}%</span></p>
+      ${(p.colors || []).length ? `<p class="small" style="margin-top:10px">Colours: ${esc(p.colors.join(", "))}</p>` : ""}
+      ${COSTS() ? `<p class="calc">${money(p, p.price)} (was ${money(p, p.compare)}, −${pct(p)}%) × ${usdRate().toFixed(3)} + ${fmt(extraFor(p))} SAR</p>` : ""}`
+      : isMD(p) ? `${p.extra25 ? '<p class="ptags"><span class="ptag ptag-x">25% OFF</span></p>' : ""}<p class="sar big">${fmt(finalSAR(p))}<small>SAR</small></p>
       ${off ? `<p class="eur"><s>${fmt(wasSAR(p))} SAR</s><span class="pct">−${off}%</span></p>` : ""}
       ${(p.colors || []).length ? `<p class="small" style="margin-top:10px">Colours: ${esc(p.colors.join(", "))}</p>` : ""}
       ${COSTS() ? `<p class="calc">${money(p, p.price)}${p.markdown ? " (was " + money(p, p.compare) + ")" : ""}${p.extra25 ? " × 0.75" : ""} × ${usdRate().toFixed(3)} + ${fmt(extraFor(p))} SAR</p>` : ""}`
       : `<p class="sar big">${fmt(finalSAR(p))}<small>SAR</small></p>
       ${off ? `<p class="eur"><s>${fmt(wasSAR(p))} SAR</s><span class="pct">−${off}%</span></p>` : ""}
       ${COSTS() ? `<p class="calc">${eur(p.price)} (was ${eur(p.compare)}, −${pct(p)}%) × ${rate().toFixed(3)} + ${fmt(extraFor(p))} SAR</p>` : ""}`}
-      <div class="pdp-sizes">${isDress(p) ? `<p class="small">${out ? "Sold out in every size" : isMD(p) ? "Available US sizes" : "Available UK sizes"}</p>${sizesHTML(p)}
-        ${!out && !isMD(p) && S.settings.sizes.length ? `<p class="small" style="margin-top:8px">${avail.some(s => anyFits(s, S.settings.sizes)) ? "In your size" : "Not available in your saved sizes"}</p>` : ""}`
+      <div class="pdp-sizes">${isDress(p) ? `<p class="small">${out ? "Sold out in every size" : catOf(p) === "scarves" ? "Size" : isUS(p) ? "Available US sizes" : "Available UK sizes"}</p>${sizesHTML(p)}
+        ${!out && isSP(p) && S.settings.sizes.length ? `<p class="small" style="margin-top:8px">${avail.some(s => anyFits(s, S.settings.sizes)) ? "In your size" : "Not available in your saved sizes"}</p>` : ""}`
         : `<p class="small">${out ? "Sold out" : "In stock"}</p>${dims ? `<p class="dims">Dimensions: ${esc(dims)}</p>` : ""}`}
-        <button class="guide-btn" data-guide="${esc(p.handle)}">${isDress(p) ? "View size guide" : "View dimensions"}</button></div>
+        ${isRL(p) ? `<a class="guide-btn macys" href="${esc(url(p))}" target="_blank" rel="noopener">View on Macy's</a>` : `<button class="guide-btn" data-guide="${esc(p.handle)}">${isDress(p) ? "View size guide" : "View dimensions"}</button>`}</div>
       <button class="btn ${fav ? "" : "solid"} favbtn" data-fav="${esc(p.handle)}" aria-pressed="${fav}">${fav ? (isDress(p) && favOf(p.handle).size ? "Saved · " + esc(favOf(p.handle).size) + " — change" : "Saved to favorites") : "Save to favorites"}</button>
       ${fav && isDress(p) && favOf(p.handle).size && !favSizeOk(p) ? `<p class="warnline">${esc(favOf(p.handle).size)} is no longer available</p>` : ""}
       ${waLink(p)}
       ${p.details ? `<div class="details"><h2>Details</h2><p>${esc(p.details)}</p></div>` : ""}
-      ${OWNER ? `<div class="acts"><button data-edit="${esc(p.handle)}">Edit</button>${COSTS() ? `<a href="${esc(url(p))}" target="_blank" rel="noopener">Store page</a>` : ""}</div>` : ""}
+      ${OWNER ? `<div class="acts"><button data-edit="${esc(p.handle)}">Edit</button>${COSTS() && !isRL(p) ? `<a href="${esc(url(p))}" target="_blank" rel="noopener">Store page</a>` : ""}</div>` : ""}
       <div class="pn">${prev ? `<a href="${plink(prev)}">‹ Previous</a>` : "<span></span>"}${next ? `<a href="${plink(next)}">Next ›</a>` : ""}</div>
     </div>
   </section>`;
@@ -983,6 +1022,7 @@ function viewAdmin(all){
       <label class="f">Clothing — fixed amount added to every dress (SAR)<input id="sExtra" type="number" inputmode="decimal" step="1" value="${extra()}"></label>
       <label class="f">Bags — fixed amount added to every bag (SAR)<input id="sExtraBags" type="number" inputmode="decimal" step="1" value="${extraBags()}"></label>
       <label class="f">Mac Duggal — fixed amount added to every dress (SAR)<input id="sExtraMD" type="number" inputmode="decimal" step="1" value="${extraMD()}"></label>
+      <label class="f">Winter Sale (Lauren Ralph Lauren) — fixed amount added to every piece (SAR)<input id="sExtraRL" type="number" inputmode="decimal" step="1" value="${extraRL()}"></label>
       <p class="small">Mac Duggal: US price, less any Black Friday markdown, less the extra 25% where Mac Duggal labels it “+25% Off In Cart”, × USD/SAR ${usdRate().toFixed(4)} (${esc(m.usdRate && m.usdRate.source || "peg 3.75")}) + the fixed amount.</p>
       <label class="f">EUR → SAR rate<input id="sRate" type="number" inputmode="decimal" step="0.0001" placeholder="Live: ${Number(m.rate && m.rate.value || 0).toFixed(4)}" value="${S.settings.rate || ""}"></label>
       <p class="small">Live rate ${Number(m.rate && m.rate.value || 0).toFixed(4)} from ${esc(m.rate && m.rate.source || "—")}${m.rate && m.rate.asOf ? ", " + esc(m.rate.asOf) : ""}. Leave empty to use the live rate.</p>
@@ -1032,8 +1072,8 @@ function openEditor(handle){
       <label class="f">Name<input id="eT" value="${esc(p.title)}"></label>
       <label class="f">Image URL<input id="eI" value="${esc(p.image)}" placeholder="https://…jpg"></label>
       ${p.manual ? `<label class="f">Product page link<input id="eU" value="${esc(p.url || "")}" placeholder="https://eu.self-portrait.com/es-es/products/…"></label>` : ""}
-      <div class="row"><label class="f" style="flex:1">Original price (${isMD(p) ? "$" : "€"})<input id="eC" type="number" step="0.01" inputmode="decimal" value="${p.compare || ""}"></label>
-      <label class="f" style="flex:1">Discounted price (${isMD(p) ? "$" : "€"})<input id="eP" type="number" step="0.01" inputmode="decimal" value="${p.price || ""}"></label></div>
+      <div class="row"><label class="f" style="flex:1">Original price (${isUS(p) ? "$" : "€"})<input id="eC" type="number" step="0.01" inputmode="decimal" value="${p.compare || ""}"></label>
+      <label class="f" style="flex:1">Discounted price (${isUS(p) ? "$" : "€"})<input id="eP" type="number" step="0.01" inputmode="decimal" value="${p.price || ""}"></label></div>
       <div><p class="small" style="margin-bottom:6px">Sizes — tap to mark in stock or sold out</p><div class="size-edit" id="eS"></div>
         <div class="row" style="margin-top:8px"><button class="btn quiet" id="eSys">Switch size set</button></div></div>
       <label class="f">Personal note (only you see this)<textarea id="eN" placeholder="Fit, colour, occasion…">${esc(S.notes[p.handle] || "")}</textarea></label>
@@ -1140,12 +1180,12 @@ function wireItem(){
 }
 
 /* ---------- router ---------- */
-const LISTS = ["all","sp","midi","maxi","bags","md","recent","discounts","popular"];
+const LISTS = ["all","sp","midi","maxi","bags","md","winter","jackets","coats","scarves","recent","discounts","popular"];
 function routeOf(){ let r = (location.hash || "#home").slice(1); if (r.startsWith("dress-")) r = "item-" + r.slice(6); return r; }
 function render(){
   const route = routeOf();
-  let navRoute = SP_ROUTES.includes(route) ? "sp" : route;
-  if (route.startsWith("item-")){ const it = products().find(x => x.handle === route.slice(5)); if (it) navRoute = isMD(it) ? "md" : "sp"; }
+  let navRoute = SP_ROUTES.includes(route) ? "sp" : WINTER_ROUTES.includes(route) ? "winter" : route;
+  if (route.startsWith("item-")){ const it = products().find(x => x.handle === route.slice(5)); if (it) navRoute = isMD(it) ? "md" : isRL(it) ? "winter" : "sp"; }
   document.querySelectorAll("nav.tabs a").forEach(a => { if (a.getAttribute("href") === "#" + navRoute) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
   $("#top").classList.toggle("home", route === "home");
   $("#navAdmin").classList.toggle("hidden", !OWNER);
@@ -1191,6 +1231,7 @@ function wireAdmin(list){
   $("#aRefreshAll").onclick = () => runCheck("all");
   $("#aNewDeals").onclick = () => runCheck("new");
   $("#sExtra").onchange = e => { const v = Number(e.target.value); if (!Number.isFinite(v) || v < 0) return toast("Enter a number of riyals, 0 or more."); S.settings.extra = v; save(); render(); toast("Every dress now adds " + fmt(v) + " SAR."); };
+  $("#sExtraRL").onchange = e => { const v = Number(e.target.value); if (!Number.isFinite(v) || v < 0) return toast("Enter a number of riyals, 0 or more."); S.settings.extraRL = v; save(); render(); toast("Every Winter Sale piece now adds " + fmt(v) + " SAR."); };
   $("#sExtraMD").onchange = e => { const v = Number(e.target.value); if (!Number.isFinite(v) || v < 0) return toast("Enter a number of riyals, 0 or more."); S.settings.extraMD = v; save(); render(); toast("Every Mac Duggal dress now adds " + fmt(v) + " SAR."); };
   $("#sExtraBags").onchange = e => { const v = Number(e.target.value); if (!Number.isFinite(v) || v < 0) return toast("Enter a number of riyals, 0 or more."); S.settings.extraBags = v; save(); render(); toast("Every bag now adds " + fmt(v) + " SAR."); };
   $("#sRate").onchange = e => { const v = Number(e.target.value); S.settings.rate = v > 0 ? v : null; save(); render(); toast(v > 0 ? "Using your rate " + v + "." : "Using the live rate."); };
