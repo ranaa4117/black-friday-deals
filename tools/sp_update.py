@@ -110,6 +110,97 @@ def fetch_collection(handle):
     return items
 
 
+# ---------- Mac Duggal (official US store, maxi dresses) ----------
+MD_STORE = "https://macduggal.com"
+MD_MAXI = "full-length-maxi"        # the store's own floor-length / maxi collection
+MD_BF = "black-friday"              # the store's Black Friday Sale collection
+MD_PROMO_TAG = "BFCM25"             # the store shows "+25% Off In Cart" on products with this tag (window.cardHighlights)
+MD_NOT_MAXI = re.compile(r"\b(mini|midi|short|tea length|cocktail dress|jumpsuit|romper|top|blouse|skirt|pants?|trousers?|blazer|jacket|coat|cape|shawl|bag|clutch|earrings?)\b", re.I)
+
+
+def fetch_md_collection(handle):
+    items, page = [], 1
+    while page <= 20:
+        batch = get_json(f"{MD_STORE}/collections/{handle}/products.json?limit=250&page={page}").get("products") or []
+        items += batch
+        if len(batch) < 250:
+            break
+        page += 1
+        time.sleep(2)
+    return items
+
+
+def normalize_md(p, bf_handles):
+    title = (p.get("title") or "").strip()
+    ptype = (p.get("product_type") or "").upper()
+    if MD_NOT_MAXI.search(title) or ptype in ("KIDS", "HANDBAGS", "READY TO WEAR", "SAMPLES"):
+        return None
+    variants = p.get("variants") or []
+    if not variants:
+        return None
+    opts = [o.get("name", "").lower() for o in p.get("options", [])]
+    ci = opts.index("color") if "color" in opts else None
+    si = opts.index("size") if "size" in opts else None
+    cheapest = min(variants, key=lambda v: float(v.get("price") or 1e9))
+    price = float(cheapest["price"])
+    compare = float(cheapest.get("compare_at_price") or 0)
+    markdown = compare > price
+    promo = MD_PROMO_TAG in (p.get("tags") or [])
+    if not markdown and not promo:
+        return None  # full price and not eligible for the cart promotion
+    sizes, colors = {}, []
+    for v in variants:
+        vals = [v.get("option1"), v.get("option2"), v.get("option3")]
+        size = (vals[si] if si is not None else v.get("title")) or ""
+        color = (vals[ci] if ci is not None else "") or ""
+        if size:
+            sizes[size] = sizes.get(size, False) or bool(v.get("available"))
+        if color and color not in colors:
+            colors.append(color)
+    imgs = [i["src"] for i in (p.get("images") or []) if i.get("src")]
+    return {
+        "handle": "md-" + p["handle"],
+        "brand": "md",
+        "cat": "maxi",
+        "cur": "USD",
+        "url": f"{MD_STORE}/products/{p['handle']}",
+        "title": title,
+        "image": imgs[0] if imgs else "",
+        "images": imgs[:6],
+        "details": clean_text(p.get("body_html"))[:500],
+        "price": round(price, 2),
+        "compare": round(compare if markdown else price, 2),
+        "bf": markdown and p["handle"] in bf_handles,
+        "markdown": markdown,
+        "extra25": promo,
+        "colors": colors[:8],
+        "sizes": [{"s": k, "a": a} for k, a in sizes.items()],
+        "publishedAt": (p.get("published_at") or "")[:10],
+    }
+
+
+def fetch_md():
+    maxi = fetch_md_collection(MD_MAXI)
+    time.sleep(1.5)
+    bf = {p["handle"] for p in fetch_md_collection(MD_BF)}
+    out = {}
+    for p in maxi:
+        n = normalize_md(p, bf)
+        if n:
+            out[n["handle"]] = n
+    return list(out.values()), len(maxi)
+
+
+def fetch_usd_rate():
+    try:
+        d = get_json("https://open.er-api.com/v6/latest/USD")
+        if d.get("result") == "success":
+            return {"value": round(d["rates"]["SAR"], 4), "source": "open.er-api.com (USD→SAR)", "asOf": d.get("time_last_update_utc", "")}
+    except Exception as e:  # noqa: BLE001
+        print("usd rate failed:", e)
+    return {"value": 3.75, "source": "SAR/USD official peg 3.75", "asOf": ""}
+
+
 # ---------- official size guide (tables in the product page) ----------
 class TableParser(HTMLParser):
     def __init__(self):
@@ -194,6 +285,8 @@ def guide_images(page_html):
 def read_guides(products, prev_by_handle):
     budget, done = SG_LIMIT, 0
     for p in products:
+        if p.get("brand", "sp") != "sp":
+            continue
         old = prev_by_handle.get(p["handle"], {})
         if not FORCE and old.get("guide") is not None and age_s(old.get("guideAt", "")) < SG_MAX_AGE:
             p["guide"], p["guideAt"] = old["guide"], old["guideAt"]
@@ -296,8 +389,10 @@ def main():
     rate = fetch_rate()
     if rate:
         meta["rate"] = rate
+    meta["usdRate"] = fetch_usd_rate()
 
     old = {p["handle"]: dict(p, cat=p.get("cat", "midi")) for p in prev.get("products", [])}
+    grp = lambda p: p.get("brand", "sp") + ":" + p["cat"]
     fresh, ok_cats, errors, raw_counts = {}, set(), [], {}
     for cat, handle in CATEGORIES:
         try:
@@ -309,10 +404,17 @@ def main():
                 n = normalize(p, cat)
                 if n and n["handle"] not in fresh:
                     fresh[n["handle"]] = n
-            ok_cats.add(cat)
+            ok_cats.add("sp:" + cat)
         except Exception as e:  # noqa: BLE001
             errors.append(f"{cat}: {e}")
         time.sleep(1.5)
+    try:
+        md_items, raw_counts["md"] = fetch_md()
+        for n in md_items:
+            fresh[n["handle"]] = n
+        ok_cats.add("md:maxi")
+    except Exception as e:  # noqa: BLE001
+        errors.append(f"macduggal: {e}")
 
     if not ok_cats:
         meta["lastError"] = f"{ts}: could not read the store ({'; '.join(errors)}). Showing data from the last successful check."
@@ -323,17 +425,18 @@ def main():
 
     # categories that failed this run keep their previous products
     for h, p in old.items():
-        if p["cat"] not in ok_cats and h not in fresh:
+        if grp(p) not in ok_cats and h not in fresh:
             fresh[h] = p
 
-    baseline = {c for c, _ in CATEGORIES if not any(p["cat"] == c for p in old.values())}
+    groups = ["sp:" + c for c, _ in CATEGORIES] + ["md:maxi"]
+    baseline = {g for g in groups if not any(grp(p) == g for p in old.values())}
     added, changed = [], []
     for h, n in fresh.items():
         o = old.get(h)
-        if n["cat"] in ok_cats:
+        if grp(n) in ok_cats:
             n["verifiedAt"] = ts
         if not o:
-            if n["cat"] in baseline:  # first time this category is tracked: starting stock, not "new"
+            if grp(n) in baseline:  # first time this category is tracked: starting stock, not "new"
                 base = meta.get("initialImport", ts)
                 n.update(firstSeen=base, lastChanged=ts, changes=[])
             else:
@@ -342,10 +445,13 @@ def main():
             continue
         n["firstSeen"] = o.get("firstSeen", ts)
         msgs = []
+        sym = "$" if n.get("cur") == "USD" else "€"
         if o.get("price") != n["price"]:
-            msgs.append(f"Sale price €{o.get('price', 0):g} → €{n['price']:g}")
+            msgs.append(f"Sale price {sym}{o.get('price', 0):g} → {sym}{n['price']:g}")
         if o.get("compare") != n["compare"]:
-            msgs.append(f"Original price €{o.get('compare', 0):g} → €{n['compare']:g}")
+            msgs.append(f"Original price {sym}{o.get('compare', 0):g} → {sym}{n['compare']:g}")
+        if o.get("extra25") != n.get("extra25") and n.get("brand") == "md":
+            msgs.append("Extra 25% in cart " + ("now applies" if n.get("extra25") else "no longer applies"))
         if o.get("image") != n["image"]:
             msgs.append("Image updated")
         msgs += size_msgs(o.get("sizes", []), n["sizes"])
@@ -355,7 +461,7 @@ def main():
         else:
             n.update(lastChanged=o.get("lastChanged", ts), changes=o.get("changes", []))
 
-    gone = [dict(p, removedAt=ts) for h, p in old.items() if h not in fresh and p["cat"] in ok_cats]
+    gone = [dict(p, removedAt=ts) for h, p in old.items() if h not in fresh and grp(p) in ok_cats]
     removed = (gone + [r for r in prev.get("removed", []) if r["handle"] not in fresh])[:120]
     for r in removed:
         r.pop("guide", None)
@@ -364,10 +470,12 @@ def main():
     products = sorted(fresh.values(), key=lambda p: p.get("firstSeen", ""), reverse=True)
     guides = read_guides(products, old)
 
-    counts = {c: sum(1 for p in products if p["cat"] == c) for c, _ in CATEGORIES}
+    counts = {c: sum(1 for p in products if p["cat"] == c and p.get("brand", "sp") == "sp") for c, _ in CATEGORIES}
+    counts["md"] = sum(1 for p in products if p.get("brand") == "md")
     meta.update(lastSuccess=ts, lastError=("; ".join(errors) and f"{ts}: partial check — {'; '.join(errors)}"),
                 count=len(products), counts=counts, storeCounts=raw_counts,
-                collections={c: f"{STORE}/collections/{h}" for c, h in CATEGORIES})
+                collections=dict({c: f"{STORE}/collections/{h}" for c, h in CATEGORIES}, md=f"{MD_STORE}/collections/{MD_MAXI}"),
+                mdPromo={"tag": MD_PROMO_TAG, "label": "+25% Off In Cart", "source": f"{MD_STORE} (product label shown by the official store)"})
     meta.setdefault("initialImport", ts)
     log = meta.get("log", [])
     log.insert(0, {"at": ts, "added": len(added), "removed": len(gone), "changed": len(changed), "guides": guides})

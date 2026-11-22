@@ -1,39 +1,14 @@
 #!/usr/bin/env python3
-"""Diagnostics for the Mac Duggal US store: where the '+25% Off In Cart' badge and promo terms come from."""
-import json, re, urllib.request
-UA = "Mozilla/5.0 (personal sale tracker; github.com/ranaa4117/black-friday-deals)"
-def get(u, acc="text/html"):
-    with urllib.request.urlopen(urllib.request.Request(u, headers={"User-Agent": UA, "Accept": acc}), timeout=45) as r:
-        return r.read().decode("utf-8", "replace")
-KEYS = re.compile(r"In Cart|BFCM|Exempt Styles|No Promo|25% ?off|extra 25|sitewide|Final ?Sale|exclusion", re.I)
-def ctx(text, label, limit=14):
-    seen = set()
-    for m in KEYS.finditer(text):
-        s = re.sub(r"\s+", " ", text[max(0, m.start() - 160): m.end() + 200])
-        k = s[100:220]
-        if k in seen: continue
-        seen.add(k); print(f"  [{label}]", s[:420])
-        if len(seen) >= limit: break
-home = get("https://macduggal.com/")
-print("== homepage"); ctx(home, "home")
-prod = json.loads(get("https://macduggal.com/collections/black-friday/products.json?limit=250", "application/json"))["products"]
-elig = next(p for p in prod if "BFCM25" in p["tags"] and "Exempt Styles - No Promo" not in p["tags"])
-ex = next((p for p in prod if "Exempt Styles - No Promo" in p["tags"]), None)
-for p in [elig, ex]:
-    if not p: continue
-    print("== product page", p["handle"], p["tags"][:30])
-    ctx(get(f"https://macduggal.com/products/{p['handle']}"), "product")
-assets = sorted(set(re.findall(r"(?:https:)?//macduggal\.com/cdn/shop/t/\d+/assets/[\w.\-]+\.js[^\"' ]*|/cdn/shop/t/\d+/assets/[\w.\-]+\.js[^\"' ]*", home)))
-print("== theme scripts:", len(assets))
-for a in assets[:40]:
-    u = a if a.startswith("http") else ("https:" + a if a.startswith("//") else "https://macduggal.com" + a)
-    try:
-        js = get(u, "*/*")
-        if KEYS.search(js): print("== script", u.split("/assets/")[-1][:60]); ctx(js, "js", 8)
-    except Exception as e:
-        print("  script failed", u[-60:], e)
-links = sorted(set(re.findall(r'href="(/pages/[^"#?]+)"', home)))
-print("== /pages links:", links[:40])
-for l in [x for x in links if re.search(r"promo|offer|term|sale|black|bf|discount|exclu", x, re.I)][:6]:
-    try: print("== page", l); ctx(get("https://macduggal.com" + l), "page", 10)
-    except Exception as e: print("  failed", e)
+"""Dry run of the Mac Duggal collection (prints a summary, writes nothing)."""
+import collections, os, sys
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import sp_update as u
+items, raw = u.fetch_md()
+c = collections.Counter(("BF" if p["bf"] else "sale" if p["markdown"] else "-") + "+" + ("25" if p["extra25"] else "no25") for p in items)
+print(f"MD dry run: {raw} in maxi collection -> {len(items)} eligible; by type {dict(c)}")
+print("in stock:", sum(1 for p in items if any(s["a"] for s in p["sizes"])), "| no image:", sum(1 for p in items if not p["image"]))
+print("sizes seen:", collections.Counter(s["s"] for p in items for s in p["sizes"]).most_common(20))
+print("colors seen:", collections.Counter(c for p in items for c in p["colors"]).most_common(40))
+for p in items[:4] + [x for x in items if x["bf"] and x["extra25"]][:2]:
+    print("  sample:", p["title"], p["price"], p["compare"], "bf" if p["bf"] else "", "25" if p["extra25"] else "", p["url"])
+print("usd rate:", u.fetch_usd_rate())
