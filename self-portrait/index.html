@@ -460,7 +460,7 @@ const PASS_HASH = "3c29f0bb09f7f11433b993fb3a8d945503758c57eacb6ecfe88c49e1ef74e
 const REPO = "ranaa4117/black-friday-deals";
 const WORKFLOW = "self-portrait-update.yml";
 const LS = "sp-edit-v1";
-const APP_VERSION = "16";
+const APP_VERSION = "17";
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
@@ -517,6 +517,8 @@ const CONVERSION = [["UK",["4","6","8","10","12","14","16"]],["Letter",["XS",">S
 /* Self-Portrait's standard body measurements (shown on every dress page), used only while a product's own guide is still being read */
 
 /* ---------- state ---------- */
+/* data files always come from GitHub Pages, so the site also works when served from another address (e.g. Cloudflare Pages) */
+const BASE = /github\.io$|^localhost$|^127\./.test(location.hostname) ? "" : "https://ranaa4117.github.io/black-friday-deals/self-portrait/";
 let DATA = { meta:{}, products:[], removed:[] };
 let WINTER = [];
 let loaded = false, pollTimer = null, syncTimer = null;
@@ -599,7 +601,7 @@ function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add
 let MORE = null, moreLoading = null;
 function ensureMore(){
   if (MORE) return Promise.resolve(MORE);
-  if (!moreLoading) moreLoading = fetch("more.json?t=" + Date.now(), { cache:"no-store" }).then(r => r.ok ? r.json() : {}).catch(() => ({})).then(m => (MORE = m || {}));
+  if (!moreLoading) moreLoading = fetch(BASE + "more.json?t=" + Date.now(), { cache:"no-store" }).then(r => r.ok ? r.json() : {}).catch(() => ({})).then(m => (MORE = m || {}));
   return moreLoading;
 }
 const withMore = p => p && MORE && MORE[p.handle] ? Object.assign({}, MORE[p.handle], p) : p;
@@ -623,9 +625,9 @@ const recentList = list => DATA.meta.initialImport ? list.filter(p => p.manual |
 /* ---------- data + sync ---------- */
 async function loadData(manual){
   try {
-    const r = await fetch("data.json?t=" + Date.now(), { cache:"no-store" });
+    const r = await fetch(BASE + "data.json?t=" + Date.now(), { cache:"no-store" });
     if (!r.ok) throw new Error("HTTP " + r.status);
-    const w = WINTER.length ? null : fetch("winter.json?t=" + Date.now(), { cache:"no-store" }).then(x => x.ok ? x.json() : {}).catch(() => ({}));
+    const w = fetch(BASE + "winter.json?t=" + Date.now(), { cache:"no-store" }).then(x => x.ok ? x.json() : {}).catch(() => ({}));
     DATA = await r.json(); if (w) WINTER = ((await w).products || []); loaded = true;
     await Promise.all([pullSync(), loadTotals()]);
     if (manual) toast("Up to date.");
@@ -636,7 +638,7 @@ async function loadData(manual){
 }
 async function pullSync(){
   try {
-    const r = await fetch("personal.json?t=" + Date.now(), { cache:"no-store" });
+    const r = await fetch(BASE + "personal.json?t=" + Date.now(), { cache:"no-store" });
     if (!r.ok) return;
     const remote = await r.json();
     if (!OWNER){ REMOTE = remote; return; }
@@ -1271,7 +1273,7 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden && lo
 async function sha(t){ const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(t)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2,"0")).join(""); }
 $("#gateForm").onsubmit = async e => { e.preventDefault(); const h = await sha($("#pass").value); if (h === PASS_HASH){ store.set("sp-unlock", h); OWNER = true; $("#pass").value = ""; await loadData(false); } else { $("#gateErr").textContent = "That passcode doesn't match. Try again."; } };
 render(); loadData(false).then(shareExistingFavs); schedulePoll(); window._lastLoad = Date.now();
-fetch("version.txt?t=" + Date.now(), { cache:"no-store" }).then(r => r.ok ? r.text() : "").then(v => {
+fetch(BASE + "version.txt?t=" + Date.now(), { cache:"no-store" }).then(r => r.ok ? r.text() : "").then(v => {
   v = v.trim();
   if (v && v !== APP_VERSION && new URLSearchParams(location.search).get("v") !== v) location.replace(location.pathname + "?v=" + v + location.hash);
 }).catch(() => {});
