@@ -17,6 +17,10 @@ on:
         description: "Re-read every size guide (1 = yes)"
         required: false
         default: "0"
+      macys_probe:
+        description: "Test reading Macy's US (1 = yes)"
+        required: false
+        default: "0"
       md_probe:
         description: "Print Mac Duggal store diagnostics (1 = yes)"
         required: false
@@ -46,6 +50,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Macy's access test
+        if: ${{ github.event.inputs.macys_probe == '1' }}
+        run: python3 tools/macys_probe.py
       - name: Mac Duggal diagnostics
         if: ${{ github.event.inputs.md_probe == '1' }}
         run: python3 tools/md_probe.py
