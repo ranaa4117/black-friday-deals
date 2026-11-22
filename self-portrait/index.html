@@ -28,7 +28,13 @@ img{display:block;max-width:100%}
 header.top{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.96);backdrop-filter:blur(6px);border-bottom:1px solid var(--rule);padding-top:env(safe-area-inset-top)}
 .brand{display:flex;flex-direction:column;align-items:center;padding:18px var(--pad) 10px;text-decoration:none}
 .brand b{font:400 clamp(19px,3.2vw,26px)/1 var(--serif);letter-spacing:.22em;text-transform:uppercase}
-.brand span{font:300 12px/1 var(--sans);letter-spacing:.18em;color:var(--stone);margin-top:8px;text-transform:uppercase}
+.brand .tagline{font:300 12px/1 var(--sans);letter-spacing:.18em;color:var(--stone);margin-top:8px;text-transform:uppercase}
+.top.home .brand{padding:clamp(28px,5vw,56px) var(--pad) clamp(16px,2.6vw,28px)}
+.top.home .brand b{font-size:clamp(30px,5.4vw,62px);line-height:1.12;letter-spacing:.14em;text-align:center}
+.top.home .brand b .ln{display:block}
+.brand b .ln{font:inherit;letter-spacing:inherit;color:inherit;margin:0;text-transform:inherit}
+.top.home .brand .tagline{font-size:clamp(12px,1.4vw,15px);margin-top:14px}
+.top.home{position:relative}
 nav.tabs{display:flex;justify-content:safe center;gap:clamp(14px,3vw,36px);padding:4px var(--pad) 12px;overflow-x:auto;scrollbar-width:none;white-space:nowrap}
 nav.tabs::-webkit-scrollbar{display:none}
 nav.tabs a{text-decoration:none;font-size:13px;letter-spacing:.08em;padding:6px 0;border-bottom:1px solid transparent;color:var(--stone)}
@@ -207,7 +213,8 @@ a.plain{text-decoration:none}
   .panel{grid-template-columns:1fr;gap:14px}
   .toolbar{position:static}
   .brand b{letter-spacing:.12em;font-size:17px;text-align:center}
-  .brand span{font-size:10.5px}
+  .top.home .brand b{font-size:29px;letter-spacing:.08em}
+  .brand .tagline{font-size:10.5px}
   nav.tabs{justify-content:flex-start}
   .hero .facts{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
   .hero .facts div{min-width:0}
@@ -232,7 +239,7 @@ a.plain{text-decoration:none}
 </div>
 
 <header class="top" id="top">
-  <a class="brand" href="#home"><b>Black Friday-Raghad Outlet 2026</b><span>Self-Portrait midi dresses · prices in SAR</span></a>
+  <a class="brand" href="#home" aria-label="Black Friday-Raghad Outlet 2026, home"><b><span class="ln">Black Friday</span> <span class="ln">Raghad Outlet 2026</span></b><small class="tagline">Self-Portrait midi dresses</small></a>
   <nav class="tabs" aria-label="Sections">
     <a href="#home">Home</a>
     <a href="#all">All dresses<span class="count" id="cAll"></span></a>
@@ -426,14 +433,14 @@ function shopCard(p){
 
 function statusBar(){
   const m = DATA.meta, el = $("#status");
-  if (!loaded){ el.innerHTML = "Loading the collection…"; return; }
+  if (!loaded){ el.classList.add("hidden"); return; }
   const stale = m.lastSuccess && (Date.now() - new Date(m.lastSuccess)) > 3 * 3600e3;
   if (!COSTS()){
-    el.innerHTML = `<span>Prices and sizes updated ${ago(m.lastSuccess)} · ${when(m.lastSuccess)}</span>${stale || m.lastError ? '<span class="warn">Availability may have changed — confirm your size before ordering</span>' : ""}<button id="refreshNow">Refresh</button>${OWNER ? '<button id="costTgl">Show my costs</button>' : ""}`;
-    $("#refreshNow").onclick = () => loadData(true);
-    if ($("#costTgl")) $("#costTgl").onclick = () => { SHOWCOSTS = true; render(); toast("Showing your € costs. Only you can see this."); };
+    el.classList.toggle("hidden", !(stale || m.lastError));
+    el.innerHTML = '<span class="warn">Availability may have changed — please confirm your size before ordering</span>';
     return;
   }
+  el.classList.remove("hidden");
   el.innerHTML = `<span>Last successful update: ${when(m.lastSuccess)}</span>
     <span>EUR/SAR ${rate().toFixed(3)}${S.settings.rate ? " (your manual rate)" : ""}</span>
     ${m.lastError ? `<span class="warn">Latest check couldn't reach the store — prices shown are from ${ago(m.lastSuccess)}</span>` : stale ? `<span class="warn">Not verified for ${ago(m.lastSuccess).replace(" ago","")} — check the store before buying</span>` : ""}
@@ -519,7 +526,7 @@ function viewAdmin(list){
   const log = (m.log || []).slice(0, 12).map(l => `<div><span>${when(l.at)}</span><span>+${l.added} new · −${l.removed} left sale · ${l.changed} changed</span></div>`).join("");
   const removed = (DATA.removed || []).slice(0, 40).map(r => `<div><a href="${esc(url(r))}" target="_blank" rel="noopener">${esc(r.title)}</a><span>${eur(r.price)} · left ${ago(r.removedAt)}</span></div>`).join("") || '<div><span>No dresses have left the sale yet.</span></div>';
   const deleted = list.length; const hidden = Object.keys(S.del).length;
-  return `<div class="section-head"><h2>Admin & settings</h2><p>Changes save instantly on this device${GH.token && GH.sync ? " and are published to customers" : ". Customers only see your edits once sync is on (Sync & publish below)"}. <button class="btn quiet" id="aLeave" style="margin-left:8px;padding:6px 12px">View as a customer</button></p></div>
+  return `<div class="section-head"><h2>Admin & settings</h2><p>Changes save instantly on this device${GH.token && GH.sync ? " and are published to customers" : ". Customers only see your edits once sync is on (Sync & publish below)"}. <button class="btn quiet" id="aCosts" style="margin-left:8px;padding:6px 12px">${SHOWCOSTS ? "Hide my costs" : "Show my costs"}</button><button class="btn quiet" id="aLeave" style="margin-left:8px;padding:6px 12px">View as a customer</button></p></div>
 
   <section class="panel"><div><h3>Pricing</h3><p class="why">Final price = discounted € × rate + fixed amount, rounded to the nearest riyal.</p></div>
     <div class="fields">
@@ -683,6 +690,7 @@ function wireDress(){
 function render(){
   const route = (location.hash || "#home").slice(1);
   const navRoute = route;
+  $("#top").classList.toggle("home", route === "home");
   document.querySelectorAll("nav.tabs a").forEach(a => { if (a.getAttribute("href") === "#" + navRoute) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
   statusBar();
   const list = products(); counts(list);
@@ -718,6 +726,7 @@ function wireAdmin(list){
   $("#sPoll").onchange = e => { S.settings.poll = Number(e.target.value); save(); schedulePoll(); toast("Reloading every " + e.target.value + " minutes."); };
   $("#mySizes").onclick = e => { const b = e.target.closest("[data-my]"); if (!b) return; const s = Number(b.dataset.my), set = new Set(S.settings.sizes); set.has(s) ? set.delete(s) : set.add(s); S.settings.sizes = UKS.filter(x => set.has(x)); save(); render(); };
   $("#aRefresh").onclick = () => loadData(true);
+  $("#aCosts").onclick = () => { SHOWCOSTS = !SHOWCOSTS; render(); toast(SHOWCOSTS ? "Showing your € costs on every page. Only you can see this." : "Costs hidden."); };
   $("#aLeave").onclick = () => { store.set("sp-unlock", ""); OWNER = false; location.hash = "#home"; render(); toast("Customer view. Open #admin to sign back in."); };
   $("#aRun").onclick = runStoreCheck;
   $("#aAdd").onclick = () => openEditor(null);
@@ -752,7 +761,7 @@ function start(){ render(); loadData(false); schedulePoll(); window._lastLoad = 
 $("#gateForm").onsubmit = async e => { e.preventDefault(); const h = await sha($("#pass").value); if (h === PASS_HASH){ store.set("sp-unlock", h); OWNER = true; $("#pass").value = ""; render(); } else { $("#gateErr").textContent = "That passcode doesn't match. Try again."; } };
 start();
 /* load the newest version of the site when it changes (browsers may keep an old copy for 10 min) */
-const APP_VERSION = "7";
+const APP_VERSION = "8";
 fetch("version.txt?t=" + Date.now(), { cache:"no-store" }).then(r => r.ok ? r.text() : "").then(v => {
   v = v.trim();
   if (v && v !== APP_VERSION && new URLSearchParams(location.search).get("v") !== v) location.replace(location.pathname + "?v=" + v + location.hash);
