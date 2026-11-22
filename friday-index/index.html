@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Friday Index — Black Friday Deals, USA &amp; Saudi Arabia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fbfaf8; --surface:#ffffff; --ink:#111111; --ink2:#4a4a4a; --ink3:#8a8a8a;
+  --line:#e7e4df; --line2:#f0eeea; --chip:#f4f2ee; --accent:#111;
+  --live:#1f6f43; --up:#8a5a00; --exp:#9a9a9a; --warn:#a33b2b;
+  --r:14px; --maxw:1180px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+button{font:inherit;color:inherit;cursor:pointer}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px}
+.serif{font-family:"Instrument Serif",Georgia,serif;font-weight:400;letter-spacing:-.01em}
+/* header */
+header.top{position:sticky;top:0;z-index:20;background:rgba(251,250,248,.92);backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:18px;height:60px}
+.logo{font-family:"Instrument Serif",serif;font-size:26px;text-decoration:none;white-space:nowrap}
+.logo i{font-style:italic}
+nav.links{display:flex;gap:18px;margin-left:auto;font-size:13.5px;color:var(--ink2)}
+nav.links a{text-decoration:none}
+nav.links a:hover{color:var(--ink)}
+.mkt-mini{display:flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--surface)}
+.mkt-mini button{border:0;background:none;padding:5px 12px;border-radius:999px;font-size:13px;color:var(--ink2)}
+.mkt-mini button[aria-pressed=true]{background:var(--ink);color:#fff}
+@media(max-width:760px){nav.links{display:none}.mkt-mini{margin-left:auto}}
+/* hero search */
+.hero{padding:34px 0 10px}
+.hero h1{font-size:clamp(34px,6vw,58px);line-height:1.02;margin:0 0 6px}
+.hero p.sub{margin:0 0 22px;color:var(--ink2);max-width:640px}
+.search{position:relative}
+.search input{width:100%;height:58px;border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:0 120px 0 50px;font:inherit;font-size:16px;outline:none;box-shadow:0 1px 0 rgba(0,0,0,.02)}
+.search input:focus{border-color:#bdb8b0}
+.search svg{position:absolute;left:18px;top:19px;opacity:.55}
+.search .clear{position:absolute;right:10px;top:10px;height:38px;border:1px solid var(--line);background:var(--chip);border-radius:10px;padding:0 12px;font-size:13px;display:none}
+.sugg{position:absolute;left:0;right:0;top:64px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 40px rgba(0,0,0,.08);z-index:30;overflow:hidden;display:none;max-height:420px;overflow-y:auto}
+.sugg button{display:flex;width:100%;text-align:left;border:0;background:none;padding:10px 16px;gap:10px;align-items:center;border-bottom:1px solid var(--line2)}
+.sugg button:hover,.sugg button.on{background:var(--chip)}
+.sugg .k{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink3);width:74px;flex:none}
+.hints{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.hints button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:12.5px;color:var(--ink2)}
+/* market selectors */
+.markets{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:26px 0 8px}
+.mkt{border:1px solid var(--line);background:var(--surface);border-radius:18px;padding:20px 22px;text-align:left;display:flex;flex-direction:column;gap:6px;transition:border-color .15s}
+.mkt:hover{border-color:#c9c4bb}
+.mkt[aria-pressed=true]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.mkt .flag{font-size:22px}
+.mkt .nm{font-family:"Instrument Serif",serif;font-size:28px;line-height:1}
+.mkt .meta{font-size:13px;color:var(--ink3)}
+@media(max-width:560px){.mkt{padding:16px}.mkt .nm{font-size:22px}}
+/* notices */
+.notice{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 14px;font-size:13px;color:var(--ink2);margin:14px 0;display:flex;gap:10px;align-items:flex-start}
+.notice.warn{border-color:#e8c9c2;background:#fdf6f4;color:#6d2a1f}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--live);flex:none;margin-top:6px}
+.notice.warn .dot{background:var(--warn)}
+/* filters */
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:14px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:22px 0 0;position:sticky;top:60px;background:var(--bg);z-index:10}
+.filters select{height:36px;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:0 30px 0 12px;font:inherit;font-size:13px;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23777' fill='none'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;max-width:190px}
+.tog{height:36px;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:0 12px;font-size:13px;color:var(--ink2)}
+.tog[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.filters .count{margin-left:auto;font-size:12.5px;color:var(--ink3)}
+@media(max-width:760px){.filters{position:static;overflow-x:auto;flex-wrap:nowrap}.filters>*{flex:none}.filters .count{display:none}}
+/* sections */
+section.blk{padding:34px 0 6px}
+.blk-h{display:flex;align-items:baseline;gap:12px;margin-bottom:16px}
+.blk-h h2{font-family:"Instrument Serif",serif;font-weight:400;font-size:30px;margin:0;line-height:1.1}
+.blk-h .s{font-size:13px;color:var(--ink3)}
+@media(max-width:560px){.blk-h .s{display:none}.blk-h h2{font-size:26px}}
+.blk-h .more{margin-left:auto;font-size:13px;border:0;background:none;text-decoration:underline;text-underline-offset:3px;color:var(--ink2)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.rail{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(270px,300px);gap:14px;overflow-x:auto;padding-bottom:8px;scroll-snap-type:x mandatory}
+.rail>*{scroll-snap-align:start}
+.empty{border:1px dashed var(--line);border-radius:var(--r);padding:22px;color:var(--ink3);font-size:14px;background:var(--surface)}
+.sub-h{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink3);margin:20px 0 10px}
+/* card */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card.expired{opacity:.62}
+.c-top{display:flex;gap:12px;align-items:center}
+.mono{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-family:"Instrument Serif",serif;font-size:17px;flex:none;background:var(--bg)}
+.c-name{font-weight:600;font-size:15px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.c-cat{font-size:12px;color:var(--ink3)}
+.c-name-wrap .c-cat{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c-name-wrap{min-width:0;flex:1}
+.badge{font-size:11.5px;font-weight:600;border-radius:999px;padding:3px 9px;white-space:nowrap;border:1px solid var(--line);background:var(--chip)}
+.badge.big{font-size:13px;background:var(--ink);color:#fff;border-color:var(--ink)}
+.c-promo{font-size:14px;color:var(--ink);line-height:1.4;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:11px;color:var(--ink2);border:1px solid var(--line);border-radius:6px;padding:2px 7px}
+.st{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;letter-spacing:.02em}
+.st::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.st.LIVE{color:var(--live)} .st.UPCOMING{color:var(--up)} .st.EXPIRED{color:var(--exp)} .st.VERIFYING,.st.NOT_ANNOUNCED{color:var(--ink3)}
+.coupon{display:flex;border:1px dashed #bcb7ae;border-radius:10px;overflow:hidden}
+.coupon code{flex:1;padding:8px 10px;font:600 13px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.04em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.coupon button{border:0;border-left:1px dashed #bcb7ae;background:var(--chip);padding:0 14px;font-size:12.5px;font-weight:600}
+.coupon button.ok{background:var(--ink);color:#fff}
+.auto{font-size:12.5px;color:var(--ink2);background:var(--chip);border-radius:10px;padding:8px 10px}
+.dates{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;font-size:12px;color:var(--ink2)}
+.dates b{display:block;font-weight:500;color:var(--ink3);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em}
+.cd{font:600 13px ui-monospace,Menlo,monospace;color:var(--up)}
+.c-foot{display:flex;align-items:center;gap:8px;border-top:1px solid var(--line2);padding-top:10px;margin-top:auto;font-size:11.5px;color:var(--ink3)}
+.c-foot .go{margin-left:auto;font-size:13px;font-weight:600;color:var(--ink);text-decoration:none;border:1px solid var(--ink);border-radius:9px;padding:6px 11px;white-space:nowrap}
+.c-foot .go:hover{background:var(--ink);color:#fff}
+.c-foot .info{border:0;background:none;padding:0;color:var(--ink3);text-decoration:underline;text-underline-offset:2px;font-size:11.5px}
+.stale{color:var(--warn);font-weight:500}
+/* categories */
+.cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.cat{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:14px;text-align:left;display:flex;flex-direction:column;gap:2px}
+.cat:hover{border-color:#c9c4bb}
+.cat .n{font-weight:500;font-size:14px}
+.cat .c{font-size:12px;color:var(--ink3)}
+/* directory */
+.dir-letters{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px}
+.dir-letters button{border:1px solid var(--line);background:var(--surface);border-radius:7px;width:30px;height:30px;font-size:12.5px}
+.dir{columns:3 260px;column-gap:28px}
+.dir .L{font-family:"Instrument Serif",serif;font-size:24px;margin:12px 0 4px;break-after:avoid}
+.dir .row{display:flex;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line2);break-inside:avoid;font-size:13.5px}
+.dir .row button{border:0;background:none;padding:0;text-align:left;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dir .row button:hover{text-decoration:underline}
+.dir .row .st{font-size:10.5px}
+.dir .row .uv{font-size:10.5px;color:var(--ink3);border:1px solid var(--line);border-radius:5px;padding:0 5px}
+/* modal */
+.scrim{position:fixed;inset:0;background:rgba(17,17,17,.35);z-index:50;display:none;align-items:flex-end;justify-content:center}
+.scrim.on{display:flex}
+.sheet{background:var(--surface);width:min(640px,100%);max-height:88vh;overflow:auto;border-radius:20px 20px 0 0;padding:22px 22px 30px}
+@media(min-width:700px){.scrim{align-items:center}.sheet{border-radius:20px}}
+.sheet h3{font-family:"Instrument Serif",serif;font-weight:400;font-size:30px;margin:0}
+.kv{display:grid;grid-template-columns:140px 1fr;gap:8px 14px;font-size:13.5px;margin:16px 0}
+.kv dt{color:var(--ink3)} .kv dd{margin:0;word-break:break-word}
+.hist{border-left:1px solid var(--line);margin:8px 0 0 4px;padding-left:14px;font-size:13px}
+.hist div{margin-bottom:10px} .hist small{color:var(--ink3);display:block}
+.x{float:right;border:1px solid var(--line);background:var(--chip);border-radius:10px;width:34px;height:34px}
+footer{border-top:1px solid var(--line);margin-top:50px;padding:26px 0 40px;font-size:12.5px;color:var(--ink3)}
+footer .runs div{padding:4px 0;border-bottom:1px solid var(--line2)}
+.skel{height:220px;border-radius:var(--r);background:linear-gradient(90deg,#f2f0ec,#f8f7f4,#f2f0ec);background-size:200% 100%;animation:sh 1.4s infinite}
+@keyframes sh{to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){.skel{animation:none}}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:10px;padding:9px 14px;font-size:13px;z-index:60;display:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap bar">
+    <a class="logo" href="#top" id="logo">Friday <i>Index</i></a>
+    <nav class="links">
+      <a href="#new">New</a><a href="#best">Best</a><a href="#upcoming">Coming soon</a><a href="#ending">Ending soon</a><a href="#categories">Categories</a><a href="#stores">Stores</a>
+    </nav>
+    <div class="mkt-mini" role="group" aria-label="Market">
+      <button data-m="us" aria-pressed="true">USA</button><button data-m="sa" aria-pressed="false">Saudi</button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="top">
+  <div class="hero">
+    <h1 class="serif">Black Friday, <i>verified.</i></h1>
+    <p class="sub">Every Black Friday &amp; White Friday deal we can source for the US and Saudi Arabia — checked against official store pages, with the last-verified time on every card.</p>
+    <div class="search" role="search">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <label for="q" class="sr">Search deals</label>
+      <input id="q" type="search" autocomplete="off" placeholder="Search stores, categories, codes, “40%”, “upcoming”, “saudi”…">
+      <button class="clear" id="qclear">Clear</button>
+      <div class="sugg" id="sugg" role="listbox"></div>
+    </div>
+    <div class="hints" id="hints"></div>
+  </div>
+
+  <div class="markets" role="group" aria-label="Choose market">
+    <button class="mkt" data-m="us" aria-pressed="true"><span class="flag">🇺🇸</span><span class="nm">USA</span><span class="meta" id="mc-us">Loading…</span></button>
+    <button class="mkt" data-m="sa" aria-pressed="false"><span class="flag">🇸🇦</span><span class="nm">Saudi Arabia</span><span class="meta" id="mc-sa">Loading…</span></button>
+  </div>
+  <div id="notices"></div>
+
+  <div class="filters" id="filters">
+    <select id="f-sort" aria-label="Sort">
+      <option value="relevance">Sort: Recommended</option>
+      <option value="discount">Highest discount</option>
+      <option value="minspend">Min. spend: low → high</option>
+      <option value="new">Newly added</option>
+      <option value="ending">Ending soon</option>
+      <option value="store">Store A–Z</option>
+    </select>
+    <select id="f-cat" aria-label="Category"><option value="">All categories</option></select>
+    <select id="f-store" aria-label="Store"><option value="">All stores</option></select>
+    <select id="f-mkt" aria-label="Market scope"><option value="current">This market</option><option value="both">Both markets</option></select>
+    <button class="tog" id="f-active" aria-pressed="false">Active</button>
+    <button class="tog" id="f-coupon" aria-pressed="false">Coupon</button>
+    <button class="tog" id="f-ship" aria-pressed="false">Free shipping</button>
+    <button class="tog" id="f-reset">Reset</button>
+    <span class="count" id="count"></span>
+  </div>
+
+  <div id="results" hidden>
+    <section class="blk"><div class="blk-h"><h2 id="r-title">Results</h2><span class="s" id="r-sub"></span></div><div class="grid" id="r-grid"></div></section>
+  </div>
+
+  <div id="home">
+    <section class="blk" id="new"><div class="blk-h"><h2>Newly added</h2><span class="s">first seen in the last 72 hours</span><button class="more" data-sort="new">See all</button></div><div class="rail" id="s-new"></div></section>
+    <section class="blk" id="best"><div class="blk-h"><h2>Best discounts</h2><span class="s">live now, highest first</span><button class="more" data-sort="discount">See all</button></div><div class="grid" id="s-best"></div></section>
+    <section class="blk" id="upcoming"><div class="blk-h"><h2>Coming soon</h2><span class="s">upcoming Black Friday deals</span></div>
+      <div class="sub-h">Confirmed start dates</div><div class="grid" id="s-up-c"></div>
+      <div class="sub-h">Announced — dates not confirmed</div><div class="grid" id="s-up-u"></div>
+    </section>
+    <section class="blk" id="ending"><div class="blk-h"><h2>Ending soon</h2><span class="s">live deals ending within 4 days</span><button class="more" data-sort="ending">See all</button></div><div class="rail" id="s-end"></div></section>
+    <section class="blk" id="categories"><div class="blk-h"><h2>Browse by category</h2></div><div class="cats" id="s-cats"></div></section>
+    <section class="blk" id="stores"><div class="blk-h"><h2>All stores</h2><span class="s" id="dir-sub"></span></div>
+      <div class="dir-letters" id="dir-letters"></div><div class="dir" id="s-dir"></div></section>
+    <section class="blk" id="expired"><div class="blk-h"><h2>Expired</h2><span class="s">kept for reference</span></div><div class="grid" id="s-exp"></div></section>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div id="mon"></div>
+    <p>Deals are sourced from official store pages first, then official announcements, then dated press roundups. “Unverified” means we could not confirm the store's current offer automatically — check the store before you buy. Codes from coupon sites are never listed. Prices and terms can change at any time.</p>
+  </div>
+</footer>
+
+<div class="scrim" id="scrim" role="dialog" aria-modal="true"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+const CATS=[
+ ["makeup","Makeup & Beauty"],["skincare","Skincare"],["haircare","Haircare"],["fashion","Fashion & Clothing"],
+ ["shoes","Shoes & Accessories"],["bags","Bags & Handbags"],["luxury","Luxury Fashion"],["jewelry","Jewelry & Watches"],
+ ["home","Home & Living"],["electronics","Electronics & Technology"],["sports","Sports & Fitness"],["wellness","Lifestyle & Wellness"],
+ ["department","Department Stores"],["other","Other Deals"]];
+const CATN=Object.fromEntries(CATS);
+const TZ={us:"-05:00",sa:"+03:00"};
+const CUR={us:"$",sa:"SAR "};
+const ST_LABEL={LIVE:"Active",UPCOMING:"Upcoming",EXPIRED:"Expired",VERIFYING:"Unverified",NOT_ANNOUNCED:"Not announced"};
+const STALE_H=48;
+
+let DEALS=[], RAW=[], SOURCES={}, STATUS=null, RUNS=[], loaded=false, loadErr=null;
+const S={market:"us",q:"",sort:"relevance",cat:"",store:"",scope:"current",active:false,coupon:false,ship:false};
+try{const m=localStorage.getItem("fi-market"); if(m==="us"||m==="sa") S.market=m;}catch(e){}
+const h0=(location.hash||"").slice(1);
+if(h0==="sa"||h0==="us") S.market=h0;
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const safeUrl=u=>{try{const x=new URL(u);return (x.protocol==="https:"||x.protocol==="http:")?x.href:"";}catch(e){return "";}};
+
+function parseStart(v,m){ if(!v) return null; if(/^\d{4}-\d{2}-\d{2}$/.test(v)) return new Date(v+"T00:00:00"+TZ[m]); const d=new Date(v); return isNaN(d)?null:d; }
+function parseEnd(v,m){ if(!v) return null; if(/^\d{4}-\d{2}-\d{2}$/.test(v)) return new Date(v+"T23:59:59"+TZ[m]); const d=new Date(v); return isNaN(d)?null:d; }
+function eff(d){
+  const now=Date.now(), s=d.status||"VERIFYING", st=parseStart(d.start,d.market), en=parseEnd(d.end,d.market);
+  if(s==="EXPIRED") return "EXPIRED";
+  if((s==="LIVE"||s==="UPCOMING")&&en&&now>en) return "EXPIRED";
+  if(s==="UPCOMING"&&st&&now>=st&&d.dateStatus!=="estimated") return "LIVE";
+  if(s==="LIVE"&&st&&now<st) return "UPCOMING";
+  return s;
+}
+const isDeal=d=>["LIVE","UPCOMING","EXPIRED"].includes(d._s);
+const ago=t=>{ if(!t) return "never"; const ms=Date.now()-new Date(t).getTime(); if(isNaN(ms)) return "—"; const h=ms/36e5; if(h<1) return Math.max(1,Math.round(ms/6e4))+" min ago"; if(h<48) return Math.round(h)+" h ago"; return Math.round(h/24)+" days ago"; };
+const fmtD=(v,m)=>{ if(!v) return "—"; const d=/^\d{4}-\d{2}-\d{2}$/.test(v)?parseStart(v,m):new Date(v); if(!d||isNaN(d)) return esc(v); const o={month:"short",day:"numeric",timeZone:m==="sa"?"Asia/Riyadh":"America/New_York"}; if(!/^\d{4}-\d{2}-\d{2}$/.test(v)) {o.hour="numeric";o.minute="2-digit";} return d.toLocaleString("en-US",o)+(/^\d{4}-\d{2}-\d{2}$/.test(v)?"":(m==="sa"?" KSA":" ET")); };
+const fmtTS=t=>{ if(!t) return "—"; const d=new Date(t); return isNaN(d)?"—":d.toLocaleString("en-US",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}); };
+const initials=n=>{ const w=String(n||"?").replace(/[^A-Za-z0-9؀-ۿ ]/g," ").trim().split(/\s+/); return (w.length>1?w[0][0]+w[1][0]:String(w[0]).slice(0,2)).toUpperCase(); };
+const stale=d=>{ if(!d.verifiedAt) return true; return (Date.now()-new Date(d.verifiedAt).getTime())>STALE_H*36e5; };
+function offerLabel(d){
+  if(d.offerType==="bogo") return "BOGO";
+  if(d.offerType==="freeship") return "Free shipping";
+  if(d.offerType==="gift") return "Gift with purchase";
+  if(d.discount) return (d.upTo!==false&&d.scope!=="Sitewide"?"Up to ":"")+d.discount+"% off";
+  if(d.offerType==="tiered") return "Tiered savings";
+  return "Sale";
+}
+function minSpendNum(d){ const m=String(d.minSpend||"").match(/[\d,.]+/); return m?parseFloat(m[0].replace(/,/g,"")):Infinity; }
+
+function enrich(list){
+  return list.map(d=>{ const x=Object.assign({},d); if(x.src&&SOURCES[x.src]&&!x.sourceUrl){ const s=SOURCES[x.src]; x.sourceUrl=s.url; x.sourceName=s.name; x.sourceType=s.type; } x._s=eff(x); x._stale=stale(x);
+    x._search=[x.store,x.domain,CATN[x.category],x.category,x.promo,x.code,x.market==="us"?"usa us united states america":"saudi ksa sa arabia white friday",ST_LABEL[x._s],x._s==="UPCOMING"?"upcoming coming soon":"",x.offerType,x.scope,(x.tags||[]).join(" "),x.freeShipping?"free shipping":"",x.appOnly?"app exclusive":""].join(" ").toLowerCase();
+    return x; });
+}
+
+/* ---------- query parsing ---------- */
+function parseQ(q){
+  const o={text:[],minPct:null,market:null,status:null,code:false};
+  q.toLowerCase().split(/\s+/).filter(Boolean).forEach(t=>{
+    let m;
+    if((m=t.match(/^(?:>=?|\+)?(\d{1,2})%?\+?$/))&&(t.includes("%")||t.includes(">")||t.includes("+"))) { o.minPct=+m[1]; return; }
+    if(["usa","us","america"].includes(t)){o.market="us";return;}
+    if(["saudi","ksa","sa","riyadh","السعودية"].includes(t)){o.market="sa";return;}
+    if(["upcoming","soon"].includes(t)){o.status="UPCOMING";return;}
+    if(["active","live"].includes(t)){o.status="LIVE";return;}
+    if(["expired"].includes(t)){o.status="EXPIRED";return;}
+    if(["coupon","code","codes"].includes(t)){o.code=true;return;}
+    if(["off","deals","deal","sale","black","friday"].includes(t)) return;
+    o.text.push(t);
+  });
+  return o;
+}
+function filtered(opts){
+  opts=opts||{};
+  const pq=parseQ(S.q);
+  let mk=pq.market|| (S.scope==="both"?null:S.market);
+  return DEALS.filter(d=>{
+    if(mk&&d.market!==mk) return false;
+    if(!opts.includeNonDeals&&!isDeal(d)) return false;
+    if(S.cat&&d.category!==S.cat) return false;
+    if(S.store&&d.storeId!==S.store) return false;
+    if(S.active&&d._s!=="LIVE") return false;
+    if(S.coupon&&!d.code) return false;
+    if(S.ship&&!d.freeShipping) return false;
+    if(pq.status&&d._s!==pq.status) return false;
+    if(pq.code&&!d.code) return false;
+    if(pq.minPct!=null&&!(d.discount>=pq.minPct)) return false;
+    for(const t of pq.text){ if(!d._search.includes(t)) return false; }
+    return true;
+  });
+}
+const RANK={LIVE:0,UPCOMING:1,EXPIRED:3,VERIFYING:2,NOT_ANNOUNCED:2};
+function sortList(a,how){
+  const t=x=>new Date(x||0).getTime();
+  const f={
+    discount:(x,y)=>(y.discount||0)-(x.discount||0),
+    minspend:(x,y)=>minSpendNum(x)-minSpendNum(y),
+    new:(x,y)=>t(y.firstSeen)-t(x.firstSeen),
+    ending:(x,y)=>((parseEnd(x.end,x.market)||{getTime:()=>9e15}).getTime())-((parseEnd(y.end,y.market)||{getTime:()=>9e15}).getTime()),
+    store:(x,y)=>x.store.localeCompare(y.store),
+    relevance:(x,y)=>(RANK[x._s]-RANK[y._s])||((x._stale?1:0)-(y._stale?1:0))||((y.discount||0)-(x.discount||0))||x.store.localeCompare(y.store)
+  }[how]||null;
+  const r=a.slice(); if(f) r.sort((x,y)=>(how!=="relevance"?(RANK[x._s]-RANK[y._s]):0)||f(x,y)); return r;
+}
+
+/* ---------- card ---------- */
+function card(d){
+  const link=safeUrl(d.salePage)||safeUrl(d.url)||("https://"+d.domain);
+  const big=offerLabel(d);
+  const tags=[];
+  if(d.scope) tags.push(d.scope==="Order tiers"?"Spend tiers":d.scope);
+  if(d.code) tags.push("Coupon"); else if(d._s!=="EXPIRED") tags.push("Automatic discount");
+  if(d.freeShipping) tags.push("Free shipping");
+  if(d.appOnly) tags.push("App exclusive");
+  if(d.minSpend) tags.push("Min. "+(String(d.minSpend).match(/^\d/)?CUR[d.market]:"")+d.minSpend);
+  let cdn="";
+  if(d._s==="UPCOMING"&&d.start&&d.dateStatus!=="estimated"){ const st=parseStart(d.start,d.market); if(st) cdn=`<div class="cd" data-cd="${st.getTime()}"></div>`; }
+  const code=d.code?`<div class="coupon"><code title="${esc(d.code)}">${esc(d.code)}</code><button data-copy="${esc(d.code)}" aria-label="Copy code ${esc(d.code)}">Copy</button></div>${d.codeVerified?"":'<div class="c-cat">Code reported by press — not yet seen on the store’s own site</div>'}`:"";
+  return `<article class="card ${d._s==="EXPIRED"?"expired":""}">
+    <div class="c-top"><div class="mono" aria-hidden="true">${esc(initials(d.store))}</div>
+      <div class="c-name-wrap"><div class="c-name">${esc(d.store)}</div><div class="c-cat">${esc(CATN[d.category]||"Other")} · ${d.market==="us"?"🇺🇸 US":"🇸🇦 Saudi"}</div></div>
+      <span class="badge big">${esc(big)}</span></div>
+    <div><span class="st ${d._s}">${ST_LABEL[d._s]}</span>${d.dateStatus==="estimated"?' <span class="tag">Estimated dates</span>':""}</div>
+    <div class="c-promo">${esc(d.promo)}</div>
+    ${cdn}
+    ${code}
+    <div class="tags">${tags.map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div>
+    <div class="dates"><div><b>Starts</b>${d.start?fmtD(d.start,d.market):"Not stated"}</div><div><b>Ends</b>${d.end?fmtD(d.end,d.market):"Not stated"}</div></div>
+    <div class="c-foot"><span class="${d._stale?"stale":""}" title="${esc(d.verifiedAt||"")}">${d._stale?"Needs re-check · ":"Verified "}${ago(d.verifiedAt)}</span>
+      <button class="info" data-id="${esc(d.id)}">Details</button>
+      <a class="go" href="${esc(link)}" target="_blank" rel="noopener">Shop ↗</a></div>
+  </article>`;
+}
+const cards=(el,list,emptyMsg)=>{ el.innerHTML=list.length?list.map(card).join(""):`<div class="empty">${emptyMsg}</div>`; };
+
+/* ---------- render ---------- */
+function anyFilter(){ return !!(S.q.trim()||S.cat||S.store||S.active||S.coupon||S.ship||S.sort!=="relevance"||S.scope==="both"); }
+function render(){
+  document.querySelectorAll("[data-m]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.m===S.market)));
+  ["us","sa"].forEach(m=>{ const l=DEALS.filter(d=>d.market===m); const live=l.filter(d=>d._s==="LIVE").length, up=l.filter(d=>d._s==="UPCOMING").length; const stores=new Set(l.map(d=>d.storeId)).size;
+    $("#mc-"+m).textContent=loaded?`${live} active · ${up} upcoming · ${stores} stores`:(loadErr?"Unavailable":"Loading…"); });
+  notices();
+  fillSelects();
+  if(!loaded){ ["#s-new","#s-best","#s-up-c","#s-end"].forEach(s=>$(s).innerHTML='<div class="skel"></div><div class="skel"></div>'); return; }
+  const showResults=anyFilter();
+  $("#results").hidden=!showResults; $("#home").hidden=showResults;
+  if(showResults){
+    const list=sortList(filtered(),S.sort);
+    $("#r-title").textContent=S.q?`Results for “${S.q}”`:(S.cat?CATN[S.cat]:"Filtered deals");
+    $("#r-sub").textContent=`${list.length} deal${list.length===1?"":"s"} · ${S.scope==="both"||parseQ(S.q).market?"":S.market==="us"?"USA":"Saudi Arabia"}`;
+    let msg="No deals match. Try fewer filters, or check the store directory — the store may be listed as “not announced” or “unverified”.";
+    if(!list.length&&S.scope!=="both"&&!parseQ(S.q).market){ const o=S.market==="us"?"sa":"us"; const prev=S.market; S.market=o; const n=filtered().length; S.market=prev;
+      if(n) msg=`No matches in ${S.market==="us"?"the USA":"Saudi Arabia"}. <button class="tog" data-m="${o}" style="margin-left:6px">Show ${n} in ${o==="us"?"the USA":"Saudi Arabia"}</button>`; }
+    cards($("#r-grid"),list,msg);
+    $("#count").textContent=list.length+" shown";
+    return;
+  }
+  $("#count").textContent="";
+  const M=DEALS.filter(d=>d.market===S.market);
+  const now=Date.now();
+  const live=M.filter(d=>d._s==="LIVE");
+  cards($("#s-new"),sortList(M.filter(d=>d._s!=="EXPIRED"&&isDeal(d)&&d.firstSeen&&now-new Date(d.firstSeen).getTime()<72*36e5),"new").slice(0,12),"Nothing new in the last 72 hours yet.");
+  cards($("#s-best"),sortList(live.filter(d=>d.discount),"discount").slice(0,9),"No live percentage discounts recorded yet for this market.");
+  const up=M.filter(d=>d._s==="UPCOMING");
+  cards($("#s-up-c"),sortList(up.filter(d=>d.start&&d.dateStatus!=="estimated"),"store").sort((a,b)=>parseStart(a.start,a.market)-parseStart(b.start,b.market)),"No confirmed upcoming start dates yet.");
+  cards($("#s-up-u"),sortList(up.filter(d=>!d.start||d.dateStatus==="estimated"),"store"),"No announced-but-undated sales right now.");
+  cards($("#s-end"),sortList(live.filter(d=>{const e=parseEnd(d.end,d.market);return e&&e-now<4*864e5;}),"ending"),"No live deals end within the next 4 days.");
+  // categories
+  $("#s-cats").innerHTML=CATS.map(([k,n])=>{ const c=M.filter(d=>d.category===k&&(d._s==="LIVE"||d._s==="UPCOMING")).length; const s=new Set(M.filter(d=>d.category===k).map(d=>d.storeId)).size;
+    return `<button class="cat" data-cat="${k}"><span class="n">${esc(n)}</span><span class="c">${c} deals · ${s} stores</span></button>`; }).join("");
+  // directory
+  const byStore={}; M.forEach(d=>{ (byStore[d.storeId]=byStore[d.storeId]||[]).push(d); });
+  const names=Object.values(byStore).map(a=>({id:a[0].storeId,name:a[0].store,cat:a[0].category,best:a.slice().sort((x,y)=>RANK[x._s]-RANK[y._s])[0],deal:a[0]})).sort((a,b)=>a.name.localeCompare(b.name,undefined,{sensitivity:"base"}));
+  $("#dir-sub").textContent=`${names.length} stores in ${S.market==="us"?"the USA":"Saudi Arabia"}`;
+  const groups={}; names.forEach(n=>{ let L=n.name[0].toUpperCase(); if(!/[A-Z]/.test(L)) L="#"; (groups[L]=groups[L]||[]).push(n); });
+  const Ls=Object.keys(groups).sort();
+  $("#dir-letters").innerHTML=Ls.map(L=>`<button data-jump="${L}">${L}</button>`).join("");
+  $("#s-dir").innerHTML=Ls.map(L=>`<div class="L" id="dir-${L==="#"?"num":L}">${L}</div>`+groups[L].map(n=>{ const s=n.best._s;
+    return `<div class="row"><button data-store="${esc(n.id)}" title="${esc(n.name)}">${esc(n.name)}</button>${s==="VERIFYING"?'<span class="uv">Unverified</span>':`<span class="st ${s}">${ST_LABEL[s]}</span>`}</div>`; }).join("")).join("");
+  cards($("#s-exp"),sortList(M.filter(d=>d._s==="EXPIRED"),"store").slice(0,24),"No expired deals yet.");
+  tick();
+}
+function notices(){
+  const n=[];
+  if(loadErr) n.push(`<div class="notice warn"><span class="dot"></span><div>${esc(loadErr)}</div></div>`);
+  if(STATUS&&STATUS.lastRun){ const h=(Date.now()-new Date(STATUS.lastRun).getTime())/36e5;
+    if(h>30) n.push(`<div class="notice warn"><span class="dot"></span><div>Automatic checks haven’t completed since ${esc(fmtTS(STATUS.lastRun))} (${esc(ago(STATUS.lastRun))}). Deals below may be out of date — cards marked “Needs re-check” especially.</div></div>`);
+    else n.push(`<div class="notice"><span class="dot"></span><div>Last automatic check ${esc(ago(STATUS.lastRun))} — ${esc(STATUS.lastRunResult||"")}. Next checks run twice daily (more often Nov 26–30).</div></div>`);
+  }
+  $("#notices").innerHTML=n.join("");
+}
+let selKey="";
+function fillSelects(){
+  const k=S.market+"|"+DEALS.length+"|"+S.scope;
+  if(k===selKey) return; selKey=k;
+  const pool=DEALS.filter(d=>S.scope==="both"||d.market===S.market);
+  $("#f-cat").innerHTML='<option value="">All categories</option>'+CATS.map(([k,n])=>`<option value="${k}" ${S.cat===k?"selected":""}>${esc(n)}</option>`).join("");
+  const st=[...new Map(pool.map(d=>[d.storeId,d.store])).entries()].sort((a,b)=>a[1].localeCompare(b[1]));
+  $("#f-store").innerHTML='<option value="">All stores</option>'+st.map(([id,n])=>`<option value="${esc(id)}" ${S.store===id?"selected":""}>${esc(n)}</option>`).join("");
+}
+function tick(){
+  document.querySelectorAll("[data-cd]").forEach(el=>{ const ms=+el.dataset.cd-Date.now();
+    if(ms<=0){ el.textContent="Starting now"; return; }
+    const d=Math.floor(ms/864e5), h=Math.floor(ms%864e5/36e5), m=Math.floor(ms%36e5/6e4), s=Math.floor(ms%6e4/1e3);
+    el.textContent=`Starts in ${d?d+"d ":""}${String(h).padStart(2,"0")}h ${String(m).padStart(2,"0")}m ${String(s).padStart(2,"0")}s`; });
+}
+setInterval(()=>{ tick(); },1000);
+// re-evaluate statuses each minute so deals flip Upcoming→Active→Expired without reload
+setInterval(()=>{ if(loaded){ DEALS=enrich(RAW); render(); } },60000);
+
+/* ---------- details ---------- */
+function openDetail(id){
+  const d=DEALS.find(x=>x.id===id); if(!d) return;
+  const link=safeUrl(d.salePage)||safeUrl(d.url)||("https://"+d.domain);
+  const src=safeUrl(d.sourceUrl);
+  const other=DEALS.filter(x=>x.storeId===d.storeId&&x.id!==d.id);
+  const hist=(d.history||[]).slice().reverse();
+  $("#sheet").innerHTML=`<button class="x" id="xclose" aria-label="Close">✕</button>
+   <div class="c-cat">${esc(CATN[d.category]||"Other")} · ${d.market==="us"?"🇺🇸 USA":"🇸🇦 Saudi Arabia"}</div>
+   <h3>${esc(d.store)}</h3>
+   <p style="margin:8px 0 0">${esc(d.promo)}</p>
+   ${d.code?`<div class="coupon" style="margin-top:12px"><code>${esc(d.code)}</code><button data-copy="${esc(d.code)}">Copy</button></div>`:""}
+   <dl class="kv">
+    <dt>Status</dt><dd><span class="st ${d._s}">${ST_LABEL[d._s]}</span>${d.dateStatus==="estimated"?" · dates estimated, not confirmed":""}</dd>
+    <dt>Offer</dt><dd>${esc(offerLabel(d))}${d.scope?" · "+esc(d.scope):""}</dd>
+    <dt>How it applies</dt><dd>${d.code?(d.codeVerified?"Coupon code (seen on the store’s own site)":"Coupon code (reported by press; not yet confirmed on store site)"):"Automatic — no code needed"}</dd>
+    ${d.minSpend?`<dt>Minimum spend</dt><dd>${esc(d.minSpend)}</dd>`:""}
+    <dt>Starts</dt><dd>${d.start?fmtD(d.start,d.market):"Not stated"}</dd>
+    <dt>Ends</dt><dd>${d.end?fmtD(d.end,d.market):"Not stated"}</dd>
+    ${d.previousDiscount!=null?`<dt>Previous discount</dt><dd>${esc(d.previousDiscount)}%</dd>`:""}
+    <dt>Shipping</dt><dd>${esc(d.shipping||"Unverified")}${d.shippingVerified?" (verified on store’s shipping page)":""}</dd>
+    <dt>Source</dt><dd>${src?`<a href="${esc(src)}" target="_blank" rel="noopener">${esc(d.sourceName||src)}</a>`:esc(d.sourceName||"—")}${d.sourceType?` · ${esc(d.sourceType)}`:""}</dd>
+    <dt>Last verified</dt><dd class="${d._stale?"stale":""}">${esc(fmtTS(d.verifiedAt))} (${esc(ago(d.verifiedAt))})</dd>
+    <dt>First seen</dt><dd>${esc(fmtTS(d.firstSeen))}</dd>
+    ${d.note?`<dt>Note</dt><dd>${esc(d.note)}</dd>`:""}
+    ${other.length?`<dt>Other market</dt><dd>${other.map(o=>`<a href="#" data-id="${esc(o.id)}">${o.market==="us"?"🇺🇸 US":"🇸🇦 Saudi"} — ${ST_LABEL[o._s]}</a>`).join(" · ")}</dd>`:""}
+   </dl>
+   <a class="go" style="display:inline-block;border:1px solid #111;border-radius:10px;padding:9px 14px;text-decoration:none;font-weight:600" href="${esc(link)}" target="_blank" rel="noopener">Go to ${esc(d.market==="us"?"US":"Saudi")} store ↗</a>
+   ${hist.length?`<h4 style="margin:22px 0 4px;font-weight:600">Change history</h4><div class="hist">${hist.map(h=>`<div>${esc(h.event)} — ${esc(h.detail||"")}<small>${esc(fmtTS(h.at))}</small></div>`).join("")}</div>`:""}`;
+  $("#scrim").classList.add("on");
+}
+function closeDetail(){ $("#scrim").classList.remove("on"); }
+
+/* ---------- copy ---------- */
+function toast(t){ const el=$("#toast"); el.textContent=t; el.style.display="block"; clearTimeout(toast._t); toast._t=setTimeout(()=>el.style.display="none",1800); }
+async function copy(text,btn){
+  let ok=false;
+  try{ await navigator.clipboard.writeText(text); ok=true; }catch(e){
+    try{ const ta=document.createElement("textarea"); ta.value=text; ta.setAttribute("readonly",""); ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.select(); ok=document.execCommand("copy"); ta.remove(); }catch(e2){ ok=false; }
+  }
+  if(ok){ btn.textContent="Copied"; btn.classList.add("ok"); toast("Copied “"+text+"”"); setTimeout(()=>{btn.textContent="Copy";btn.classList.remove("ok");},1600); }
+  else { toast("Couldn’t copy — select the code and copy it manually"); const c=btn.parentElement.querySelector("code"); if(c){ const r=document.createRange(); r.selectNodeContents(c); const s=getSelection(); s.removeAllRanges(); s.addRange(r);} }
+}
+
+/* ---------- search suggestions ---------- */
+let sIdx=-1, sItems=[];
+function suggest(){
+  const q=$("#q").value.trim().toLowerCase(); const box=$("#sugg");
+  if(!q||!loaded){ box.style.display="none"; return; }
+  const out=[];
+  const seen=new Set();
+  DEALS.forEach(d=>{ if(d.store.toLowerCase().includes(q)&&!seen.has(d.storeId+d.market)){ seen.add(d.storeId+d.market); out.push({k:"Store",t:d.store+(d.market==="sa"?" · Saudi":" · USA"),a:{store:d.storeId,market:d.market}}); } });
+  CATS.forEach(([k,n])=>{ if(n.toLowerCase().includes(q)) out.push({k:"Category",t:n,a:{cat:k}}); });
+  DEALS.forEach(d=>{ if(d.code&&d.code.toLowerCase().includes(q)&&!seen.has("c"+d.code)){ seen.add("c"+d.code); out.push({k:"Code",t:d.code+" — "+d.store,a:{q:d.code}}); } });
+  if(/^\d/.test(q)) out.unshift({k:"Discount",t:parseInt(q)+"% off or more",a:{q:parseInt(q)+"%"}});
+  if("upcoming".startsWith(q)||"coming soon".startsWith(q)) out.unshift({k:"Status",t:"Upcoming sales",a:{q:"upcoming"}});
+  if("saudi".startsWith(q)||"ksa".startsWith(q)) out.unshift({k:"Market",t:"Saudi Arabia",a:{market:"sa"}});
+  if("usa".startsWith(q)||"america".startsWith(q)) out.unshift({k:"Market",t:"USA",a:{market:"us"}});
+  sItems=out.slice(0,9); sIdx=-1;
+  if(!sItems.length){ box.style.display="none"; return; }
+  box.innerHTML=sItems.map((s,i)=>`<button role="option" data-si="${i}"><span class="k">${s.k}</span><span>${esc(s.t)}</span></button>`).join("");
+  box.style.display="block";
+}
+function applySugg(i){
+  const s=sItems[i]; if(!s) return; const a=s.a;
+  if(a.market){ setMarket(a.market); S.q=""; }
+  if(a.store){ S.store=a.store; S.q=""; selKey=""; }
+  if(a.cat){ S.cat=a.cat; S.q=""; }
+  if(a.q!=null) S.q=a.q;
+  $("#q").value=S.q; $("#sugg").style.display="none"; syncControls(); render(); scrollToFilters();
+}
+function scrollToFilters(){ const f=$("#filters"); window.scrollTo({top:f.getBoundingClientRect().top+scrollY-64,behavior:"smooth"}); }
+
+/* ---------- controls ---------- */
+function setMarket(m){ S.market=m; try{localStorage.setItem("fi-market",m);}catch(e){} if(location.hash!=="#"+m) history.replaceState(null,"","#"+m); S.store=""; selKey=""; }
+function syncControls(){
+  $("#f-sort").value=S.sort; $("#f-cat").value=S.cat; $("#f-mkt").value=S.scope;
+  $("#f-active").setAttribute("aria-pressed",S.active); $("#f-coupon").setAttribute("aria-pressed",S.coupon); $("#f-ship").setAttribute("aria-pressed",S.ship);
+  $("#qclear").style.display=S.q?"block":"none";
+}
+let qT;
+$("#q").addEventListener("input",e=>{ S.q=e.target.value; $("#qclear").style.display=S.q?"block":"none"; suggest(); clearTimeout(qT); qT=setTimeout(render,120); });
+$("#q").addEventListener("keydown",e=>{
+  const box=$("#sugg"); if(box.style.display!=="block") return;
+  if(e.key==="ArrowDown"||e.key==="ArrowUp"){ e.preventDefault(); sIdx=(sIdx+(e.key==="ArrowDown"?1:-1)+sItems.length)%sItems.length; box.querySelectorAll("button").forEach((b,i)=>b.classList.toggle("on",i===sIdx)); }
+  else if(e.key==="Enter"){ if(sIdx>=0){ e.preventDefault(); applySugg(sIdx);} else { box.style.display="none"; scrollToFilters(); } }
+  else if(e.key==="Escape") box.style.display="none";
+});
+$("#q").addEventListener("blur",()=>setTimeout(()=>$("#sugg").style.display="none",180));
+$("#sugg").addEventListener("mousedown",e=>{ const b=e.target.closest("[data-si]"); if(b){ e.preventDefault(); applySugg(+b.dataset.si);} });
+$("#qclear").addEventListener("click",()=>{ S.q=""; $("#q").value=""; syncControls(); render(); $("#q").focus(); });
+$("#f-sort").addEventListener("change",e=>{S.sort=e.target.value;render();});
+$("#f-cat").addEventListener("change",e=>{S.cat=e.target.value;render();});
+$("#f-store").addEventListener("change",e=>{S.store=e.target.value;render();});
+$("#f-mkt").addEventListener("change",e=>{S.scope=e.target.value;selKey="";render();});
+[["#f-active","active"],["#f-coupon","coupon"],["#f-ship","ship"]].forEach(([s,k])=>$(s).addEventListener("click",()=>{S[k]=!S[k];syncControls();render();}));
+$("#f-reset").addEventListener("click",()=>{ Object.assign(S,{q:"",sort:"relevance",cat:"",store:"",scope:"current",active:false,coupon:false,ship:false}); $("#q").value=""; selKey=""; syncControls(); render(); });
+$("#hints").innerHTML=["40%","upcoming","coupon","Electronics & Technology","Sephora","free shipping","saudi"].map(h=>`<button data-hint="${esc(h)}">${esc(h)}</button>`).join("");
+
+document.addEventListener("click",e=>{
+  const t=e.target;
+  const cp=t.closest("[data-copy]"); if(cp){ e.preventDefault(); copy(cp.dataset.copy,cp); return; }
+  const mb=t.closest("[data-m]"); if(mb){ setMarket(mb.dataset.m); render(); return; }
+  const inf=t.closest("[data-id]"); if(inf){ e.preventDefault(); openDetail(inf.dataset.id); return; }
+  const ct=t.closest("[data-cat]"); if(ct){ S.cat=ct.dataset.cat; syncControls(); render(); scrollToFilters(); return; }
+  const sr=t.closest("[data-sort]"); if(sr){ S.sort=sr.dataset.sort; if(sr.dataset.sort==="discount") S.active=true; syncControls(); render(); scrollToFilters(); return; }
+  const st=t.closest("[data-store]"); if(st){ S.store=st.dataset.store; S.sort="relevance"; selKey=""; fillSelects(); $("#f-store").value=S.store; render(); scrollToFilters(); return; }
+  const hj=t.closest("[data-jump]"); if(hj){ const el=document.getElementById("dir-"+(hj.dataset.jump==="#"?"num":hj.dataset.jump)); if(el) window.scrollTo({top:el.getBoundingClientRect().top+scrollY-130,behavior:"smooth"}); return; }
+  const hi=t.closest("[data-hint]"); if(hi){ const h=hi.dataset.hint; const c=CATS.find(x=>x[1]===h); if(c){S.cat=c[0];S.q="";} else if(h==="free shipping"){S.ship=true;} else if(h==="saudi"){setMarket("sa");} else S.q=h; $("#q").value=S.q; syncControls(); render(); scrollToFilters(); return; }
+  if(t.id==="xclose"||t===$("#scrim")) closeDetail();
+});
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeDetail(); });
+window.addEventListener("hashchange",()=>{ const h=location.hash.slice(1); if(h==="us"||h==="sa"){ S.market=h; selKey=""; render(); } });
+$("#logo").addEventListener("click",e=>{ e.preventDefault(); $("#f-reset").click(); window.scrollTo({top:0,behavior:"smooth"}); });
+
+function monitorPanel(){
+  const r=RUNS.slice(0,5);
+  $("#mon").innerHTML=`<p style="color:var(--ink2);margin:0 0 8px"><b style="font-weight:600">Monitoring</b> · ${DEALS.length} records · ${DEALS.filter(d=>d._s==="VERIFYING").length} unverified · ${DEALS.filter(d=>d._stale&&isDeal(d)).length} need re-check</p>`+
+   (r.length?`<div class="runs">${r.map(x=>`<div>${esc(fmtTS(x.at))} — ${esc(x.type||"")} — ${esc(x.summary||"")}</div>`).join("")}</div>`:"");
+}
+
+/* ---------- data (static: data.json, refreshed every 5 minutes) ---------- */
+syncControls(); render();
+let lastGen="";
+async function load(first){
+  try{
+    const r=await fetch("data.json?t="+Date.now(),{cache:"no-store"});
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    const j=await r.json();
+    if(j.generatedAt===lastGen&&!first) return;
+    lastGen=j.generatedAt||"";
+    SOURCES=j.sources||{}; STATUS=j.status||null; RUNS=(j.runs||[]).slice().sort((a,b)=>String(b.at).localeCompare(String(a.at)));
+    RAW=Object.entries(j.deals||{}).map(([id,d])=>Object.assign({id},d)).filter(d=>d.store&&d.market);
+    DEALS=enrich(RAW); loaded=true; loadErr=null; selKey=""; render(); monitorPanel();
+  }catch(e){
+    loadErr=loaded?"Couldn’t refresh deals just now — what you see may be out of date. Retrying in 5 minutes.":"Deals couldn’t be loaded. Please refresh the page in a moment.";
+    render();
+  }
+}
+load(true);
+setInterval(()=>load(false),5*60*1000);
+})();
+</script>
+</body>
+</html>
