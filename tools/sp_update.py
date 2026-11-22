@@ -30,6 +30,8 @@ UA = "Mozilla/5.0 (personal sale tracker; github.com/ranaa4117/black-friday-deal
 SG_LIMIT = int(os.environ.get("SG_LIMIT", "60"))       # size guides read per run
 SG_MAX_AGE = 3 * 24 * 3600                              # re-read a guide every 3 days
 DEBUG = os.environ.get("SG_DEBUG") == "1"
+FORCE = os.environ.get("SG_FORCE") == "1"                # re-read every guide this run
+ACC_IMG = re.compile(r"https://cld\.accentuate\.io/[^\"'\s,?]+\.(?:png|jpe?g|webp|svg|avif)", re.I)
 
 
 def now_iso():
@@ -173,22 +175,40 @@ def parse_guide(page_html, cat):
     return out
 
 
+def guide_images(page_html):
+    """Official size-guide illustrations embedded in the product page (garment sketch, body figure)."""
+    urls = []
+    for m in ACC_IMG.finditer(page_html):
+        if m.group(0) not in urls:
+            urls.append(m.group(0))
+    body = [u for u in urls if "human-figure" in u.lower()]
+    garment = [u for u in urls if "human-figure" not in u.lower()]
+    return {"garment": garment[0] if garment else "", "body": body[0] if body else "", "all": urls[:6]}
+
+
 def read_guides(products, prev_by_handle):
     budget, done = SG_LIMIT, 0
     for p in products:
         old = prev_by_handle.get(p["handle"], {})
-        if old.get("guide") is not None and age_s(old.get("guideAt", "")) < SG_MAX_AGE:
+        if not FORCE and old.get("guide") is not None and age_s(old.get("guideAt", "")) < SG_MAX_AGE:
             p["guide"], p["guideAt"] = old["guide"], old["guideAt"]
+            if "guideImg" in old:
+                p["guideImg"] = old["guideImg"]
             continue
         if budget <= 0:
             if "guide" in old:
                 p["guide"], p["guideAt"] = old["guide"], old.get("guideAt", "")
+                if "guideImg" in old:
+                    p["guideImg"] = old["guideImg"]
             continue
         budget -= 1
         try:
             page = fetch(f"{STORE}/products/{p['handle']}", accept="text/html")
             p["guide"], p["guideAt"] = parse_guide(page, p["cat"]), now_iso()
+            p["guideImg"] = guide_images(page)
             done += 1
+            if DEBUG and done <= 3:
+                print("guide images", p["handle"], p["guideImg"])
             if DEBUG and done == 1 and not p["guide"]:
                 i = page.find("<table")
                 print("no tables parsed; first table html:", page[i:i + 1500] if i >= 0 else "(no <table> in page)")
@@ -196,6 +216,8 @@ def read_guides(products, prev_by_handle):
             print("guide failed", p["handle"], e)
             if "guide" in old:
                 p["guide"], p["guideAt"] = old["guide"], old.get("guideAt", "")
+                if "guideImg" in old:
+                    p["guideImg"] = old["guideImg"]
         time.sleep(0.8)
     return done
 
@@ -332,6 +354,7 @@ def main():
     removed = (gone + [r for r in prev.get("removed", []) if r["handle"] not in fresh])[:120]
     for r in removed:
         r.pop("guide", None)
+        r.pop("guideImg", None)
 
     products = sorted(fresh.values(), key=lambda p: p.get("firstSeen", ""), reverse=True)
     guides = read_guides(products, old)

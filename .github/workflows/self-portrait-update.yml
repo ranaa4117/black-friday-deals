@@ -13,6 +13,10 @@ on:
         description: "Print size-guide diagnostics (1 = yes)"
         required: false
         default: "0"
+      force:
+        description: "Re-read every size guide (1 = yes)"
+        required: false
+        default: "0"
       probe:
         description: "Product handle to inspect for the size-guide illustration"
         required: false
@@ -39,6 +43,7 @@ jobs:
           SG_LIMIT: ${{ github.event.inputs.sg_limit || '60' }}
           SG_DEBUG: ${{ github.event.inputs.debug || '0' }}
           SG_PROBE: ${{ github.event.inputs.probe || '' }}
+          SG_FORCE: ${{ github.event.inputs.force || '0' }}
         run: python3 tools/sp_update.py
       - name: Publish new data
         run: |
