@@ -181,9 +181,13 @@ def guide_images(page_html):
     for m in ACC_IMG.finditer(page_html):
         if m.group(0) not in urls:
             urls.append(m.group(0))
+    name = lambda u: u.rsplit("/", 1)[-1]
     body = [u for u in urls if "human-figure" in u.lower()]
-    garment = [u for u in urls if "human-figure" not in u.lower()]
-    return {"garment": garment[0] if garment else "", "body": body[0] if body else "", "all": urls[:6]}
+    # size-guide sketches are named like "DRESS---Short-Sleeve-Midi--1000x1200.jpg" or "Screenshot-…png";
+    # colour swatches ("Black.png", "Light-yellow.png") come from the same host and must be skipped
+    sketch = re.compile(r"dress|bag|clutch|tote|screenshot|sketch|garment|measure|size|\d{3,4}x\d{3,4}", re.I)
+    garment = [u for u in urls if "human-figure" not in u.lower() and sketch.search(name(u))]
+    return {"garment": garment[0] if garment else "", "body": body[0] if body else "", "all": urls[:12]}
 
 
 def read_guides(products, prev_by_handle):
