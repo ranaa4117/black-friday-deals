@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-<title>SELF-PORTRAIT | BLACK FRIDAY EDIT</title>
+<title>Black Friday-Raghad Outlet 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
@@ -221,7 +221,7 @@ a.plain{text-decoration:none}
 
 <div id="gate" class="hidden">
   <form id="gateForm" autocomplete="off">
-    <b>SELF-PORTRAIT</b>
+    <b>Black Friday-Raghad Outlet 2026</b>
     <p>Owner area. Enter your passcode to manage the collection.</p>
     <input id="pass" type="password" aria-label="Passcode" placeholder="Passcode" autocomplete="current-password">
     <div class="err" id="gateErr"></div>
@@ -231,12 +231,11 @@ a.plain{text-decoration:none}
 </div>
 
 <header class="top" id="top">
-  <a class="brand" href="#home"><b>Self-Portrait | Black Friday Edit</b><span>The Midi Dress Sale Collection</span></a>
+  <a class="brand" href="#home"><b>Black Friday-Raghad Outlet 2026</b><span>Self-Portrait midi dresses · prices in SAR</span></a>
   <nav class="tabs" aria-label="Sections">
-    <a href="#home">Home</a>
-    <a href="#all">All sale dresses<span class="count" id="cAll"></span></a>
-    <a href="#favorites">My favorites<span class="count" id="cFav"></span></a>
-    <a href="#recent">Recently added<span class="count" id="cNew"></span></a>
+    <a href="#home">All dresses<span class="count" id="cAll"></span></a>
+    <a href="#favorites">Favorites<span class="count" id="cFav"></span></a>
+    <a href="#recent">New in<span class="count" id="cNew"></span></a>
     <a href="#admin" id="navAdmin" class="hidden">Admin</a>
   </nav>
   <div class="status" id="status"></div>
@@ -260,6 +259,13 @@ const REPO = "ranaa4117/black-friday-deals";
 const WORKFLOW = "self-portrait-update.yml";
 const LS = "sp-edit-v1";
 const FR = ["FR 32","FR 34","FR 36","FR 38","FR 40","FR 42","FR 44","FR 46"], KNIT = ["XS","S","M","L","XL"];
+/* Self-Portrait size chart: FR 32–44 = UK 4–16; XS = UK 4, S = UK 6–8, M = UK 10–12, L = UK 14–16, XL = UK 18 */
+const UKS = [4,6,8,10,12,14,16,18];
+const LETTER = { XS:[4,4], S:[6,8], M:[10,12], L:[14,16], XL:[18,18] };
+const ukRange = s => { const m = /^FR\s*(\d+)/.exec(s); if (m) { const n = Number(m[1]) - 28; return [n, n]; } return LETTER[String(s).trim().toUpperCase()] || null; };
+const ukLabel = s => { const r = ukRange(s); return !r ? s : r[0] === r[1] ? String(r[0]) : r[0] + "–" + r[1]; };
+const fitsUK = (s, n) => { const r = ukRange(s); return !!r && r[0] <= n && n <= r[1]; };
+const anyFits = (s, nums) => nums.some(n => fitsUK(s, n));
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
@@ -275,6 +281,7 @@ let SHOWCOSTS = false;
 const COSTS = () => OWNER && SHOWCOSTS;
 const C = () => OWNER ? S : (REMOTE || defaults());
 let GH = JSON.parse(store.get("sp-gh") || '{"token":"","sync":false}');
+S.settings.sizes = [...new Set((S.settings.sizes || []).map(x => typeof x === "number" ? x : (ukRange(x) || [null])[0]).filter(n => UKS.includes(n)))].sort((a,b) => a - b);
 let UI = { q:"", sort:"new", avail:"all", sizes:[], mineOnly:false, limit:48 };
 
 /* ---------- helpers ---------- */
@@ -365,12 +372,11 @@ function schedulePoll(){ clearInterval(pollTimer); const m = Math.max(2, Number(
 const heartSVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.3-9.2C1.4 8 3.5 4.5 7 4.5c2.1 0 3.6 1.2 5 3 1.4-1.8 2.9-3 5-3 3.5 0 5.6 3.5 4.3 6.8-1.8 4.6-9.3 9.2-9.3 9.2z"/></svg>';
 
 function sizesHTML(p){
-  const mine = new Set(S.settings.sizes);
+  const mine = S.settings.sizes;
   const list = p.sizes || [];
   if (!list.length) return '<p class="small" style="margin-top:12px">Sizes not listed</p>';
-  const fr = list[0].s.startsWith("FR");
-  return '<ul class="sizes" aria-label="Sizes">' + list.map((s, i) =>
-    `<li class="${s.a ? "on" : "off"}${mine.has(s.s) ? " mine" : ""}" title="${esc(s.s)} ${s.a ? "available" : "sold out"}">${i === 0 && fr ? '<span class="sys">FR</span>' : ""}${esc(fr ? s.s.replace("FR ","") : s.s)}</li>`).join("") + "</ul>";
+  return '<ul class="sizes" aria-label="UK sizes">' + list.map((s, i) =>
+    `<li class="${s.a ? "on" : "off"}${anyFits(s.s, mine) ? " mine" : ""}" title="UK ${esc(ukLabel(s.s))} ${s.a ? "available" : "sold out"}">${i === 0 ? '<span class="sys">UK</span>' : ""}${esc(ukLabel(s.s))}</li>`).join("") + "</ul>";
 }
 
 function card(p, admin){
@@ -445,7 +451,7 @@ function filtered(list){
   const q = UI.q.trim().toLowerCase(), want = UI.mineOnly ? S.settings.sizes : UI.sizes;
   let out = list.filter(p => (!q || p.title.toLowerCase().includes(q))
     && (UI.avail === "all" || (UI.avail === "in" ? isAvail(p) : !isAvail(p)))
-    && (!want.length || (p.sizes || []).some(s => s.a && want.includes(s.s))));
+    && (!want.length || (p.sizes || []).some(s => s.a && anyFits(s.s, want))));
   const by = {
     asc: (a,b) => finalSAR(a) - finalSAR(b), desc: (a,b) => finalSAR(b) - finalSAR(a),
     disc: (a,b) => pct(b) - pct(a) || finalSAR(a) - finalSAR(b),
@@ -455,33 +461,10 @@ function filtered(list){
   return out.sort(by);
 }
 
-function viewHome(list){
-  const avail = list.filter(isAvail);
-  const picks = [...avail].sort((a,b) => pct(b) - pct(a)).filter(p => p.image).slice(0, 3);
-  const top = [...avail].sort((a,b) => pct(b) - pct(a)).slice(0, 4);
-  const cheapest = avail.length ? Math.min(...avail.map(finalSAR)) : 0;
-  return `<section class="hero">
-      <div>
-        <h1>Black Friday Edit</h1>
-        <p class="sub">The Midi Dress Sale Collection</p>
-        <p class="lede">${COSTS() ? `Every discounted midi dress from Self-Portrait Spain, priced in riyals with your ${fmt(extra())} SAR added to each dress, and re-checked against the store every 30 minutes.` : "Every Self-Portrait midi dress in the sale, priced in Saudi riyals. Sizes and prices are refreshed every 30 minutes."}</p>
-        <div class="facts">
-          <div><strong>${avail.length}</strong><small>dresses available now</small></div>
-          <div><strong>${cheapest ? fmt(cheapest) : "—"}</strong><small>lowest final price, SAR</small></div>
-          <div><strong>${ago(DATA.meta.lastSuccess) || "—"}</strong><small>last update · ${when(DATA.meta.lastSuccess).replace(" (Riyadh)","")}</small></div>
-        </div>
-        <a class="cta" href="#all">Shop all sale dresses</a>
-      </div>
-      <div class="triptych">${picks.map(p => `<a href="#dress-${esc(p.handle)}"><img src="${esc(img(p.image, 600))}" alt="${esc(p.title)}"></a>`).join("")}</div>
-    </section>
-    <div class="section-head"><h2>Deepest markdowns</h2><a href="#all" data-sort="disc">See all by discount</a></div>
-    <div class="grid">${top.map(p => card(p)).join("")}</div>`;
-}
-
 function viewAll(list){
   const all = filtered(list), shown = all.slice(0, UI.limit);
-  const sizeBtns = [...FR, ...KNIT].map(s => `<button data-size="${s}" aria-pressed="${UI.sizes.includes(s)}">${s.replace("FR ","")}</button>`).join("");
-  return `<div class="section-head"><h2>All sale dresses</h2><p>${COSTS() ? `Discounted midi dresses on Self-Portrait Spain. Prices include the EUR/SAR conversion and ${fmt(extra())} SAR per dress.` : "All prices in Saudi riyals. Tap the heart to save dresses you love."}</p></div>
+  const sizeBtns = UKS.map(n => `<button data-size="${n}" aria-pressed="${UI.sizes.includes(n)}">${n}</button>`).join("");
+  return `${COSTS() ? `<p class="small" style="padding-top:14px">Owner view: prices include the EUR/SAR conversion and ${fmt(extra())} SAR per dress.</p>` : ""}
     <div class="toolbar" id="toolbar">
       <label class="search"><input id="q" type="search" placeholder="Search by name — lace, boucle, rhinestone…" value="${esc(UI.q)}" aria-label="Search dresses"></label>
       <select id="sort" aria-label="Sort">
@@ -489,8 +472,8 @@ function viewAll(list){
         <option value="asc">Final price: low to high</option><option value="desc">Final price: high to low</option><option value="disc">Biggest discount</option>
       </select>
       <select id="avail" aria-label="Availability"><option value="all">Available and sold out</option><option value="in">Available only</option><option value="out">Sold out only</option></select>
-      ${OWNER ? "" : "<!--"}<button class="tbtn" id="mine" aria-pressed="${UI.mineOnly}" ${S.settings.sizes.length ? "" : "disabled title='Choose your sizes below'"}>In my sizes${S.settings.sizes.length ? " (" + S.settings.sizes.map(s => s.replace("FR ","")).join(", ") + ")" : ""}</button>${OWNER ? "" : "-->"}
-      <div class="sizebar" ${UI.mineOnly ? 'style="opacity:.4;pointer-events:none"' : ""}>Available in: <span class="small">FR</span>${sizeBtns.slice(0)}${UI.sizes.length ? ' <button id="clearSizes">Clear</button>' : ""}</div>
+      ${OWNER ? "" : "<!--"}<button class="tbtn" id="mine" aria-pressed="${UI.mineOnly}" ${S.settings.sizes.length ? "" : "disabled title='Choose your sizes below'"}>In my sizes${S.settings.sizes.length ? " (" + "UK " + S.settings.sizes.join(", ") + ")" : ""}</button>${OWNER ? "" : "-->"}
+      <div class="sizebar" ${UI.mineOnly ? 'style="opacity:.4;pointer-events:none"' : ""}>Size: <span class="small">UK</span>${sizeBtns.slice(0)}${UI.sizes.length ? ' <button id="clearSizes">Clear</button>' : ""}</div>
     </div>
     <p class="result-line">${all.length} of ${list.length} dresses</p>
     ${all.length ? `<div class="grid">${shown.map(p => card(p)).join("")}</div>${all.length > shown.length ? `<button class="more" id="more">Show more (${all.length - shown.length})</button>` : ""}`
@@ -499,13 +482,13 @@ function viewAll(list){
 
 function viewFav(list){
   const favs = list.filter(p => S.fav[p.handle]).sort((a,b) => finalSAR(a) - finalSAR(b));
-  if (!favs.length) return `<div class="section-head"><h2>My favorites</h2></div><div class="empty"><h3>No favorites yet</h3><p>Tap the heart on any dress to keep it here and compare final prices.</p><a class="cta" href="#all">Browse the sale</a></div>`;
+  if (!favs.length) return `<div class="section-head"><h2>Favorites</h2></div><div class="empty"><h3>No favorites yet</h3><p>Tap the heart on any dress to keep it here and compare final prices.</p><a class="cta" href="#home">Browse the sale</a></div>`;
   const mine = S.settings.sizes;
   const total = favs.reduce((t,p) => t + finalSAR(p), 0);
-  return `<div class="section-head"><h2>My favorites</h2><p>${favs.length} saved · together ${fmt(total)} SAR</p></div>
+  return `<div class="section-head"><h2>Favorites</h2><p>${favs.length} saved · together ${fmt(total)} SAR</p></div>
     <div class="table-wrap"><table class="compare"><thead><tr><th></th><th>Dress</th><th>Final price</th>${COSTS() ? "<th>Sale €</th>" : ""}<th>Off</th><th>${mine.length ? "My sizes" : "Sizes in stock"}</th></tr></thead><tbody>
     ${favs.map((p,i) => { const inStock = (p.sizes||[]).filter(s => s.a).map(s => s.s);
-      const sz = mine.length ? mine.map(s => inStock.includes(s) ? s.replace("FR ","FR ") : `<s style="color:#bdb6ae">${s}</s>`).join(", ") : (inStock.join(", ") || "Sold out");
+      const sz = mine.length ? mine.map(n => inStock.some(s => fitsUK(s, n)) ? "UK " + n : `<s style="color:#bdb6ae">UK ${n}</s>`).join(", ") : (inStock.length ? "UK " + inStock.map(ukLabel).join(", ") : "Sold out");
       return `<tr class="${i === 0 ? "best" : ""}"><td><img src="${esc(img(p.image,120))}" alt=""></td><td><a href="#dress-${esc(p.handle)}">${esc(p.title)}</a></td><td class="num">${fmt(finalSAR(p))} SAR</td>${COSTS() ? `<td>${eur(p.price)}</td>` : ""}<td>${offShown(p)}%</td><td>${sz}</td></tr>`; }).join("")}
     </tbody></table></div>
     <div class="grid" style="margin-top:30px">${favs.map(p => card(p)).join("")}</div>`;
@@ -513,7 +496,7 @@ function viewFav(list){
 
 function viewRecent(list){
   const r = recentList(list);
-  const head = `<div class="section-head"><h2>Recently added</h2><p>Dresses that joined the sale after tracking began on ${when(DATA.meta.initialImport)}, newest first.</p></div>`;
+  const head = `<div class="section-head"><h2>New in</h2><p>Dresses that joined the sale after tracking began on ${when(DATA.meta.initialImport)}, newest first.</p></div>`;
   if (r.length) return head + `<div class="grid">${r.map(p => `${card(p)}`).join("")}</div>`;
   const fresh = [...list].sort((a,b) => (b.publishedAt||"").localeCompare(a.publishedAt||"")).slice(0, 8);
   return head + `<div class="empty" style="padding:40px 0"><h3>Nothing new since tracking began</h3><p>The store is checked every 30 minutes; newly discounted dresses will appear here. Meanwhile, these were published most recently by the store:</p></div><div class="grid">${fresh.map(p => card(p)).join("")}</div>`;
@@ -535,8 +518,8 @@ function viewAdmin(list){
     </div></section>
 
   <section class="panel"><div><h3>My sizes</h3><p class="why">Your sizes are highlighted on every card and power the “In my sizes” filter.</p></div>
-    <div class="fields"><div class="size-edit" id="mySizes">${[...FR, ...KNIT].map(s => `<button data-my="${s}" class="${sizes.has(s) ? "" : "off"}" aria-pressed="${sizes.has(s)}">${s}</button>`).join("")}</div>
-    <p class="small">Self-Portrait uses French sizes for woven dresses (FR 34 ≈ UK 6, FR 36 ≈ UK 8, FR 38 ≈ UK 10) and XS–XL for knits.</p></div></section>
+    <div class="fields"><div class="size-edit" id="mySizes">${UKS.map(n => `<button data-my="${n}" class="${sizes.has(n) ? "" : "off"}" aria-pressed="${sizes.has(n)}">UK ${n}</button>`).join("")}</div>
+    <p class="small">Sizes follow Self-Portrait's conversion chart: FR 32–44 = UK 4–16; knits XS = UK 4, S = UK 6–8, M = UK 10–12, L = UK 14–16.</p></div></section>
 
   <section class="panel"><div><h3>Refresh & updates</h3><p class="why">A GitHub Action reads the Spain store every 30 minutes and publishes new data. This page reloads that data automatically.</p></div>
     <div class="fields">
@@ -597,7 +580,7 @@ function openEditor(handle){
       <div class="row">${!isNewItem ? `<button class="btn danger" id="eDel">Delete</button>` : ""}${S.ov[p.handle] && !p.manual ? `<button class="btn quiet" id="eReset">Reset to store data</button>` : ""}</div>
       <div class="row"><button class="btn quiet" id="eCancel">Cancel</button><button class="btn solid" id="eSave">${isNewItem ? "Add dress" : "Save changes"}</button></div>
     </div>`;
-  const drawSizes = () => { $("#eS").innerHTML = sizes.map((s,i) => `<button data-i="${i}" class="${s.a ? "" : "off"}" aria-pressed="${s.a}">${esc(s.s)}</button>`).join(""); };
+  const drawSizes = () => { $("#eS").innerHTML = sizes.map((s,i) => `<button data-i="${i}" class="${s.a ? "" : "off"}" aria-pressed="${s.a}" title="${esc(s.s)}">UK ${esc(ukLabel(s.s))}</button>`).join(""); };
   drawSizes();
   $("#eS").onclick = e => { const b = e.target.closest("button"); if (!b) return; const s = sizes[b.dataset.i]; s.a = !s.a; drawSizes(); };
   $("#eSys").onclick = () => { const fr = sizes[0] && sizes[0].s.startsWith("FR"); sizes = (fr ? KNIT : FR).map(s => ({ s, a:true })); $("#eSys").textContent = fr ? "Use FR sizes" : "Use XS–XL sizes"; drawSizes(); };
@@ -641,12 +624,12 @@ function textDialog(title, value, onOk, okLabel){
 /* ---------- dress page ---------- */
 function viewDress(list, handle){
   const p = list.find(x => x.handle === handle);
-  if (!p) return `<div class="empty"><h3>This dress is no longer in the sale</h3><p>It may have sold out or gone back to full price.</p><a class="cta" href="#all">See all sale dresses</a></div>`;
+  if (!p) return `<div class="empty"><h3>This dress is no longer in the sale</h3><p>It may have sold out or gone back to full price.</p><a class="cta" href="#home">See all sale dresses</a></div>`;
   const pics = (p.images && p.images.length ? p.images : [p.image]).filter(Boolean);
   const fav = !!S.fav[p.handle], off = offShown(p), out = !isAvail(p);
   const avail = (p.sizes || []).filter(s => s.a).map(s => s.s);
   const i = list.indexOf(p), prev = list[i - 1], next = list[i + 1];
-  return `<nav class="crumbs"><a href="#all" id="backLink">All sale dresses</a></nav>
+  return `<nav class="crumbs"><a href="#home" id="backLink">All sale dresses</a></nav>
   <section class="pdp">
     <div class="gallery">
       <div class="slides" id="slides" tabindex="0" aria-label="Photos of ${esc(p.title)}">${pics.map((src, n) => `<figure><img ${n > 1 ? 'loading="lazy"' : ""} src="${esc(img(src, 1200))}" alt="${esc(p.title)}, photo ${n + 1} of ${pics.length}"></figure>`).join("")}</div>
@@ -659,7 +642,7 @@ function viewDress(list, handle){
       ${off ? `<p class="eur"><s>${fmt(wasSAR(p))} SAR</s><span class="pct">−${off}%</span></p>` : ""}
       ${COSTS() ? `<p class="calc">${eur(p.price)} (was ${eur(p.compare)}) × ${rate().toFixed(3)} + ${fmt(extra())} SAR</p>` : ""}
       <div class="pdp-sizes"><p class="small">${out ? "Sold out in every size" : "Available sizes"}</p>${sizesHTML(p)}
-        ${!out && S.settings.sizes.length ? `<p class="small" style="margin-top:8px">${S.settings.sizes.filter(s => avail.includes(s)).length ? "In your size" : "Not available in your saved sizes"}</p>` : ""}</div>
+        ${!out && S.settings.sizes.length ? `<p class="small" style="margin-top:8px">${avail.some(s => anyFits(s, S.settings.sizes)) ? "In your size" : "Not available in your saved sizes"}</p>` : ""}</div>
       <button class="btn ${fav ? "" : "solid"} favbtn" data-fav="${esc(p.handle)}" aria-pressed="${fav}">${fav ? "Saved to favorites" : "Save to favorites"}</button>
       ${p.details ? `<div class="details"><h2>Details</h2><p>${esc(p.details)}</p></div>` : ""}
       <p class="small" style="margin-top:22px">Sizes and prices updated ${ago(DATA.meta.lastSuccess)}. Availability can change quickly.</p>
@@ -687,7 +670,8 @@ function wireDress(){
 /* ---------- router ---------- */
 function render(){
   const route = (location.hash || "#home").slice(1);
-  document.querySelectorAll("nav.tabs a").forEach(a => { if (a.getAttribute("href") === "#" + route) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+  const navRoute = route === "all" ? "home" : route;
+  document.querySelectorAll("nav.tabs a").forEach(a => { if (a.getAttribute("href") === "#" + navRoute) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
   statusBar();
   const list = products(); counts(list);
   const v = $("#view");
@@ -697,9 +681,9 @@ function render(){
   if (isAdmin && !OWNER){ $("#gate").classList.remove("hidden"); setTimeout(() => $("#pass").focus(), 50); v.innerHTML = ""; return; }
   $("#gate").classList.add("hidden");
   if (route.startsWith("dress-") && $("#slides")) window._galleryAt = Math.round($("#slides").scrollLeft / $("#slides").clientWidth);
-  v.innerHTML = route.startsWith("dress-") ? viewDress(list, route.slice(6)) : route === "all" ? viewAll(list) : route === "favorites" ? viewFav(list) : route === "recent" ? viewRecent(list) : isAdmin ? viewAdmin(list) : viewHome(list);
+  v.innerHTML = route.startsWith("dress-") ? viewDress(list, route.slice(6)) : route === "all" || route === "home" ? viewAll(list) : route === "favorites" ? viewFav(list) : route === "recent" ? viewRecent(list) : isAdmin ? viewAdmin(list) : viewAll(list);
   document.documentElement.style.setProperty("--hh", $("#top").offsetHeight + "px");
-  if (route === "all") wireAll();
+  if (route === "all" || route === "home") wireAll();
   if (route.startsWith("dress-")) wireDress();
   if (isAdmin) wireAdmin(list);
 }
@@ -710,7 +694,7 @@ function wireAll(){
   $("#sort").onchange = e => { UI.sort = e.target.value; render(); };
   $("#avail").onchange = e => { UI.avail = e.target.value; render(); };
   if ($("#mine")) $("#mine").onclick = () => { UI.mineOnly = !UI.mineOnly; render(); };
-  document.querySelectorAll("[data-size]").forEach(b => b.onclick = () => { const s = b.dataset.size; UI.sizes = UI.sizes.includes(s) ? UI.sizes.filter(x => x !== s) : [...UI.sizes, s]; render(); });
+  document.querySelectorAll("[data-size]").forEach(b => b.onclick = () => { const s = Number(b.dataset.size); UI.sizes = UI.sizes.includes(s) ? UI.sizes.filter(x => x !== s) : [...UI.sizes, s]; render(); });
   if ($("#clearSizes")) $("#clearSizes").onclick = () => { UI.sizes = []; render(); };
   if ($("#more")) $("#more").onclick = () => { UI.limit += 48; const y = scrollY; render(); scrollTo(0, y); };
 }
@@ -720,7 +704,7 @@ function wireAdmin(list){
   $("#sExtra").onchange = e => { const v = Number(e.target.value); if (!Number.isFinite(v) || v < 0) return toast("Enter a number of riyals, 0 or more."); S.settings.extra = v; save(); render(); toast("Every dress now adds " + fmt(v) + " SAR."); };
   $("#sRate").onchange = e => { const v = Number(e.target.value); S.settings.rate = v > 0 ? v : null; save(); render(); toast(v > 0 ? "Using your rate " + v + "." : "Using the live rate."); };
   $("#sPoll").onchange = e => { S.settings.poll = Number(e.target.value); save(); schedulePoll(); toast("Reloading every " + e.target.value + " minutes."); };
-  $("#mySizes").onclick = e => { const b = e.target.closest("[data-my]"); if (!b) return; const s = b.dataset.my, set = new Set(S.settings.sizes); set.has(s) ? set.delete(s) : set.add(s); S.settings.sizes = [...FR, ...KNIT].filter(x => set.has(x)); save(); render(); };
+  $("#mySizes").onclick = e => { const b = e.target.closest("[data-my]"); if (!b) return; const s = Number(b.dataset.my), set = new Set(S.settings.sizes); set.has(s) ? set.delete(s) : set.add(s); S.settings.sizes = UKS.filter(x => set.has(x)); save(); render(); };
   $("#aRefresh").onclick = () => loadData(true);
   $("#aLeave").onclick = () => { store.set("sp-unlock", ""); OWNER = false; location.hash = "#home"; render(); toast("Customer view. Open #admin to sign back in."); };
   $("#aRun").onclick = runStoreCheck;
@@ -756,7 +740,7 @@ function start(){ render(); loadData(false); schedulePoll(); window._lastLoad = 
 $("#gateForm").onsubmit = async e => { e.preventDefault(); const h = await sha($("#pass").value); if (h === PASS_HASH){ store.set("sp-unlock", h); OWNER = true; $("#pass").value = ""; render(); } else { $("#gateErr").textContent = "That passcode doesn't match. Try again."; } };
 start();
 /* load the newest version of the site when it changes (browsers may keep an old copy for 10 min) */
-const APP_VERSION = "5";
+const APP_VERSION = "6";
 fetch("version.txt?t=" + Date.now(), { cache:"no-store" }).then(r => r.ok ? r.text() : "").then(v => {
   v = v.trim();
   if (v && v !== APP_VERSION && new URLSearchParams(location.search).get("v") !== v) location.replace(location.pathname + "?v=" + v + location.hash);
