@@ -444,7 +444,7 @@ const PASS_HASH = "3c29f0bb09f7f11433b993fb3a8d945503758c57eacb6ecfe88c49e1ef74e
 const REPO = "ranaa4117/black-friday-deals";
 const WORKFLOW = "self-portrait-update.yml";
 const LS = "sp-edit-v1";
-const APP_VERSION = "14";
+const APP_VERSION = "15";
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
@@ -698,6 +698,7 @@ function card(p, showCat){
     ${showCat ? `<p class="cat-tag">${esc(kindOf(p))}</p>` : ""}
     <h3><a href="${plink(p)}" class="plain">${esc(p.title)}</a></h3>
     ${isMD(p) ? `
+    ${p.extra25 ? '<p class="ptags"><span class="ptag ptag-x">25% OFF</span></p>' : ""}
     <p class="sar">${fmt(finalSAR(p))}<small>SAR</small></p>
     ${off ? `<p class="eur"><s>${fmt(wasSAR(p))} SAR</s></p>` : ""}
     ${COSTS() ? `<p class="calc">${money(p, p.price)}${p.markdown ? " (was " + money(p, p.compare) + ")" : ""}${p.extra25 ? " × 0.75" : ""} × ${usdRate().toFixed(3)} + ${fmt(extraFor(p))} SAR</p>` : ""}` : `
@@ -771,17 +772,16 @@ function viewList(route, all){
   showPop = route === "popular" || u.sort === "pop";
   const filtered = u.q || u.color || (u.pmin !== "" && u.pmin != null) || (u.pmax !== "" && u.pmax != null);
   if (route === "popular" && !base.length){
-    body = `<div class="empty"><h3>No favorites yet</h3><p>Pieces appear here, ranked, as soon as they are added to favorites.</p><a class="cta" href="#all">Browse the sale</a></div>`;
+    body = `<div class="empty"><h3>No favorites yet</h3><a class="cta" href="#all">Browse the sale</a></div>`;
   } else if (route === "recent" && !base.length){
     const fresh = [...all].sort((a,b) => (b.publishedAt||"").localeCompare(a.publishedAt||"")).slice(0, 8);
-    body = `<div class="empty" style="padding:40px 0"><h3>Nothing new since tracking began</h3><p>Newly discounted pieces appear here. These were published most recently:</p></div><div class="grid">${fresh.map(p => card(p, true)).join("")}</div>`;
+    body = `<div class="empty" style="padding:40px 0"><h3>Nothing new yet</h3></div><div class="grid">${fresh.map(p => card(p, true)).join("")}</div>`;
   } else {
     body = res.length ? `<div class="grid">${shown.map(p => card(p, shownCat)).join("")}</div>${res.length > shown.length ? `<button class="more" id="more">Show more</button>` : ""}`
       : `<div class="empty" dir="rtl" lang="ar"><h3>لا توجد نتائج</h3>${filtered ? '<button class="btn" id="resetF" style="margin-top:14px">مسح الكل</button>' : ""}</div>`;
   }
-  return `<div class="list-head"><div><h2>${TITLES[route]}</h2><p>${sub}</p></div></div>
+  return `<div class="list-head"><div><h2>${TITLES[route]}</h2></div></div>
     ${subnav}
-    ${route === "md" && false ? '<p class="promo-note">Extra 25% off in cart: Mac Duggal takes it automatically at checkout on the styles it labels “+25% Off In Cart” (shown on each dress), after any Black Friday markdown. Prices that include it are estimates — the retailer charges the final amount.</p>' : ""}
     <div class="toolbar ar-filters" id="toolbar" dir="rtl" lang="ar">
       <div class="fhead"><h3>الفلاتر</h3>${filtered ? '<button class="linkish" id="clearAll">مسح الكل</button>' : ""}</div>
       <label class="search"><input id="q" type="search" placeholder="ابحث باسم المنتج" value="${esc(u.q)}" aria-label="ابحث باسم المنتج" dir="auto"></label>
@@ -801,7 +801,6 @@ function viewList(route, all){
 
 function viewVS(){
   return `<section class="soon"><p class="soon-brand">Victoria's Secret</p><p class="soon-tag">Coming Soon</p>
-    <p class="small">This brand isn't live yet. Offers will be added here only after they're checked against the official store.</p>
     <a class="cta" href="#home">Back to home</a></section>`;
 }
 
@@ -852,10 +851,10 @@ function viewHome(all){
 
 function viewFav(all){
   const favs = all.filter(p => S.fav[p.handle]).sort((a,b) => finalSAR(a) - finalSAR(b));
-  if (!favs.length) return `<div class="list-head"><div><h2>My favorites</h2></div></div><div class="empty"><h3>No favorites yet</h3><p>Tap the heart on any piece to keep it here and compare final prices.</p><a class="cta" href="#all">Browse the sale</a></div>`;
+  if (!favs.length) return `<div class="list-head"><div><h2>My favorites</h2></div></div><div class="empty"><h3>No favorites yet</h3><a class="cta" href="#all">Browse the sale</a></div>`;
   const mine = S.settings.sizes, total = favs.reduce((t,p) => t + finalSAR(p), 0);
   const gone = favs.filter(p => isDress(p) && !favSizeOk(p));
-  return `<div class="list-head"><div><h2>My favorites</h2><p>${favs.length} saved · together ${fmt(total)} SAR</p></div></div>
+  return `<div class="list-head"><div><h2>My favorites</h2></div></div>
     ${gone.length ? `<p class="warnline" style="font-size:14px;margin:6px 0 14px">${gone.length === 1 ? "1 saved size is" : gone.length + " saved sizes are"} no longer available: ${gone.map(p => esc(p.title) + " (" + esc(favOf(p.handle).size) + ")").join(", ")}. Your choice is kept — change it or remove the piece below.</p>` : ""}
     <div class="table-wrap"><table class="compare"><thead><tr><th></th><th>Piece</th><th>Selected size</th><th>Final price</th>${COSTS() ? "<th>Sale €</th>" : ""}<th>Off</th><th>${mine.length ? "My sizes" : "In stock"}</th><th></th></tr></thead><tbody>
     ${favs.map((p,i) => { const inStock = (p.sizes||[]).filter(s => s.a).map(s => s.s);
@@ -884,7 +883,7 @@ function viewItem(all, handle){
     <div class="info">
       <p class="cat-tag">${esc(kindOf(p))}</p>
       <h1>${esc(p.title)}</h1>
-      ${isMD(p) ? `<p class="sar big">${fmt(finalSAR(p))}<small>SAR</small></p>
+      ${isMD(p) ? `${p.extra25 ? '<p class="ptags"><span class="ptag ptag-x">25% OFF</span></p>' : ""}<p class="sar big">${fmt(finalSAR(p))}<small>SAR</small></p>
       ${off ? `<p class="eur"><s>${fmt(wasSAR(p))} SAR</s><span class="pct">−${off}%</span></p>` : ""}
       ${(p.colors || []).length ? `<p class="small" style="margin-top:10px">Colours: ${esc(p.colors.join(", "))}</p>` : ""}
       ${COSTS() ? `<p class="calc">${money(p, p.price)}${p.markdown ? " (was " + money(p, p.compare) + ")" : ""}${p.extra25 ? " × 0.75" : ""} × ${usdRate().toFixed(3)} + ${fmt(extraFor(p))} SAR</p>` : ""}`
