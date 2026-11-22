@@ -223,6 +223,70 @@ a.plain{text-decoration:none}
   .cta{display:block;text-align:center}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ---- v2: categories, banners, filters, size guide ---- */
+nav.tabs{gap:clamp(12px,2.4vw,30px)}
+.banners{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:clamp(28px,4vw,48px)}
+.banner{position:relative;display:block;aspect-ratio:4/5;overflow:hidden;background:var(--ivory);text-decoration:none;color:#fff}
+.banner img{width:100%;height:100%;object-fit:cover;transition:transform 1.1s cubic-bezier(.2,.6,.2,1)}
+.banner:hover img{transform:scale(1.04)}
+.banner::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.55),rgba(0,0,0,0) 48%)}
+.banner .cap{position:absolute;left:clamp(14px,2vw,26px);right:12px;bottom:clamp(14px,2vw,24px);z-index:1}
+.banner .cap b{display:block;font:400 clamp(22px,2.6vw,34px)/1.1 var(--serif)}
+.banner .cap span{font-size:13px;letter-spacing:.04em;opacity:.92}
+.list-head{display:flex;justify-content:space-between;align-items:end;gap:14px;flex-wrap:wrap;padding:30px 0 6px}
+.list-head h2{font:400 clamp(28px,3.6vw,46px)/1.05 var(--serif)}
+.list-head p{font-size:13px;color:var(--stone)}
+.filters{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;width:100%}
+.filters select{border:1px solid var(--rule);background:#fff;padding:8px 10px;font-size:13.5px;border-radius:0;max-width:100%}
+.chips{display:flex;flex-wrap:wrap;gap:6px;align-items:center;width:100%;font-size:12.5px;color:var(--stone)}
+.chips button{border:1px solid var(--rule);min-width:38px;padding:5px 9px;font-size:12.5px;color:var(--ink)}
+.chips button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.verified{font-size:11.5px;color:var(--stone);margin-top:8px}
+.guide-btn{margin-top:12px;align-self:flex-start;border-bottom:1px solid var(--ink);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;padding:2px 0}
+.dims{font-size:12.5px;color:#3d3a37;margin-top:10px}
+.cat-tag{font-size:11px;color:var(--stone);letter-spacing:.06em;margin-top:12px}
+.card .cat-tag + h3{margin-top:4px}
+/* size guide drawer */
+dialog.drawer{margin:0 0 0 auto;height:100vh;max-height:100vh;width:min(560px,100vw);border-left:1px solid var(--rule)}
+dialog.drawer[open]{animation:slideIn .35s cubic-bezier(.2,.7,.2,1)}
+@keyframes slideIn{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
+.sg{padding:22px clamp(18px,3.5vw,30px) 40px}
+.sg-top{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--ink);padding-bottom:14px}
+.sg-top h3{font:500 13px var(--sans);letter-spacing:.16em;text-transform:uppercase}
+.sg-top button{font-size:12.5px;letter-spacing:.14em;text-transform:uppercase}
+.sg h4{font:400 21px/1.2 var(--serif);margin:24px 0 4px}
+.sg .who{font-size:13px;color:var(--stone)}
+.sg-tabs{display:flex;gap:22px;margin:20px 0 6px;border-bottom:1px solid var(--rule)}
+.sg-tabs button{padding:10px 0;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--stone);border-bottom:1px solid transparent;margin-bottom:-1px}
+.sg-tabs button[aria-selected="true"]{color:var(--ink);border-color:var(--ink)}
+.units{display:flex;justify-content:flex-end;gap:16px;margin:12px 0 8px}
+.units button{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--stone)}
+.units button[aria-pressed="true"]{color:var(--ink);font-weight:500}
+.sgt-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table.sgt{border-collapse:collapse;width:100%;font-size:13px;min-width:420px}
+table.sgt th,table.sgt td{padding:11px 8px;text-align:center;white-space:nowrap}
+table.sgt th:first-child,table.sgt td:first-child{text-align:left;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:#3d3a37;position:sticky;left:0;background:inherit}
+table.sgt tr{background:#f4f3f1}
+table.sgt tr:nth-child(even){background:#ecebe8}
+table.sgt thead tr{background:#fff}
+table.sgt thead th{font-weight:500;border-bottom:1px solid var(--ink)}
+table.sgt td.mine,table.sgt th.mine{font-weight:600}
+.sg .note{border-left:1px solid var(--ink)}
+.sg ul.fit{margin:10px 0 0 18px;font-size:13.5px;color:#3d3a37}
+.sg .src{font-size:12px;color:var(--stone);margin-top:24px;border-top:1px solid var(--rule);padding-top:14px}
+.owner-tools{display:flex;gap:10px;flex-wrap:wrap}
+@media (max-width:820px){
+  .banners{grid-template-columns:1fr 1fr 1fr;gap:6px}
+  .banner{aspect-ratio:3/4}
+  .banner .cap b{font-size:17px}
+  .banner .cap span{font-size:11px}
+  dialog.drawer{width:100vw;height:92vh;max-height:92vh;margin:auto 0 0 0;border-left:0;border-top:1px solid var(--rule)}
+  dialog.drawer[open]{animation:slideUp .35s cubic-bezier(.2,.7,.2,1)}
+}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+
+.toolbar{position:static}
 </style>
 </head>
 <body>
@@ -239,25 +303,31 @@ a.plain{text-decoration:none}
 </div>
 
 <header class="top" id="top">
-  <a class="brand" href="#home" aria-label="Black Friday-Raghad Outlet 2026, home"><b><span class="ln">Black Friday</span> <span class="ln">Raghad Outlet 2026</span></b><small class="tagline">Self-Portrait midi dresses</small></a>
+  <a class="brand" href="#home" aria-label="Black Friday-Raghad Outlet 2026, home"><b><span class="ln">Black Friday</span> <span class="ln">Raghad Outlet 2026</span></b><small class="tagline">Self-Portrait sale edit</small></a>
   <nav class="tabs" aria-label="Sections">
     <a href="#home">Home</a>
-    <a href="#all">All dresses<span class="count" id="cAll"></span></a>
-    <a href="#favorites">Favorites<span class="count" id="cFav"></span></a>
-    <a href="#recent">New in<span class="count" id="cNew"></span></a>
+    <a href="#all">All products<span class="count" id="c-all"></span></a>
+    <a href="#midi">Midi dresses<span class="count" id="c-midi"></span></a>
+    <a href="#maxi">Maxi dresses<span class="count" id="c-maxi"></span></a>
+    <a href="#bags">Bags<span class="count" id="c-bags"></span></a>
+    <a href="#favorites">My favorites<span class="count" id="c-fav"></span></a>
+    <a href="#recent">Newly added<span class="count" id="c-new"></span></a>
+    <a href="#discounts">Biggest discounts</a>
     <a href="#admin" id="navAdmin" class="hidden">Admin</a>
   </nav>
-  <div class="status" id="status"></div>
+  <div class="status hidden" id="status"></div>
 </header>
 
 <main id="view" aria-live="polite"></main>
 
 <footer>
-  Independent personal shopping service — not affiliated with or endorsed by Self-Portrait. Product names and photos belong to Self-Portrait.
-  Prices are in Saudi riyals. Size availability is refreshed every 30 minutes and can change quickly, so please confirm your size before ordering.
+  Independent personal shopping service — not affiliated with or endorsed by Self-Portrait. Product names, photos and size guides belong to Self-Portrait.
+  Prices are in Saudi riyals. Stock is re-checked every 15 minutes and can change quickly, so please confirm your size before ordering.
+  <br><span id="globalUpdate"></span>
 </footer>
 
 <dialog id="dlg"><div class="dlg" id="dlgBody"></div></dialog>
+<dialog id="guide" class="drawer" aria-label="Size guide"><div class="sg" id="guideBody"></div></dialog>
 <div id="toast" role="status"></div>
 
 <script>
@@ -267,75 +337,91 @@ const PASS_HASH = "3c29f0bb09f7f11433b993fb3a8d945503758c57eacb6ecfe88c49e1ef74e
 const REPO = "ranaa4117/black-friday-deals";
 const WORKFLOW = "self-portrait-update.yml";
 const LS = "sp-edit-v1";
-const FR = ["FR 32","FR 34","FR 36","FR 38","FR 40","FR 42","FR 44","FR 46"], KNIT = ["XS","S","M","L","XL"];
-/* Self-Portrait size chart: FR 32–44 = UK 4–16; XS = UK 4, S = UK 6–8, M = UK 10–12, L = UK 14–16, XL = UK 18 */
+const APP_VERSION = "9";
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
+
+/* ---------- categories ---------- */
+const CATS = { midi:"Midi dresses", maxi:"Maxi dresses", bags:"Bags" };
+const CAT1 = { midi:"Midi dress", maxi:"Maxi dress", bags:"Bag" };
+const catOf = p => p.cat || "midi";
+const isDress = p => catOf(p) !== "bags";
+const BAG_STYLES = [["clutch","Clutch"],["tote","Tote"],["crossbody","Crossbody"],["cross body","Crossbody"],["shoulder","Shoulder bag"],["top handle","Top handle"],["bucket","Bucket bag"],["baguette","Baguette"],["pouch","Pouch"],["micro","Mini bag"],["mini","Mini bag"],["bow","Bow bag"]];
+const bagStyle = p => { const t = p.title.toLowerCase(); const m = BAG_STYLES.find(([k]) => t.includes(k)); return m ? m[1] : "Other bags"; };
+const colorOf = p => { const w = p.title.split(/\s+/); return /^(off|light|dark|pale|hot|baby|burnt)$/i.test(w[0]) ? w[0] + " " + w[1] : w[0]; };
+
+/* ---------- UK sizes (Self-Portrait conversion chart) ---------- */
 const UKS = [4,6,8,10,12,14,16,18];
 const LETTER = { XS:[4,4], S:[6,8], M:[10,12], L:[14,16], XL:[18,18] };
 const ukRange = s => { const m = /^FR\s*(\d+)/.exec(s); if (m) { const n = Number(m[1]) - 28; return [n, n]; } return LETTER[String(s).trim().toUpperCase()] || null; };
 const ukLabel = s => { const r = ukRange(s); return !r ? s : r[0] === r[1] ? String(r[0]) : r[0] + "–" + r[1]; };
 const fitsUK = (s, n) => { const r = ukRange(s); return !!r && r[0] <= n && n <= r[1]; };
 const anyFits = (s, nums) => nums.some(n => fitsUK(s, n));
-const $ = s => document.querySelector(s);
-const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
+/* official Self-Portrait size conversion chart (eu.self-portrait.com/pages/size-conversion-chart) */
+const CONVERSION = [["UK",["4","6","8","10","12","14","16"]],["Letter",["XS",">S","S",">M","M",">L","L"]],["FR",["32","34","36","38","40","42","44"]],["IT",["36","38","40","42","44","46","48"]],["US",["0","2","4","6","8","10","12"]],["DE",["30","32","34","36","38","40","42"]],["DK",["30","32","34","36","38","40","42"]],["AU",["4","6","8","10","12","14","16"]],["JP",["3","5","7","9","11","13","15"]]];
+/* Self-Portrait's standard body measurements (shown on every dress page), used only while a product's own guide is still being read */
+const BODY_STD = { kind:"Body measurements", system:"FR", sizes:["32","34","36","38","40","42","44"], rows:[["Bust","77","80","83","88","93","98","103"],["Waist","62","64","68","73","78","83","88"],["Hip","88","90","94","99","104","109","114"]] };
 
+/* ---------- state ---------- */
 let DATA = { meta:{}, products:[], removed:[] };
 let loaded = false, pollTimer = null, syncTimer = null;
-const defaults = () => ({ fav:{}, notes:{}, ov:{}, manual:[], del:{}, settings:{ extra:450, rate:null, sizes:[], poll:10 }, updatedAt:0 });
+const defaults = () => ({ fav:{}, notes:{}, ov:{}, manual:[], del:{}, settings:{ extra:450, rate:null, sizes:[], poll:5 }, updatedAt:0 });
 let S = Object.assign(defaults(), JSON.parse(store.get(LS) || "{}"));
 S.settings = Object.assign(defaults().settings, S.settings || {});
+S.settings.sizes = [...new Set((S.settings.sizes || []).map(x => typeof x === "number" ? x : (ukRange(x) || [null])[0]).filter(n => UKS.includes(n)))].sort((a,b) => a - b);
 let OWNER = store.get("sp-unlock") === PASS_HASH;
-let REMOTE = null;
-let SHOWCOSTS = false;
+let REMOTE = null, SHOWCOSTS = false;
 const COSTS = () => OWNER && SHOWCOSTS;
 const C = () => OWNER ? S : (REMOTE || defaults());
 let GH = JSON.parse(store.get("sp-gh") || '{"token":"","sync":false}');
-S.settings.sizes = [...new Set((S.settings.sizes || []).map(x => typeof x === "number" ? x : (ukRange(x) || [null])[0]).filter(n => UKS.includes(n)))].sort((a,b) => a - b);
-let UI = { q:"", sort:"new", avail:"all", sizes:[], mineOnly:false, limit:48 };
+const UI = {};
+const ui = r => UI[r] || (UI[r] = { q:"", sort: r === "discounts" ? "disc" : "new", avail:"all", sizes:[], mine:false, type:"", price:"", disc:"", style:"", color:"", limit:48 });
 
 /* ---------- helpers ---------- */
 const rate = () => Number(C().settings && C().settings.rate) || Number(DATA.meta.rate && DATA.meta.rate.value) || 0;
-const extra = () => { const v = C().settings && C().settings.extra; return v !== undefined && v !== null && Number.isFinite(Number(v)) ? Number(v) : 450; };
-const wasSAR = p => Math.round(p.compare * rate() + extra());
-const offShown = p => COSTS() ? pct(p) : (wasSAR(p) > finalSAR(p) ? Math.round((1 - finalSAR(p) / wasSAR(p)) * 100) : 0);
+const extra = () => { const v = C().settings && C().settings.extra; return v !== undefined && v !== null && v !== "" && Number.isFinite(Number(v)) ? Number(v) : 450; };
 const finalSAR = p => Math.round(p.price * rate() + extra());
+const wasSAR = p => Math.round(p.compare * rate() + extra());
 const pct = p => p.compare > p.price ? Math.round((1 - p.price / p.compare) * 100) : 0;
+const offShown = p => COSTS() ? pct(p) : (wasSAR(p) > finalSAR(p) ? Math.round((1 - finalSAR(p) / wasSAR(p)) * 100) : 0);
 const isAvail = p => (p.sizes || []).some(s => s.a);
 const fmt = n => Number(n).toLocaleString("en-US");
 const eur = n => "€" + (Math.round(n * 100) / 100).toLocaleString("en-US");
-const when = iso => iso ? new Date(iso).toLocaleString("en-GB", { timeZone:"Asia/Riyadh", day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" }) + " (Riyadh)" : "—";
+const when = iso => iso ? new Date(iso).toLocaleString("en-GB", { timeZone:"Asia/Riyadh", day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" }) : "—";
 const ago = iso => { if (!iso) return ""; const m = Math.round((Date.now() - new Date(iso)) / 60000); return m < 1 ? "just now" : m < 60 ? m + " min ago" : m < 1440 ? Math.round(m/60) + " h ago" : Math.round(m/1440) + " days ago"; };
 const img = (src, w) => !src ? "" : /cdn\.shopify\.com|self-portrait\.com\/cdn/.test(src) ? src + (src.includes("?") ? "&" : "?") + "width=" + w : src;
 const url = p => p.url || ("https://eu.self-portrait.com/es-es/products/" + p.handle);
-function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 3200); }
+const plink = p => "#item-" + p.handle;
+function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove("show"), 3400); }
+const dimsOf = p => { const t = (p.guide || []).find(g => g.kind === "Dimensions"); if (!t) return ""; return t.rows.map(r => r[0].charAt(0) + " " + r[1]).join(" × ") + " cm"; };
 
 function save(){
   S.updatedAt = Date.now();
   store.set(LS, JSON.stringify(S));
   if (GH.token && GH.sync){ clearTimeout(syncTimer); syncTimer = setTimeout(pushSync, 2500); }
 }
-
 function products(){
   const c = C(), ov = c.ov || {}, del = c.del || {};
   const merge = p => { const o = ov[p.handle]; return o ? Object.assign({}, p, o, { edited:true }) : p; };
   return DATA.products.filter(p => !del[p.handle]).map(merge)
-    .concat((c.manual || []).filter(p => !del[p.handle]).map(p => merge(Object.assign({ manual:true }, p))));
+    .concat((c.manual || []).filter(p => !del[p.handle]).map(p => merge(Object.assign({ manual:true, cat:"midi" }, p))));
 }
+const recentList = list => DATA.meta.initialImport ? list.filter(p => p.manual || (p.firstSeen || "") > DATA.meta.initialImport) : [];
 
-/* ---------- data ---------- */
+/* ---------- data + sync ---------- */
 async function loadData(manual){
   try {
     const r = await fetch("data.json?t=" + Date.now(), { cache:"no-store" });
     if (!r.ok) throw new Error("HTTP " + r.status);
     DATA = await r.json(); loaded = true;
     await pullSync();
-    if (manual) toast("Refreshed. Last store check " + ago(DATA.meta.lastCheck) + ".");
+    if (manual) toast("Up to date. Last store check " + ago(DATA.meta.lastCheck) + ".");
   } catch (e) {
     if (manual || !loaded) toast("Couldn't load the latest data (" + e.message + "). Check your connection and try again.");
   }
   render();
 }
-
 async function pullSync(){
   try {
     const r = await fetch("personal.json?t=" + Date.now(), { cache:"no-store" });
@@ -349,7 +435,6 @@ async function pullSync(){
     }
   } catch {}
 }
-
 async function gh(path, opts = {}){
   const r = await fetch("https://api.github.com/repos/" + REPO + path, Object.assign({}, opts, {
     headers: Object.assign({ "Authorization":"Bearer " + GH.token, "Accept":"application/vnd.github+json" }, opts.headers || {}) }));
@@ -362,204 +447,284 @@ async function pushSync(){
     const sha = cur.status === 200 ? (await cur.json()).sha : undefined;
     const body = btoa(unescape(encodeURIComponent(JSON.stringify(S))));
     await gh("/contents/self-portrait/personal.json", { method:"PUT", body: JSON.stringify({ message:"Update personal edits", content: body, sha }) });
-    toast("Saved and synced to your other devices.");
+    toast("Saved and published.");
   } catch (e) { toast("Saved on this device. Sync failed: " + e.message); }
 }
-async function runStoreCheck(){
-  if (!GH.token){ toast("Add a GitHub token in Admin › Sync to run a store check from here."); location.hash = "#admin"; return; }
+async function runCheck(kind){
+  const label = kind === "all" ? "Refresh of all products" : "Check for new deals";
+  if (!GH.token){ await loadData(true); toast("Reloaded the latest data. To start a live store check from here, add a GitHub token in Admin › Sync & publish."); return; }
   try {
-    const r = await gh("/actions/workflows/" + WORKFLOW + "/dispatches", { method:"POST", body: JSON.stringify({ ref:"main" }) });
+    const r = await gh("/actions/workflows/" + WORKFLOW + "/dispatches", { method:"POST", body: JSON.stringify({ ref:"main", inputs:{ sg_limit: kind === "all" ? "120" : "40" } }) });
     if (r.status === 404) throw new Error("workflow not found");
-    toast("Store check started. New data usually appears within 2–4 minutes.");
-    const before = DATA.meta.lastCheck; let n = 0;
-    const iv = setInterval(async () => { n++; await loadData(false); if (DATA.meta.lastCheck !== before || n > 12){ clearInterval(iv); if (DATA.meta.lastCheck !== before) toast("Store check finished " + ago(DATA.meta.lastCheck) + "."); } }, 30000);
+    toast(label + " started. Results usually arrive within 2–5 minutes.");
+    const before = DATA.meta.lastCheck, beforeCount = recentList(products()).length; let n = 0;
+    const iv = setInterval(async () => { n++; await loadData(false);
+      if (DATA.meta.lastCheck !== before){ clearInterval(iv); const l = DATA.meta.log && DATA.meta.log[0];
+        toast(label + " finished: " + (l ? `${l.added} new, ${l.changed} changed, ${l.removed} left the sale.` : "data updated.")); }
+      else if (n > 14) clearInterval(iv); }, 30000);
   } catch (e) { toast("Couldn't start the store check: " + e.message); }
 }
-function schedulePoll(){ clearInterval(pollTimer); const m = Math.max(2, Number(S.settings.poll) || 10); pollTimer = setInterval(() => loadData(false), m * 60000); }
+function schedulePoll(){ clearInterval(pollTimer); const m = Math.max(2, Number(S.settings.poll) || 5); pollTimer = setInterval(() => loadData(false), m * 60000); }
 
-/* ---------- rendering ---------- */
+/* ---------- pieces ---------- */
 const heartSVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.3-9.2C1.4 8 3.5 4.5 7 4.5c2.1 0 3.6 1.2 5 3 1.4-1.8 2.9-3 5-3 3.5 0 5.6 3.5 4.3 6.8-1.8 4.6-9.3 9.2-9.3 9.2z"/></svg>';
 
 function sizesHTML(p){
-  const mine = S.settings.sizes;
-  const list = p.sizes || [];
+  if (!isDress(p)) return "";
+  const mine = S.settings.sizes, list = p.sizes || [];
   if (!list.length) return '<p class="small" style="margin-top:12px">Sizes not listed</p>';
   return '<ul class="sizes" aria-label="UK sizes">' + list.map((s, i) =>
     `<li class="${s.a ? "on" : "off"}${anyFits(s.s, mine) ? " mine" : ""}" title="UK ${esc(ukLabel(s.s))} ${s.a ? "available" : "sold out"}">${i === 0 ? '<span class="sys">UK</span>' : ""}${esc(ukLabel(s.s))}</li>`).join("") + "</ul>";
 }
 
-function card(p, admin){
-  if (!COSTS()) return shopCard(p);
-  const fav = !!S.fav[p.handle], note = S.notes[p.handle], out = !isAvail(p);
-  const isNew = DATA.meta.initialImport && p.firstSeen > DATA.meta.initialImport;
-  const chg = (p.changes || []).filter(c => c !== "Newly discovered on sale").slice(0, 2).join("; ");
-  return `<article class="card${out ? " out" : ""}">
-    <a class="ph" href="#dress-${esc(p.handle)}">
-      ${p.image ? `<img loading="lazy" src="${esc(img(p.image, 700))}" alt="${esc(p.title)}">` : '<span class="empty" style="display:grid;place-items:center;height:100%">No image</span>'}
-      ${pct(p) ? `<span class="badge">−${pct(p)}%</span>` : ""}
-      ${out ? '<span class="flag">Sold out</span>' : isNew ? '<span class="flag">New to sale</span>' : p.manual ? '<span class="flag">Added by you</span>' : ""}
-    </a>
-    <button class="heart" data-fav="${esc(p.handle)}" aria-pressed="${fav}" aria-label="${fav ? "Remove from" : "Save to"} favorites">${heartSVG}</button>
-    <h3>${esc(p.title)}</h3>
-    <p class="eur"><s>${eur(p.compare)}</s><span class="now">${eur(p.price)}</span><span class="pct">−${pct(p)}%</span></p>
-    <p class="sar">${fmt(finalSAR(p))}<small>SAR</small></p>
-    <p class="calc">${eur(p.price)} × ${rate().toFixed(3)} + ${fmt(extra())} SAR</p>
-    ${sizesHTML(p)}
-    ${note ? `<p class="note">${esc(note)}</p>` : ""}
-    ${chg ? `<p class="change">Updated ${ago(p.lastChanged)}: ${esc(chg)}</p>` : ""}
-    ${p.edited ? '<p class="change">Edited by you — store updates for edited fields are paused</p>' : ""}
-    <div class="acts"><button data-edit="${esc(p.handle)}">${admin ? "Edit" : "Note / edit"}</button></div>
-  </article>`;
-}
-
-function shopCard(p){
+function card(p, showCat){
   const fav = !!S.fav[p.handle], out = !isAvail(p), off = offShown(p);
-  const isNew = DATA.meta.initialImport && p.firstSeen > DATA.meta.initialImport;
+  const isNew = DATA.meta.initialImport && (p.firstSeen || "") > DATA.meta.initialImport;
+  const nPics = (p.images || []).length, dims = dimsOf(p);
   return `<article class="card${out ? " out" : ""}">
-    <a class="ph" href="#dress-${esc(p.handle)}" aria-label="View ${esc(p.title)}">
+    <a class="ph" href="${plink(p)}" aria-label="View ${esc(p.title)}">
       ${p.image ? `<img loading="lazy" src="${esc(img(p.image, 700))}" alt="${esc(p.title)}">` : '<span class="empty" style="display:grid;place-items:center;height:100%">No image</span>'}
-      ${(p.images || []).length > 1 ? `<img class="alt" loading="lazy" src="${esc(img(p.images[1], 700))}" alt="">` : ""}
+      ${nPics > 1 ? `<img class="alt" loading="lazy" src="${esc(img(p.images[1], 700))}" alt="">` : ""}
       ${off ? `<span class="badge">−${off}%</span>` : ""}
-      ${out ? '<span class="flag">Sold out</span>' : isNew ? '<span class="flag">New to sale</span>' : (p.images || []).length > 1 ? `<span class="flag light">${p.images.length} photos</span>` : ""}
+      ${out ? '<span class="flag">Sold out</span>' : isNew ? '<span class="flag">New to sale</span>' : nPics > 1 ? `<span class="flag light">${nPics} photos</span>` : ""}
     </a>
     <button class="heart" data-fav="${esc(p.handle)}" aria-pressed="${fav}" aria-label="${fav ? "Remove from" : "Save to"} favorites">${heartSVG}</button>
-    <h3><a href="#dress-${esc(p.handle)}" class="plain">${esc(p.title)}</a></h3>
+    ${showCat ? `<p class="cat-tag">${CAT1[catOf(p)]}</p>` : ""}
+    <h3><a href="${plink(p)}" class="plain">${esc(p.title)}</a></h3>
+    ${COSTS() ? `<p class="eur"><s>${eur(p.compare)}</s><span class="now">${eur(p.price)}</span><span class="pct">−${pct(p)}%</span></p>` : ""}
     <p class="sar">${fmt(finalSAR(p))}<small>SAR</small></p>
-    ${off ? `<p class="eur"><s>${fmt(wasSAR(p))} SAR</s></p>` : ""}
+    ${off && !COSTS() ? `<p class="eur"><s>${fmt(wasSAR(p))} SAR</s></p>` : ""}
+    ${COSTS() ? `<p class="calc">${eur(p.price)} × ${rate().toFixed(3)} + ${fmt(extra())} SAR</p>` : ""}
     ${sizesHTML(p)}
-    ${OWNER ? `<div class="acts"><button data-edit="${esc(p.handle)}">Edit</button></div>` : ""}
+    ${!isDress(p) && dims ? `<p class="dims">${esc(dims)}</p>` : ""}
+    <button class="guide-btn" data-guide="${esc(p.handle)}">${isDress(p) ? "View size guide" : "View dimensions"}</button>
+    <p class="verified">${p.manual ? "Added by you" : "Checked " + ago(p.verifiedAt || DATA.meta.lastSuccess)}</p>
+    ${OWNER ? `<div class="acts"><button data-edit="${esc(p.handle)}">Edit</button>${COSTS() ? `<a href="${esc(url(p))}" target="_blank" rel="noopener">Store page</a>` : ""}</div>` : ""}
   </article>`;
 }
 
 function statusBar(){
   const m = DATA.meta, el = $("#status");
   if (!loaded){ el.classList.add("hidden"); return; }
-  const stale = m.lastSuccess && (Date.now() - new Date(m.lastSuccess)) > 3 * 3600e3;
+  const stale = m.lastSuccess && (Date.now() - new Date(m.lastSuccess)) > 2 * 3600e3;
+  $("#globalUpdate").textContent = m.lastSuccess ? "Collection last updated " + ago(m.lastSuccess) + " · " + when(m.lastSuccess) + " (Riyadh time)" : "";
   if (!COSTS()){
     el.classList.toggle("hidden", !(stale || m.lastError));
-    el.innerHTML = '<span class="warn">Availability may have changed — please confirm your size before ordering</span>';
+    el.innerHTML = '<span class="warn">Last successful update ' + ago(m.lastSuccess) + ' — availability may have changed, please confirm your size before ordering</span>';
     return;
   }
   el.classList.remove("hidden");
-  el.innerHTML = `<span>Last successful update: ${when(m.lastSuccess)}</span>
-    <span>EUR/SAR ${rate().toFixed(3)}${S.settings.rate ? " (your manual rate)" : ""}</span>
-    ${m.lastError ? `<span class="warn">Latest check couldn't reach the store — prices shown are from ${ago(m.lastSuccess)}</span>` : stale ? `<span class="warn">Not verified for ${ago(m.lastSuccess).replace(" ago","")} — check the store before buying</span>` : ""}
-    <button id="refreshNow">Refresh now</button><button id="costTgl">Hide my costs</button>`;
+  el.innerHTML = `<span>Owner view · last successful update ${when(m.lastSuccess)}</span><span>EUR/SAR ${rate().toFixed(3)}${S.settings.rate ? " (your manual rate)" : ""}</span>
+    ${m.lastError ? `<span class="warn">${esc(m.lastError)}</span>` : ""}<button id="costTgl">Hide my costs</button>`;
   $("#costTgl").onclick = () => { SHOWCOSTS = false; render(); };
-  $("#refreshNow").onclick = () => { loadData(true); if (GH.token) runStoreCheck(); };
 }
 
 function counts(list){
-  $("#cAll").textContent = list.length ? " " + list.length : "";
-  const f = list.filter(p => S.fav[p.handle]).length; $("#cFav").textContent = f ? " " + f : "";
-  const n = recentList(list).length; $("#cNew").textContent = n ? " " + n : "";
+  $("#c-all").textContent = " " + list.length;
+  for (const c of Object.keys(CATS)) $("#c-" + c).textContent = " " + list.filter(p => catOf(p) === c).length;
+  const f = list.filter(p => S.fav[p.handle]).length; $("#c-fav").textContent = f ? " " + f : "";
+  const n = recentList(list).length; $("#c-new").textContent = n ? " " + n : "";
 }
-const recentList = list => DATA.meta.initialImport ? list.filter(p => p.manual || p.firstSeen > DATA.meta.initialImport).sort((a,b) => (b.firstSeen||"").localeCompare(a.firstSeen||"")) : [];
 
-function filtered(list){
-  const q = UI.q.trim().toLowerCase(), want = UI.mineOnly ? S.settings.sizes : UI.sizes;
+/* ---------- filtering ---------- */
+const PRICE_BANDS = [["0-999","Under 1,000 SAR"],["1000-1499","1,000–1,499 SAR"],["1500-1999","1,500–1,999 SAR"],["2000-2499","2,000–2,499 SAR"],["2500-1e9","2,500 SAR and up"]];
+const DISC_BANDS = [["30","30% off or more"],["40","40% off or more"],["50","50% off or more"],["60","60% off or more"]];
+function applyFilters(list, u){
+  const q = u.q.trim().toLowerCase(), want = u.mine ? S.settings.sizes : u.sizes;
+  const [lo, hi] = u.price ? u.price.split("-").map(Number) : [0, Infinity];
   let out = list.filter(p => (!q || p.title.toLowerCase().includes(q))
-    && (UI.avail === "all" || (UI.avail === "in" ? isAvail(p) : !isAvail(p)))
-    && (!want.length || (p.sizes || []).some(s => s.a && anyFits(s.s, want))));
+    && (!u.type || catOf(p) === u.type)
+    && (u.avail === "all" || (u.avail === "in" ? isAvail(p) : !isAvail(p)))
+    && (!want.length || (isDress(p) && (p.sizes || []).some(s => s.a && anyFits(s.s, want))))
+    && (!u.price || (finalSAR(p) >= lo && finalSAR(p) <= hi))
+    && (!u.disc || offShown(p) >= Number(u.disc))
+    && (!u.style || bagStyle(p) === u.style)
+    && (!u.color || colorOf(p) === u.color));
   const by = {
     asc: (a,b) => finalSAR(a) - finalSAR(b), desc: (a,b) => finalSAR(b) - finalSAR(a),
-    disc: (a,b) => pct(b) - pct(a) || finalSAR(a) - finalSAR(b),
+    disc: (a,b) => offShown(b) - offShown(a) || finalSAR(a) - finalSAR(b),
     new: (a,b) => (b.firstSeen||"").localeCompare(a.firstSeen||"") || (b.publishedAt||"").localeCompare(a.publishedAt||""),
     upd: (a,b) => (b.lastChanged||"").localeCompare(a.lastChanged||""),
-  }[UI.sort];
+    fav: (a,b) => (S.fav[b.handle] ? 1 : 0) - (S.fav[a.handle] ? 1 : 0) || (b.firstSeen||"").localeCompare(a.firstSeen||""),
+  }[u.sort] || (() => 0);
   return out.sort(by);
 }
 
-function viewHome(list){
-  const avail = list.filter(isAvail);
-  const picks = [...avail].sort((a,b) => pct(b) - pct(a)).filter(p => p.image).slice(0, 3);
-  const top = [...avail].sort((a,b) => pct(b) - pct(a)).slice(0, 8);
-  return `<section class="home-pics triptych">${picks.map(p => `<a href="#dress-${esc(p.handle)}" aria-label="${esc(p.title)}"><img src="${esc(img(p.image, 900))}" alt="${esc(p.title)}"></a>`).join("")}</section>
-    <div class="section-head"><h2>Deepest markdowns</h2><a href="#all" data-sort="disc">See all dresses</a></div>
-    <div class="grid">${top.map(p => card(p)).join("")}</div>
-    <a class="more" href="#all" style="text-align:center;text-decoration:none;width:max-content">Shop all ${list.length} dresses</a>`;
-}
+const opt = (v, label, cur) => `<option value="${esc(v)}" ${String(cur) === String(v) ? "selected" : ""}>${esc(label)}</option>`;
 
-function viewAll(list){
-  const all = filtered(list), shown = all.slice(0, UI.limit);
-  const sizeBtns = UKS.map(n => `<button data-size="${n}" aria-pressed="${UI.sizes.includes(n)}">${n}</button>`).join("");
-  return `${COSTS() ? `<p class="small" style="padding-top:14px">Owner view: prices include the EUR/SAR conversion and ${fmt(extra())} SAR per dress.</p>` : ""}
+function viewList(route, all){
+  const u = ui(route);
+  const TITLES = { all:"All products", midi:"Midi dresses", maxi:"Maxi dresses", bags:"Bags", recent:"Newly added", discounts:"Biggest discounts" };
+  let base = route === "midi" || route === "maxi" || route === "bags" ? all.filter(p => catOf(p) === route) : route === "recent" ? recentList(all) : all;
+  const kind = route === "bags" ? "bags" : route === "midi" || route === "maxi" ? "dress" : "mixed";
+  const shownCat = kind === "mixed";
+  const res = applyFilters(base, u), shown = res.slice(0, u.limit);
+  const styles = [...new Set(base.filter(p => !isDress(p)).map(bagStyle))].sort();
+  const colors = [...new Set(base.filter(p => !isDress(p)).map(colorOf))].sort();
+  const sub = { all:"Every discounted midi dress, maxi dress and bag in the Self-Portrait sale.", midi:"Discounted Self-Portrait midi dresses.", maxi:"Discounted Self-Portrait maxi dresses.", bags:"Discounted Self-Portrait bags.", recent:"Pieces that joined the sale since tracking began, newest first.", discounts:"The deepest markdowns across every category." }[route];
+  const sizeChips = kind !== "bags" ? `<div class="chips">UK size${S.settings.sizes.length && OWNER ? ` <button id="mine" aria-pressed="${u.mine}">My sizes</button>` : ""} ${UKS.map(n => `<button data-size="${n}" aria-pressed="${u.sizes.includes(n)}" ${u.mine ? "disabled" : ""}>${n}</button>`).join("")}${u.sizes.length ? ' <button id="clearSizes">Clear</button>' : ""}</div>` : "";
+  let body;
+  if (route === "recent" && !base.length){
+    const fresh = [...all].sort((a,b) => (b.publishedAt||"").localeCompare(a.publishedAt||"")).slice(0, 8);
+    body = `<div class="empty" style="padding:40px 0"><h3>Nothing new since tracking began</h3><p>The store is checked every 15 minutes; newly discounted pieces appear here. These were published most recently by Self-Portrait:</p></div><div class="grid">${fresh.map(p => card(p, true)).join("")}</div>`;
+  } else {
+    body = res.length ? `<div class="grid">${shown.map(p => card(p, shownCat)).join("")}</div>${res.length > shown.length ? `<button class="more" id="more">Show more (${res.length - shown.length})</button>` : ""}`
+      : `<div class="empty"><h3>Nothing matches these filters</h3><p>Try a wider price range, fewer sizes, or clear the search.</p><button class="btn" id="resetF" style="margin-top:14px">Clear all filters</button></div>`;
+  }
+  return `<div class="list-head"><div><h2>${TITLES[route]}</h2><p>${sub}</p></div><p>${fmt(res.length)} of ${fmt(base.length)} · updated ${ago(DATA.meta.lastSuccess)}</p></div>
     <div class="toolbar" id="toolbar">
-      <label class="search"><input id="q" type="search" placeholder="Search by name — lace, boucle, rhinestone…" value="${esc(UI.q)}" aria-label="Search dresses"></label>
-      <select id="sort" aria-label="Sort">
-        <option value="new">Newly added</option><option value="upd">Recently updated</option>
-        <option value="asc">Final price: low to high</option><option value="desc">Final price: high to low</option><option value="disc">Biggest discount</option>
-      </select>
-      <select id="avail" aria-label="Availability"><option value="all">Available and sold out</option><option value="in">Available only</option><option value="out">Sold out only</option></select>
-      ${OWNER ? "" : "<!--"}<button class="tbtn" id="mine" aria-pressed="${UI.mineOnly}" ${S.settings.sizes.length ? "" : "disabled title='Choose your sizes below'"}>In my sizes${S.settings.sizes.length ? " (" + "UK " + S.settings.sizes.join(", ") + ")" : ""}</button>${OWNER ? "" : "-->"}
-      <div class="sizebar" ${UI.mineOnly ? 'style="opacity:.4;pointer-events:none"' : ""}>Size: <span class="small">UK</span>${sizeBtns.slice(0)}${UI.sizes.length ? ' <button id="clearSizes">Clear</button>' : ""}</div>
+      <label class="search"><input id="q" type="search" placeholder="${kind === "bags" ? "Search bags — clutch, crystal, satin…" : "Search by name — lace, boucle, rhinestone…"}" value="${esc(u.q)}" aria-label="Search"></label>
+      <div class="filters">
+        <select id="f-sort" aria-label="Sort">${opt("new","Recently added",u.sort)}${opt("upd","Recently updated",u.sort)}${opt("asc","Lowest final price",u.sort)}${opt("desc","Highest final price",u.sort)}${opt("disc","Biggest discount",u.sort)}${opt("fav","Favorites first",u.sort)}</select>
+        ${kind === "mixed" ? `<select id="f-type" aria-label="Category / dress length">${opt("","All categories",u.type)}${opt("midi","Midi dresses",u.type)}${opt("maxi","Maxi dresses",u.type)}${opt("bags","Bags",u.type)}</select>` : ""}
+        ${kind === "bags" ? `<select id="f-style" aria-label="Bag style">${opt("","All styles",u.style)}${styles.map(s => opt(s, s, u.style)).join("")}</select><select id="f-color" aria-label="Colour">${opt("","All colours",u.color)}${colors.map(s => opt(s, s, u.color)).join("")}</select>` : ""}
+        <select id="f-price" aria-label="Price range">${opt("","Any price",u.price)}${PRICE_BANDS.map(([v,l]) => opt(v,l,u.price)).join("")}</select>
+        <select id="f-disc" aria-label="Discount">${opt("","Any discount",u.disc)}${DISC_BANDS.map(([v,l]) => opt(v,l,u.disc)).join("")}</select>
+        <select id="f-avail" aria-label="Availability">${opt("all","In stock and sold out",u.avail)}${opt("in","In stock only",u.avail)}${opt("out","Sold out only",u.avail)}</select>
+      </div>
+      ${sizeChips}
     </div>
-    <p class="result-line">${all.length} of ${list.length} dresses</p>
-    ${all.length ? `<div class="grid">${shown.map(p => card(p)).join("")}</div>${all.length > shown.length ? `<button class="more" id="more">Show more (${all.length - shown.length})</button>` : ""}`
-      : `<div class="empty"><h3>No dresses match</h3><p>Try fewer sizes or clear the search.</p></div>`}`;
+    ${body}`;
 }
 
-function viewFav(list){
-  const favs = list.filter(p => S.fav[p.handle]).sort((a,b) => finalSAR(a) - finalSAR(b));
-  if (!favs.length) return `<div class="section-head"><h2>Favorites</h2></div><div class="empty"><h3>No favorites yet</h3><p>Tap the heart on any dress to keep it here and compare final prices.</p><a class="cta" href="#all">Browse the sale</a></div>`;
-  const mine = S.settings.sizes;
-  const total = favs.reduce((t,p) => t + finalSAR(p), 0);
-  return `<div class="section-head"><h2>Favorites</h2><p>${favs.length} saved · together ${fmt(total)} SAR</p></div>
-    <div class="table-wrap"><table class="compare"><thead><tr><th></th><th>Dress</th><th>Final price</th>${COSTS() ? "<th>Sale €</th>" : ""}<th>Off</th><th>${mine.length ? "My sizes" : "Sizes in stock"}</th></tr></thead><tbody>
+function viewHome(all){
+  const avail = all.filter(isAvail);
+  const byDisc = [...avail].sort((a,b) => offShown(b) - offShown(a));
+  const picks = byDisc.filter(p => p.image && isDress(p)).slice(0, 3);
+  const cover = c => { const p = [...avail].filter(x => catOf(x) === c && x.image).sort((a,b) => offShown(b) - offShown(a))[c === "bags" ? 0 : 3] || avail.find(x => catOf(x) === c); return p ? img(p.image, 800) : ""; };
+  return `<section class="home-pics triptych">${picks.map(p => `<a href="${plink(p)}" aria-label="${esc(p.title)}"><img src="${esc(img(p.image, 900))}" alt="${esc(p.title)}"></a>`).join("")}</section>
+    <section class="banners" aria-label="Shop by category">${Object.entries(CATS).map(([c, name]) => `<a class="banner" href="#${c}"><img loading="lazy" src="${esc(cover(c))}" alt=""><span class="cap"><b>${name}</b><span>${all.filter(p => catOf(p) === c).length} pieces on sale</span></span></a>`).join("")}</section>
+    <div class="section-head"><h2>Biggest discounts</h2><a href="#discounts">See all</a></div>
+    <div class="grid">${byDisc.slice(0, 8).map(p => card(p, true)).join("")}</div>
+    <a class="more" href="#all" style="text-align:center;text-decoration:none;width:max-content">Shop all ${all.length} pieces</a>`;
+}
+
+function viewFav(all){
+  const favs = all.filter(p => S.fav[p.handle]).sort((a,b) => finalSAR(a) - finalSAR(b));
+  if (!favs.length) return `<div class="list-head"><div><h2>My favorites</h2></div></div><div class="empty"><h3>No favorites yet</h3><p>Tap the heart on any piece to keep it here and compare final prices.</p><a class="cta" href="#all">Browse the sale</a></div>`;
+  const mine = S.settings.sizes, total = favs.reduce((t,p) => t + finalSAR(p), 0);
+  return `<div class="list-head"><div><h2>My favorites</h2><p>${favs.length} saved · together ${fmt(total)} SAR</p></div></div>
+    <div class="table-wrap"><table class="compare"><thead><tr><th></th><th>Piece</th><th>Final price</th>${COSTS() ? "<th>Sale €</th>" : ""}<th>Off</th><th>${mine.length ? "My sizes" : "In stock"}</th></tr></thead><tbody>
     ${favs.map((p,i) => { const inStock = (p.sizes||[]).filter(s => s.a).map(s => s.s);
-      const sz = mine.length ? mine.map(n => inStock.some(s => fitsUK(s, n)) ? "UK " + n : `<s style="color:#bdb6ae">UK ${n}</s>`).join(", ") : (inStock.length ? "UK " + inStock.map(ukLabel).join(", ") : "Sold out");
-      return `<tr class="${i === 0 ? "best" : ""}"><td><img src="${esc(img(p.image,120))}" alt=""></td><td><a href="#dress-${esc(p.handle)}">${esc(p.title)}</a></td><td class="num">${fmt(finalSAR(p))} SAR</td>${COSTS() ? `<td>${eur(p.price)}</td>` : ""}<td>${offShown(p)}%</td><td>${sz}</td></tr>`; }).join("")}
+      const sz = !isDress(p) ? (inStock.length ? "In stock" : "Sold out") : mine.length ? mine.map(n => inStock.some(s => fitsUK(s, n)) ? "UK " + n : `<s style="color:#bdb6ae">UK ${n}</s>`).join(", ") : (inStock.length ? "UK " + inStock.map(ukLabel).join(", ") : "Sold out");
+      return `<tr class="${i === 0 ? "best" : ""}"><td><img src="${esc(img(p.image,120))}" alt=""></td><td><a href="${plink(p)}">${esc(p.title)}</a><br><span class="tag">${CAT1[catOf(p)]}</span></td><td class="num">${fmt(finalSAR(p))} SAR</td>${COSTS() ? `<td>${eur(p.price)}</td>` : ""}<td>${offShown(p)}%</td><td>${sz}</td></tr>`; }).join("")}
     </tbody></table></div>
-    <div class="grid" style="margin-top:30px">${favs.map(p => card(p)).join("")}</div>`;
+    <div class="grid" style="margin-top:30px">${favs.map(p => card(p, true)).join("")}</div>`;
 }
 
-function viewRecent(list){
-  const r = recentList(list);
-  const head = `<div class="section-head"><h2>New in</h2><p>Dresses that joined the sale after tracking began on ${when(DATA.meta.initialImport)}, newest first.</p></div>`;
-  if (r.length) return head + `<div class="grid">${r.map(p => `${card(p)}`).join("")}</div>`;
-  const fresh = [...list].sort((a,b) => (b.publishedAt||"").localeCompare(a.publishedAt||"")).slice(0, 8);
-  return head + `<div class="empty" style="padding:40px 0"><h3>Nothing new since tracking began</h3><p>The store is checked every 30 minutes; newly discounted dresses will appear here. Meanwhile, these were published most recently by the store:</p></div><div class="grid">${fresh.map(p => card(p)).join("")}</div>`;
+function viewItem(all, handle){
+  const p = all.find(x => x.handle === handle);
+  if (!p) return `<div class="empty"><h3>This piece is no longer in the sale</h3><p>It may have sold out or gone back to full price.</p><a class="cta" href="#all">See all sale pieces</a></div>`;
+  const pics = (p.images && p.images.length ? p.images : [p.image]).filter(Boolean);
+  const fav = !!S.fav[p.handle], off = offShown(p), out = !isAvail(p), dims = dimsOf(p);
+  const avail = (p.sizes || []).filter(s => s.a).map(s => s.s);
+  const sib = all.filter(x => catOf(x) === catOf(p)), i = sib.indexOf(p), prev = sib[i - 1], next = sib[i + 1];
+  return `<nav class="crumbs"><a href="#${catOf(p)}" id="backLink">${CATS[catOf(p)]}</a></nav>
+  <section class="pdp">
+    <div class="gallery">
+      <div class="slides" id="slides" tabindex="0" aria-label="Photos of ${esc(p.title)}">${pics.map((src, n) => `<figure><img ${n > 1 ? 'loading="lazy"' : ""} src="${esc(img(src, 1200))}" alt="${esc(p.title)}, photo ${n + 1} of ${pics.length}"></figure>`).join("")}</div>
+      ${pics.length > 1 ? `<div class="gnav"><button id="gPrev" aria-label="Previous photo">‹</button><span id="gCount">1 / ${pics.length}</span><button id="gNext" aria-label="Next photo">›</button></div>
+      <div class="thumbs" id="thumbs">${pics.map((src, n) => `<button data-shot="${n}" aria-label="Photo ${n + 1}" ${n === 0 ? 'aria-current="true"' : ""}><img loading="lazy" src="${esc(img(src, 200))}" alt=""></button>`).join("")}</div>` : ""}
+    </div>
+    <div class="info">
+      <p class="cat-tag">${CAT1[catOf(p)]}</p>
+      <h1>${esc(p.title)}</h1>
+      <p class="sar big">${fmt(finalSAR(p))}<small>SAR</small></p>
+      ${off ? `<p class="eur"><s>${fmt(wasSAR(p))} SAR</s><span class="pct">−${off}%</span></p>` : ""}
+      ${COSTS() ? `<p class="calc">${eur(p.price)} (was ${eur(p.compare)}, −${pct(p)}%) × ${rate().toFixed(3)} + ${fmt(extra())} SAR</p>` : ""}
+      <div class="pdp-sizes">${isDress(p) ? `<p class="small">${out ? "Sold out in every size" : "Available UK sizes"}</p>${sizesHTML(p)}
+        ${!out && S.settings.sizes.length ? `<p class="small" style="margin-top:8px">${avail.some(s => anyFits(s, S.settings.sizes)) ? "In your size" : "Not available in your saved sizes"}</p>` : ""}`
+        : `<p class="small">${out ? "Sold out" : "In stock"}</p>${dims ? `<p class="dims">Dimensions: ${esc(dims)}</p>` : ""}`}
+        <button class="guide-btn" data-guide="${esc(p.handle)}">${isDress(p) ? "View size guide" : "View dimensions"}</button></div>
+      <button class="btn ${fav ? "" : "solid"} favbtn" data-fav="${esc(p.handle)}" aria-pressed="${fav}">${fav ? "Saved to favorites" : "Save to favorites"}</button>
+      ${p.details ? `<div class="details"><h2>Details</h2><p>${esc(p.details)}</p></div>` : ""}
+      <p class="small" style="margin-top:22px">${p.manual ? "Added by you." : "Price and stock checked " + ago(p.verifiedAt || DATA.meta.lastSuccess) + " (" + when(p.verifiedAt || DATA.meta.lastSuccess) + "). Availability can change quickly."}</p>
+      ${OWNER ? `<div class="acts"><button data-edit="${esc(p.handle)}">Edit</button>${COSTS() ? `<a href="${esc(url(p))}" target="_blank" rel="noopener">Store page</a>` : ""}</div>` : ""}
+      <div class="pn">${prev ? `<a href="${plink(prev)}">‹ Previous</a>` : "<span></span>"}${next ? `<a href="${plink(next)}">Next ›</a>` : ""}</div>
+    </div>
+  </section>`;
 }
 
-function viewAdmin(list){
-  const m = DATA.meta, sizes = new Set(S.settings.sizes);
-  const log = (m.log || []).slice(0, 12).map(l => `<div><span>${when(l.at)}</span><span>+${l.added} new · −${l.removed} left sale · ${l.changed} changed</span></div>`).join("");
-  const removed = (DATA.removed || []).slice(0, 40).map(r => `<div><a href="${esc(url(r))}" target="_blank" rel="noopener">${esc(r.title)}</a><span>${eur(r.price)} · left ${ago(r.removedAt)}</span></div>`).join("") || '<div><span>No dresses have left the sale yet.</span></div>';
-  const deleted = list.length; const hidden = Object.keys(S.del).length;
-  return `<div class="section-head"><h2>Admin & settings</h2><p>Changes save instantly on this device${GH.token && GH.sync ? " and are published to customers" : ". Customers only see your edits once sync is on (Sync & publish below)"}. <button class="btn quiet" id="aCosts" style="margin-left:8px;padding:6px 12px">${SHOWCOSTS ? "Hide my costs" : "Show my costs"}</button><button class="btn quiet" id="aLeave" style="margin-left:8px;padding:6px 12px">View as a customer</button></p></div>
+/* ---------- size guide drawer ---------- */
+let GUIDE_UNIT = "cm";
+function guideTable(t, unit, availSizes){
+  const conv = v => unit === "in" && /^-?\d+(\.\d+)?$/.test(v) ? (Number(v) / 2.54).toFixed(1).replace(/\.0$/, "") : v;
+  const isFR = t.system === "FR";
+  const head = t.sizes.map(s => `<th scope="col">${esc(s)}</th>`).join("");
+  const ukRow = isFR ? `<tr><td>UK</td>${t.sizes.map(s => `<td>${/^\d+$/.test(s) ? Number(s) - 28 : ""}</td>`).join("")}</tr>` : "";
+  return `<div class="sgt-wrap"><table class="sgt"><thead><tr><th scope="col">${isFR ? "FR" : t.system || "Size"}</th>${head}</tr></thead><tbody>${ukRow}${t.rows.map(r => `<tr><td>${esc(r[0])}</td>${r.slice(1).map(v => `<td>${esc(conv(v))}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+}
+function openGuide(handle, tab){
+  const p = products().find(x => x.handle === handle); if (!p) return;
+  const guide = p.guide || [], dress = isDress(p);
+  const garment = guide.filter(g => g.kind === "Garment measurements"), body = guide.filter(g => g.kind === "Body measurements"), dims = guide.filter(g => g.kind === "Dimensions");
+  const tabs = dress ? [["garment","Garment measurement"],["body","Body measurement"],["convert","Size conversion"]] : [["dims","Dimensions"]];
+  tab = tab || tabs[0][0];
+  const lines = (p.details || "").split("\n").map(l => l.trim()).filter(l => l && l.length < 170);
+  const fit = dress ? lines.filter(l => /\b(true to size|size up|size down|runs (small|large)|stretch|model|fit|fitted|fitting|lining|lined|zip|regular|relaxed|length)\b/i.test(l)).slice(0, 8)
+                    : lines.filter(l => !/^(details|fit|composition|care)/i.test(l)).slice(1, 9);
+  let content = "";
+  if (tab === "garment") content = garment.length ? garment.map(t => guideTable(t, GUIDE_UNIT)).join("") + '<p class="small" style="margin-top:8px">Measurements of the garment itself, by UK size.</p>'
+    : `<p class="small" style="margin-top:14px">${guide.length || !p.guideAt ? "This dress's own garment measurements haven't been collected yet — they're read from Self-Portrait automatically and appear here shortly." : "Self-Portrait doesn't list garment measurements for this dress."}</p>`;
+  if (tab === "body") content = (body.length ? body : [BODY_STD]).map(t => guideTable(t, GUIDE_UNIT)).join("") + `<p class="small" style="margin-top:8px">Body measurements by French size, with the UK equivalent.${body.length ? "" : " (Self-Portrait's standard body chart — this dress's page will be checked shortly.)"}</p>`;
+  if (tab === "convert") content = `<div class="sgt-wrap"><table class="sgt"><tbody>${CONVERSION.map(([sys, vals]) => `<tr><td>${sys}</td>${vals.map(v => `<td>${esc(v)}</td>`).join("")}</tr>`).join("")}</tbody></table></div><p class="small" style="margin-top:8px">“>S” means between S and M, and so on, as on Self-Portrait's chart.</p>`;
+  if (tab === "dims") content = dims.length ? dims.map(t => guideTable(t, GUIDE_UNIT)).join("") : `<p class="small" style="margin-top:14px">${p.guideAt ? "Self-Portrait doesn't list dimensions for this bag." : "This bag's dimensions haven't been collected yet — they appear here shortly."}</p>`;
+  const showUnits = tab !== "convert" && (tab !== "garment" || garment.length) && (tab !== "dims" || dims.length);
+  $("#guideBody").innerHTML = `<div class="sg-top"><h3>${dress ? "Size guide" : "Dimensions"}</h3><button id="sgClose">Close</button></div>
+    <h4>${esc(p.title)}</h4><p class="who">${CAT1[catOf(p)]}${isDress(p) && (p.sizes || []).length ? " · in stock: UK " + ((p.sizes || []).filter(s => s.a).map(s => ukLabel(s.s)).join(", ") || "none") : ""}</p>
+    ${tabs.length > 1 ? `<div class="sg-tabs" role="tablist">${tabs.map(([k, l]) => `<button role="tab" data-sgtab="${k}" aria-selected="${k === tab}">${l}</button>`).join("")}</div>` : ""}
+    ${showUnits ? `<div class="units"><button data-unit="in" aria-pressed="${GUIDE_UNIT === "in"}">Inches</button><button data-unit="cm" aria-pressed="${GUIDE_UNIT === "cm"}">Centimetres</button></div>` : ""}
+    ${content}
+    ${fit.length ? `<h4 style="font-size:17px">${dress ? "Fit notes" : "Product details"}</h4><ul class="fit">${fit.map(l => `<li>${esc(l)}</li>`).join("")}</ul>` : ""}
+    <p class="src">Source: Self-Portrait's official size guide on this product's page (eu.self-portrait.com) and their size conversion chart.${p.guideAt ? " Read " + ago(p.guideAt) + "." : ""}</p>`;
+  $("#sgClose").onclick = () => $("#guide").close();
+  $("#guideBody").querySelectorAll("[data-sgtab]").forEach(b => b.onclick = () => openGuide(handle, b.dataset.sgtab));
+  $("#guideBody").querySelectorAll("[data-unit]").forEach(b => b.onclick = () => { GUIDE_UNIT = b.dataset.unit; openGuide(handle, tab); });
+  if (!$("#guide").open) $("#guide").showModal();
+}
+$("#guide").addEventListener("click", e => { if (e.target === $("#guide")) $("#guide").close(); });
 
-  <section class="panel"><div><h3>Pricing</h3><p class="why">Final price = discounted € × rate + fixed amount, rounded to the nearest riyal.</p></div>
+/* ---------- admin ---------- */
+function viewAdmin(all){
+  const m = DATA.meta, sizes = new Set(S.settings.sizes), cnt = m.counts || {}, sc = m.storeCounts || {};
+  const log = (m.log || []).slice(0, 14).map(l => `<div><span>${when(l.at)}</span><span>+${l.added} new · −${l.removed} left · ${l.changed} changed${l.guides != null ? " · " + l.guides + " guides" : ""}</span></div>`).join("");
+  const removed = (DATA.removed || []).slice(0, 60).map(r => `<div><a href="${esc(url(r))}" target="_blank" rel="noopener">${esc(r.title)}</a><span>${CAT1[r.cat || "midi"]} · ${eur(r.price)} · left ${ago(r.removedAt)}</span></div>`).join("") || '<div><span>Nothing has left the sale yet.</span></div>';
+  const hidden = Object.keys(S.del).length;
+  const withGuide = all.filter(p => p.guide && p.guide.length).length;
+  return `<div class="list-head"><div><h2>Admin & settings</h2><p>Changes save instantly on this device${GH.token && GH.sync ? " and are published to customers" : ". Customers see your edits once sync is on (Sync & publish below)"}.</p></div>
+    <div class="owner-tools"><button class="btn quiet" id="aCosts">${SHOWCOSTS ? "Hide my costs" : "Show my costs"}</button><button class="btn quiet" id="aLeave">View as a customer</button></div></div>
+
+  <section class="panel"><div><h3>Updates</h3><p class="why">GitHub checks the Spain store every 15 minutes: new sale items, prices, discounts, sizes, stock, photos and the exchange rate.</p></div>
     <div class="fields">
-      <label class="f">Fixed amount added to every dress (SAR)<input id="sExtra" type="number" inputmode="decimal" step="1" value="${extra()}"></label>
-      <label class="f">EUR → SAR rate<input id="sRate" type="number" inputmode="decimal" step="0.0001" placeholder="Live: ${Number(m.rate && m.rate.value || 0).toFixed(4)}" value="${S.settings.rate || ""}"></label>
-      <p class="small">Live rate ${Number(m.rate && m.rate.value || 0).toFixed(4)} from ${esc(m.rate && m.rate.source || "—")}${m.rate && m.rate.asOf ? ", " + esc(m.rate.asOf) : ""}. Leave the field empty to use the live rate.</p>
-      <p class="small">Example: €200 × ${rate().toFixed(3)} = ${fmt(Math.round(200 * rate()))} SAR, + ${fmt(extra())} = <b>${fmt(Math.round(200 * rate() + extra()))} SAR</b>.</p>
-    </div></section>
-
-  <section class="panel"><div><h3>My sizes</h3><p class="why">Your sizes are highlighted on every card and power the “In my sizes” filter.</p></div>
-    <div class="fields"><div class="size-edit" id="mySizes">${UKS.map(n => `<button data-my="${n}" class="${sizes.has(n) ? "" : "off"}" aria-pressed="${sizes.has(n)}">UK ${n}</button>`).join("")}</div>
-    <p class="small">Sizes follow Self-Portrait's conversion chart: FR 32–44 = UK 4–16; knits XS = UK 4, S = UK 6–8, M = UK 10–12, L = UK 14–16.</p></div></section>
-
-  <section class="panel"><div><h3>Refresh & updates</h3><p class="why">A GitHub Action reads the Spain store every 30 minutes and publishes new data. This page reloads that data automatically.</p></div>
-    <div class="fields">
-      <div class="row"><button class="btn solid" id="aRefresh">Reload data now</button><button class="btn" id="aRun">Run a store check now</button></div>
-      <p class="small">Last store check ${when(m.lastCheck)} · last successful ${when(m.lastSuccess)} · ${m.count || 0} sale midi dresses found.${m.lastError ? `<br><span style="color:var(--sale)">${esc(m.lastError)}</span>` : ""}</p>
-      <label class="f">Reload this page's data every<select id="sPoll">${[5,10,15,30,60].map(n => `<option value="${n}" ${Number(S.settings.poll) === n ? "selected" : ""}>${n} minutes</option>`).join("")}</select></label>
-      <p class="small">Store checks run every 30 minutes on GitHub's schedule (GitHub can delay scheduled runs by a few minutes at busy times).</p>
+      <div class="row"><button class="btn solid" id="aRefreshAll">Refresh all products</button><button class="btn" id="aNewDeals">Check for new deals</button></div>
+      <p class="small">Last store check ${when(m.lastCheck)} · last successful ${when(m.lastSuccess)} (Riyadh).<br>Tracked now: ${cnt.midi || 0} midi · ${cnt.maxi || 0} maxi · ${cnt.bags || 0} bags. Store sale lists: ${sc.midi ?? "—"} · ${sc.maxi ?? "—"} · ${sc.bags ?? "—"}. Size guides collected: ${withGuide} of ${all.length}.${m.lastError ? `<br><span style="color:var(--sale)">${esc(m.lastError)}</span>` : ""}</p>
+      <label class="f">Reload this page's data every<select id="sPoll">${[2,5,10,15,30].map(n => `<option value="${n}" ${Number(S.settings.poll) === n ? "selected" : ""}>${n} minutes</option>`).join("")}</select></label>
       <div class="mono-list">${log || "<div>No runs logged yet.</div>"}</div>
     </div></section>
 
-  <section class="panel"><div><h3>Products</h3><p class="why">Edit names, photos, prices, sizes and notes, or add a dress by hand. ${hidden ? hidden + " deleted." : ""}</p></div>
+  <section class="panel"><div><h3>Pricing</h3><p class="why">Final price = discounted € × EUR/SAR rate + fixed amount, for every product, rounded to the nearest riyal.</p></div>
+    <div class="fields">
+      <label class="f">Fixed amount added to every product (SAR)<input id="sExtra" type="number" inputmode="decimal" step="1" value="${extra()}"></label>
+      <label class="f">EUR → SAR rate<input id="sRate" type="number" inputmode="decimal" step="0.0001" placeholder="Live: ${Number(m.rate && m.rate.value || 0).toFixed(4)}" value="${S.settings.rate || ""}"></label>
+      <p class="small">Live rate ${Number(m.rate && m.rate.value || 0).toFixed(4)} from ${esc(m.rate && m.rate.source || "—")}${m.rate && m.rate.asOf ? ", " + esc(m.rate.asOf) : ""}. Leave empty to use the live rate.</p>
+      <p class="small">Example: €200 × ${rate().toFixed(3)} = ${fmt(Math.round(200 * rate()))} SAR, + ${fmt(extra())} = <b>${fmt(Math.round(200 * rate() + extra()))} SAR</b>.</p>
+    </div></section>
+
+  <section class="panel"><div><h3>My sizes</h3><p class="why">Highlighted on cards and used by the “My sizes” filter.</p></div>
+    <div class="fields"><div class="size-edit" id="mySizes">${UKS.map(n => `<button data-my="${n}" class="${sizes.has(n) ? "" : "off"}" aria-pressed="${sizes.has(n)}">UK ${n}</button>`).join("")}</div>
+    <p class="small">Self-Portrait's chart: FR 32–44 = UK 4–16; knits XS = UK 4, S = UK 6–8, M = UK 10–12, L = UK 14–16.</p></div></section>
+
+  <section class="panel"><div><h3>Products</h3><p class="why">Edit names, photos, prices, sizes and notes, or add a piece by hand.${hidden ? " " + hidden + " deleted." : ""}</p></div>
     <div class="fields" style="max-width:none">
-      <div class="row"><button class="btn solid" id="aAdd">Add a dress</button><label class="search" style="flex:1"><input id="aQ" type="search" placeholder="Find a dress to edit"></label></div>
+      <div class="row"><button class="btn solid" id="aAdd">Add a product</button><label class="search" style="flex:1"><input id="aQ" type="search" placeholder="Find a product to edit"></label></div>
       <div class="edit-list" id="editList"></div>
       ${hidden ? `<div class="row"><button class="btn quiet" id="aRestore">Restore ${hidden} deleted</button></div>` : ""}
     </div></section>
 
-  <section class="panel"><div><h3>Left the sale</h3><p class="why">Dresses that were removed from the sale or went back to full price.</p></div>
+  <section class="panel"><div><h3>Left the sale</h3><p class="why">Pieces removed from the sale or back to full price.</p></div>
     <div class="fields" style="max-width:none"><div class="mono-list">${removed}</div></div></section>
 
-  <section class="panel"><div><h3>Sync & publish</h3><p class="why">Your edits live in this browser. Turn on sync to publish price, photo, size, add and delete edits to the customer site and share them across your devices.</p></div>
+  <section class="panel"><div><h3>Sync & publish</h3><p class="why">Publishes your price, photo, size, add and delete edits to customers and shares them across your devices. Also lets the two update buttons start a live store check.</p></div>
     <div class="fields">
       <label class="f">GitHub fine-grained token (Contents: read & write, Actions: read & write for ${REPO})<input id="ghTok" type="password" autocomplete="off" value="${esc(GH.token)}" placeholder="github_pat_…"></label>
       <label class="row small"><input type="checkbox" id="ghSync" ${GH.sync ? "checked" : ""}> Sync my edits through the repo</label>
@@ -567,71 +732,70 @@ function viewAdmin(list){
       <div class="row"><button class="btn" id="ghSave">Save sync settings</button><button class="btn quiet" id="bCopy">Copy backup</button><button class="btn quiet" id="bImport">Import backup</button></div>
     </div></section>`;
 }
-
-function editList(list){
+function editList(all){
   const q = ($("#aQ") && $("#aQ").value || "").toLowerCase();
-  $("#editList").innerHTML = list.filter(p => !q || p.title.toLowerCase().includes(q)).slice(0, 120).map(p =>
-    `<button data-edit="${esc(p.handle)}"><img loading="lazy" src="${esc(img(p.image,100))}" alt=""><span>${esc(p.title)}<br><span class="tag">${eur(p.price)} · ${fmt(finalSAR(p))} SAR${p.edited ? " · edited" : ""}${p.manual ? " · added by you" : ""}${S.fav[p.handle] ? " · ♥" : ""}</span></span><span class="tag">Edit</span></button>`).join("");
+  $("#editList").innerHTML = all.filter(p => !q || p.title.toLowerCase().includes(q)).slice(0, 150).map(p =>
+    `<button data-edit="${esc(p.handle)}"><img loading="lazy" src="${esc(img(p.image,100))}" alt=""><span>${esc(p.title)}<br><span class="tag">${CAT1[catOf(p)]} · ${eur(p.price)} · ${fmt(finalSAR(p))} SAR${p.edited ? " · edited" : ""}${p.manual ? " · added by you" : ""}${S.fav[p.handle] ? " · ♥" : ""}</span></span><span class="tag">Edit</span></button>`).join("");
 }
 
-/* ---------- edit dialog ---------- */
+/* ---------- editor ---------- */
+const FR = ["FR 32","FR 34","FR 36","FR 38","FR 40","FR 42","FR 44"], KNIT = ["XS","S","M","L","XL"];
 function openEditor(handle){
   const list = products();
   let p = handle ? list.find(x => x.handle === handle) : null;
   const isNewItem = !p;
-  if (!p) p = { handle:"manual-" + Date.now(), title:"", image:"", price:0, compare:0, sizes: FR.slice(0,7).map(s => ({ s, a:true })), url:"", manual:true, firstSeen:new Date().toISOString(), lastChanged:new Date().toISOString(), changes:[] };
+  if (!p) p = { handle:"manual-" + Date.now(), cat:"midi", title:"", image:"", images:[], price:0, compare:0, sizes: FR.map(s => ({ s, a:true })), url:"", manual:true, firstSeen:new Date().toISOString(), lastChanged:new Date().toISOString(), changes:[] };
   let sizes = (p.sizes || []).map(s => Object.assign({}, s));
-  const body = $("#dlgBody");
-  body.innerHTML = `<h3>${isNewItem ? "Add a dress" : "Edit dress"}</h3>
+  $("#dlgBody").innerHTML = `<h3>${isNewItem ? "Add a product" : "Edit product"}</h3>
     <div class="fields">
+      ${p.manual ? `<label class="f">Category<select id="eCat">${Object.entries(CAT1).map(([k,v]) => opt(k, v, p.cat || "midi")).join("")}</select></label>` : ""}
       <label class="f">Name<input id="eT" value="${esc(p.title)}"></label>
       <label class="f">Image URL<input id="eI" value="${esc(p.image)}" placeholder="https://…jpg"></label>
       ${p.manual ? `<label class="f">Product page link<input id="eU" value="${esc(p.url || "")}" placeholder="https://eu.self-portrait.com/es-es/products/…"></label>` : ""}
       <div class="row"><label class="f" style="flex:1">Original price (€)<input id="eC" type="number" step="0.01" inputmode="decimal" value="${p.compare || ""}"></label>
       <label class="f" style="flex:1">Discounted price (€)<input id="eP" type="number" step="0.01" inputmode="decimal" value="${p.price || ""}"></label></div>
-      <div><p class="small" style="margin-bottom:6px">Sizes — tap to mark available or sold out</p><div class="size-edit" id="eS"></div>
-        <div class="row" style="margin-top:8px"><button class="btn quiet" id="eSys">${sizes[0] && sizes[0].s.startsWith("FR") ? "Use XS–XL sizes" : "Use FR sizes"}</button></div></div>
-      <label class="f">Personal note<textarea id="eN" placeholder="Fit, colour, occasion…">${esc(S.notes[p.handle] || "")}</textarea></label>
+      <div><p class="small" style="margin-bottom:6px">Sizes — tap to mark in stock or sold out</p><div class="size-edit" id="eS"></div>
+        <div class="row" style="margin-top:8px"><button class="btn quiet" id="eSys">Switch size set</button></div></div>
+      <label class="f">Personal note (only you see this)<textarea id="eN" placeholder="Fit, colour, occasion…">${esc(S.notes[p.handle] || "")}</textarea></label>
       <label class="row small"><input type="checkbox" id="eF" ${S.fav[p.handle] ? "checked" : ""}> Favorite</label>
       <p class="small" id="eErr" style="color:var(--sale)"></p>
     </div>
     <div class="foot">
       <div class="row">${!isNewItem ? `<button class="btn danger" id="eDel">Delete</button>` : ""}${S.ov[p.handle] && !p.manual ? `<button class="btn quiet" id="eReset">Reset to store data</button>` : ""}</div>
-      <div class="row"><button class="btn quiet" id="eCancel">Cancel</button><button class="btn solid" id="eSave">${isNewItem ? "Add dress" : "Save changes"}</button></div>
+      <div class="row"><button class="btn quiet" id="eCancel">Cancel</button><button class="btn solid" id="eSave">${isNewItem ? "Add product" : "Save changes"}</button></div>
     </div>`;
-  const drawSizes = () => { $("#eS").innerHTML = sizes.map((s,i) => `<button data-i="${i}" class="${s.a ? "" : "off"}" aria-pressed="${s.a}" title="${esc(s.s)}">UK ${esc(ukLabel(s.s))}</button>`).join(""); };
+  const drawSizes = () => { $("#eS").innerHTML = sizes.map((s,i) => `<button data-i="${i}" class="${s.a ? "" : "off"}" aria-pressed="${s.a}" title="${esc(s.s)}">${ukRange(s.s) ? "UK " + esc(ukLabel(s.s)) : esc(s.s)}</button>`).join(""); };
   drawSizes();
   $("#eS").onclick = e => { const b = e.target.closest("button"); if (!b) return; const s = sizes[b.dataset.i]; s.a = !s.a; drawSizes(); };
-  $("#eSys").onclick = () => { const fr = sizes[0] && sizes[0].s.startsWith("FR"); sizes = (fr ? KNIT : FR).map(s => ({ s, a:true })); $("#eSys").textContent = fr ? "Use FR sizes" : "Use XS–XL sizes"; drawSizes(); };
+  $("#eSys").onclick = () => { const cur = sizes[0] && sizes[0].s; sizes = (cur && cur.startsWith("FR") ? KNIT : cur && KNIT.includes(cur) ? ["One Size"] : FR).map(s => ({ s, a:true })); drawSizes(); };
   $("#eCancel").onclick = () => $("#dlg").close();
   $("#eSave").onclick = () => {
     const t = $("#eT").value.trim(), price = Number($("#eP").value), compare = Number($("#eC").value);
-    if (!t) return $("#eErr").textContent = "Add a name for the dress.";
+    if (!t) return $("#eErr").textContent = "Add a name.";
     if (!(price > 0)) return $("#eErr").textContent = "Enter the discounted price in euros.";
     if (compare && compare < price) return $("#eErr").textContent = "The original price should be higher than the discounted price.";
     const fields = { title:t, image:$("#eI").value.trim(), price, compare: compare || price, sizes };
     if (p.manual){
-      const rec = Object.assign({}, p, fields, { url: ($("#eU") && $("#eU").value.trim()) || "", lastChanged:new Date().toISOString() });
+      const rec = Object.assign({}, p, fields, { cat: $("#eCat") ? $("#eCat").value : p.cat, url: ($("#eU") && $("#eU").value.trim()) || "", lastChanged:new Date().toISOString() });
+      if (rec.image && !(rec.images || []).length) rec.images = [rec.image];
       delete rec.edited; delete rec.manual;
       const i = S.manual.findIndex(x => x.handle === p.handle); if (i >= 0) S.manual[i] = rec; else S.manual.push(rec);
     } else {
       const base = DATA.products.find(x => x.handle === p.handle) || {};
       const ov = {}; for (const k of Object.keys(fields)) if (JSON.stringify(fields[k]) !== JSON.stringify(base[k])) ov[k] = fields[k];
+      if (ov.image) ov.images = [ov.image, ...(base.images || []).filter(x => x !== ov.image)];
       if (Object.keys(ov).length) S.ov[p.handle] = ov; else delete S.ov[p.handle];
     }
     const n = $("#eN").value.trim(); if (n) S.notes[p.handle] = n; else delete S.notes[p.handle];
     if ($("#eF").checked) S.fav[p.handle] = Date.now(); else delete S.fav[p.handle];
-    save(); $("#dlg").close(); toast(isNewItem ? "Dress added." : "Changes saved."); render();
+    save(); $("#dlg").close(); toast(isNewItem ? "Product added." : "Changes saved."); render();
   };
-  if ($("#eDel")) $("#eDel").onclick = () => {
-    const b = $("#eDel");
-    if (b.dataset.sure){ S.del[p.handle] = Date.now(); delete S.fav[p.handle]; save(); $("#dlg").close(); toast("Dress deleted. Restore it from Admin › Products."); render(); }
-    else { b.dataset.sure = 1; b.textContent = "Tap again to delete"; }
-  };
+  if ($("#eDel")) $("#eDel").onclick = () => { const b = $("#eDel");
+    if (b.dataset.sure){ S.del[p.handle] = Date.now(); delete S.fav[p.handle]; save(); $("#dlg").close(); toast("Deleted. Restore it from Admin › Products."); render(); }
+    else { b.dataset.sure = 1; b.textContent = "Tap again to delete"; } };
   if ($("#eReset")) $("#eReset").onclick = () => { delete S.ov[p.handle]; save(); $("#dlg").close(); toast("Back to the store's data."); render(); };
   $("#dlg").showModal();
 }
-
 function textDialog(title, value, onOk, okLabel){
   $("#dlgBody").innerHTML = `<h3>${title}</h3><label class="f"><textarea id="tA" style="min-height:220px;font-size:12px">${esc(value)}</textarea></label><p class="small" id="tErr" style="color:var(--sale)"></p>
     <div class="foot"><span></span><div class="row"><button class="btn quiet" id="tC">Close</button>${onOk ? `<button class="btn solid" id="tO">${okLabel}</button>` : ""}</div></div>`;
@@ -640,44 +804,13 @@ function textDialog(title, value, onOk, okLabel){
   $("#dlg").showModal();
 }
 
-/* ---------- dress page ---------- */
-function viewDress(list, handle){
-  const p = list.find(x => x.handle === handle);
-  if (!p) return `<div class="empty"><h3>This dress is no longer in the sale</h3><p>It may have sold out or gone back to full price.</p><a class="cta" href="#all">See all sale dresses</a></div>`;
-  const pics = (p.images && p.images.length ? p.images : [p.image]).filter(Boolean);
-  const fav = !!S.fav[p.handle], off = offShown(p), out = !isAvail(p);
-  const avail = (p.sizes || []).filter(s => s.a).map(s => s.s);
-  const i = list.indexOf(p), prev = list[i - 1], next = list[i + 1];
-  return `<nav class="crumbs"><a href="#all" id="backLink">All sale dresses</a></nav>
-  <section class="pdp">
-    <div class="gallery">
-      <div class="slides" id="slides" tabindex="0" aria-label="Photos of ${esc(p.title)}">${pics.map((src, n) => `<figure><img ${n > 1 ? 'loading="lazy"' : ""} src="${esc(img(src, 1200))}" alt="${esc(p.title)}, photo ${n + 1} of ${pics.length}"></figure>`).join("")}</div>
-      ${pics.length > 1 ? `<div class="gnav"><button id="gPrev" aria-label="Previous photo">‹</button><span id="gCount">1 / ${pics.length}</span><button id="gNext" aria-label="Next photo">›</button></div>
-      <div class="thumbs" id="thumbs">${pics.map((src, n) => `<button data-shot="${n}" aria-label="Photo ${n + 1}" ${n === 0 ? 'aria-current="true"' : ""}><img loading="lazy" src="${esc(img(src, 200))}" alt=""></button>`).join("")}</div>` : ""}
-    </div>
-    <div class="info">
-      <h1>${esc(p.title)}</h1>
-      <p class="sar big">${fmt(finalSAR(p))}<small>SAR</small></p>
-      ${off ? `<p class="eur"><s>${fmt(wasSAR(p))} SAR</s><span class="pct">−${off}%</span></p>` : ""}
-      ${COSTS() ? `<p class="calc">${eur(p.price)} (was ${eur(p.compare)}) × ${rate().toFixed(3)} + ${fmt(extra())} SAR</p>` : ""}
-      <div class="pdp-sizes"><p class="small">${out ? "Sold out in every size" : "Available sizes"}</p>${sizesHTML(p)}
-        ${!out && S.settings.sizes.length ? `<p class="small" style="margin-top:8px">${avail.some(s => anyFits(s, S.settings.sizes)) ? "In your size" : "Not available in your saved sizes"}</p>` : ""}</div>
-      <button class="btn ${fav ? "" : "solid"} favbtn" data-fav="${esc(p.handle)}" aria-pressed="${fav}">${fav ? "Saved to favorites" : "Save to favorites"}</button>
-      ${p.details ? `<div class="details"><h2>Details</h2><p>${esc(p.details)}</p></div>` : ""}
-      <p class="small" style="margin-top:22px">Sizes and prices updated ${ago(DATA.meta.lastSuccess)}. Availability can change quickly.</p>
-      ${OWNER ? `<div class="acts"><button data-edit="${esc(p.handle)}">Edit</button>${COSTS() ? `<a href="${esc(url(p))}" target="_blank" rel="noopener">Store page</a>` : ""}</div>` : ""}
-      <div class="pn">${prev ? `<a href="#dress-${esc(prev.handle)}">‹ Previous dress</a>` : "<span></span>"}${next ? `<a href="#dress-${esc(next.handle)}">Next dress ›</a>` : ""}</div>
-    </div>
-  </section>`;
-}
-
-function wireDress(){
+/* ---------- gallery ---------- */
+function wireItem(){
   const sl = $("#slides"); if (!sl) return;
   const n = sl.children.length;
   const at = () => Math.round(sl.scrollLeft / sl.clientWidth);
   const go = k => sl.scrollTo({ left: Math.max(0, Math.min(n - 1, k)) * sl.clientWidth, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
-  const mark = () => { const k = at(); if ($("#gCount")) $("#gCount").textContent = (k + 1) + " / " + n;
-    document.querySelectorAll("#thumbs button").forEach((b, j) => b.toggleAttribute("aria-current", j === k)); };
+  const mark = () => { const k = at(); if ($("#gCount")) $("#gCount").textContent = (k + 1) + " / " + n; document.querySelectorAll("#thumbs button").forEach((b, j) => b.toggleAttribute("aria-current", j === k)); };
   sl.addEventListener("scroll", () => { clearTimeout(sl._t); sl._t = setTimeout(mark, 60); }, { passive:true });
   if ($("#gPrev")){ $("#gPrev").onclick = () => go(at() - 1); $("#gNext").onclick = () => go(at() + 1); }
   if ($("#thumbs")) $("#thumbs").onclick = e => { const b = e.target.closest("[data-shot]"); if (b) go(Number(b.dataset.shot)); };
@@ -687,51 +820,51 @@ function wireDress(){
 }
 
 /* ---------- router ---------- */
+const LISTS = ["all","midi","maxi","bags","recent","discounts"];
+function routeOf(){ let r = (location.hash || "#home").slice(1); if (r.startsWith("dress-")) r = "item-" + r.slice(6); return r; }
 function render(){
-  const route = (location.hash || "#home").slice(1);
-  const navRoute = route;
+  const route = routeOf();
+  document.querySelectorAll("nav.tabs a").forEach(a => { if (a.getAttribute("href") === "#" + route) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
   $("#top").classList.toggle("home", route === "home");
-  document.querySelectorAll("nav.tabs a").forEach(a => { if (a.getAttribute("href") === "#" + navRoute) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
+  $("#navAdmin").classList.toggle("hidden", !OWNER);
   statusBar();
   const list = products(); counts(list);
   const v = $("#view");
   if (!loaded){ v.innerHTML = '<div class="empty"><h3>Loading the collection</h3><p>One moment.</p></div>'; return; }
-  const isAdmin = route === "admin";
-  $("#navAdmin").classList.toggle("hidden", !OWNER);
-  if (isAdmin && !OWNER){ $("#gate").classList.remove("hidden"); setTimeout(() => $("#pass").focus(), 50); v.innerHTML = ""; return; }
+  if (route === "admin" && !OWNER){ $("#gate").classList.remove("hidden"); setTimeout(() => $("#pass").focus(), 50); v.innerHTML = ""; return; }
   $("#gate").classList.add("hidden");
-  if (route.startsWith("dress-") && $("#slides")) window._galleryAt = Math.round($("#slides").scrollLeft / $("#slides").clientWidth);
-  v.innerHTML = route.startsWith("dress-") ? viewDress(list, route.slice(6)) : route === "all" ? viewAll(list) : route === "favorites" ? viewFav(list) : route === "recent" ? viewRecent(list) : isAdmin ? viewAdmin(list) : viewHome(list);
+  if (route.startsWith("item-") && $("#slides")) window._galleryAt = Math.round($("#slides").scrollLeft / $("#slides").clientWidth);
+  v.innerHTML = route.startsWith("item-") ? viewItem(list, route.slice(5)) : LISTS.includes(route) ? viewList(route, list)
+    : route === "favorites" ? viewFav(list) : route === "admin" ? viewAdmin(list) : viewHome(list);
   document.documentElement.style.setProperty("--hh", $("#top").offsetHeight + "px");
-  if (route === "all") wireAll();
-  if (route.startsWith("dress-")) wireDress();
-  if (isAdmin) wireAdmin(list);
+  if (LISTS.includes(route)) wireList(route);
+  if (route.startsWith("item-")) wireItem();
+  if (route === "admin") wireAdmin(list);
 }
-
-function wireAll(){
-  $("#sort").value = UI.sort; $("#avail").value = UI.avail;
-  const q = $("#q"); q.oninput = () => { UI.q = q.value; UI.limit = 48; const pos = q.selectionStart; render(); const n = $("#q"); n.focus(); n.setSelectionRange(pos, pos); };
-  $("#sort").onchange = e => { UI.sort = e.target.value; render(); };
-  $("#avail").onchange = e => { UI.avail = e.target.value; render(); };
-  if ($("#mine")) $("#mine").onclick = () => { UI.mineOnly = !UI.mineOnly; render(); };
-  document.querySelectorAll("[data-size]").forEach(b => b.onclick = () => { const s = Number(b.dataset.size); UI.sizes = UI.sizes.includes(s) ? UI.sizes.filter(x => x !== s) : [...UI.sizes, s]; render(); });
-  if ($("#clearSizes")) $("#clearSizes").onclick = () => { UI.sizes = []; render(); };
-  if ($("#more")) $("#more").onclick = () => { UI.limit += 48; const y = scrollY; render(); scrollTo(0, y); };
+function wireList(route){
+  const u = ui(route);
+  const q = $("#q"); q.oninput = () => { u.q = q.value; u.limit = 48; const pos = q.selectionStart; render(); const n = $("#q"); n.focus(); n.setSelectionRange(pos, pos); };
+  const bind = (id, key) => { const el = $("#" + id); if (el) el.onchange = () => { u[key] = el.value; u.limit = 48; render(); }; };
+  bind("f-sort","sort"); bind("f-type","type"); bind("f-style","style"); bind("f-color","color"); bind("f-price","price"); bind("f-disc","disc"); bind("f-avail","avail");
+  if ($("#mine")) $("#mine").onclick = () => { u.mine = !u.mine; render(); };
+  document.querySelectorAll("[data-size]").forEach(b => b.onclick = () => { const s = Number(b.dataset.size); u.sizes = u.sizes.includes(s) ? u.sizes.filter(x => x !== s) : [...u.sizes, s]; u.limit = 48; render(); });
+  if ($("#clearSizes")) $("#clearSizes").onclick = () => { u.sizes = []; render(); };
+  if ($("#resetF")) $("#resetF").onclick = () => { delete UI[route]; render(); };
+  if ($("#more")) $("#more").onclick = () => { u.limit += 48; const y = scrollY; render(); scrollTo(0, y); };
 }
-
 function wireAdmin(list){
   editList(list); $("#aQ").oninput = () => editList(products());
-  $("#sExtra").onchange = e => { const v = Number(e.target.value); if (!Number.isFinite(v) || v < 0) return toast("Enter a number of riyals, 0 or more."); S.settings.extra = v; save(); render(); toast("Every dress now adds " + fmt(v) + " SAR."); };
+  $("#aCosts").onclick = () => { SHOWCOSTS = !SHOWCOSTS; render(); toast(SHOWCOSTS ? "Showing your € costs on every page. Only you can see this." : "Costs hidden."); };
+  $("#aLeave").onclick = () => { store.set("sp-unlock", ""); OWNER = false; SHOWCOSTS = false; location.hash = "#home"; render(); loadData(false); toast("Customer view. Open #admin to sign back in."); };
+  $("#aRefreshAll").onclick = () => runCheck("all");
+  $("#aNewDeals").onclick = () => runCheck("new");
+  $("#sExtra").onchange = e => { const v = Number(e.target.value); if (!Number.isFinite(v) || v < 0) return toast("Enter a number of riyals, 0 or more."); S.settings.extra = v; save(); render(); toast("Every product now adds " + fmt(v) + " SAR."); };
   $("#sRate").onchange = e => { const v = Number(e.target.value); S.settings.rate = v > 0 ? v : null; save(); render(); toast(v > 0 ? "Using your rate " + v + "." : "Using the live rate."); };
   $("#sPoll").onchange = e => { S.settings.poll = Number(e.target.value); save(); schedulePoll(); toast("Reloading every " + e.target.value + " minutes."); };
   $("#mySizes").onclick = e => { const b = e.target.closest("[data-my]"); if (!b) return; const s = Number(b.dataset.my), set = new Set(S.settings.sizes); set.has(s) ? set.delete(s) : set.add(s); S.settings.sizes = UKS.filter(x => set.has(x)); save(); render(); };
-  $("#aRefresh").onclick = () => loadData(true);
-  $("#aCosts").onclick = () => { SHOWCOSTS = !SHOWCOSTS; render(); toast(SHOWCOSTS ? "Showing your € costs on every page. Only you can see this." : "Costs hidden."); };
-  $("#aLeave").onclick = () => { store.set("sp-unlock", ""); OWNER = false; location.hash = "#home"; render(); toast("Customer view. Open #admin to sign back in."); };
-  $("#aRun").onclick = runStoreCheck;
   $("#aAdd").onclick = () => openEditor(null);
-  if ($("#aRestore")) $("#aRestore").onclick = () => { S.del = {}; save(); render(); toast("Deleted dresses restored."); };
-  $("#ghSave").onclick = () => { GH = { token: $("#ghTok").value.trim(), sync: $("#ghSync").checked }; store.set("sp-gh", JSON.stringify(GH)); toast(GH.sync && GH.token ? "Sync on. Saving now…" : "Sync settings saved."); if (GH.sync && GH.token) pushSync(); render(); };
+  if ($("#aRestore")) $("#aRestore").onclick = () => { S.del = {}; save(); render(); toast("Deleted products restored."); };
+  $("#ghSave").onclick = () => { GH = { token: $("#ghTok").value.trim(), sync: $("#ghSync").checked }; store.set("sp-gh", JSON.stringify(GH)); toast(GH.sync && GH.token ? "Sync on. Publishing now…" : "Sync settings saved."); if (GH.sync && GH.token) pushSync(); render(); };
   $("#bCopy").onclick = async () => { const txt = JSON.stringify(S); try { await navigator.clipboard.writeText(txt); toast("Backup copied. Paste it somewhere safe."); } catch { textDialog("Your backup", txt); } };
   $("#bImport").onclick = () => textDialog("Import backup", "", txt => { try { const d = JSON.parse(txt); if (!d || typeof d !== "object" || !("fav" in d)) throw 0; S = Object.assign(defaults(), d); S.settings = Object.assign(defaults().settings, d.settings || {}); save(); $("#dlg").close(); render(); toast("Backup imported."); } catch { $("#tErr").textContent = "That isn't a backup from this site. Paste the full text you copied."; } }, "Import");
 }
@@ -740,28 +873,27 @@ document.addEventListener("click", e => {
   const f = e.target.closest("[data-fav]");
   if (f){ const h = f.dataset.fav; if (S.fav[h]) delete S.fav[h]; else S.fav[h] = Date.now(); save(); const on = !!S.fav[h];
     document.querySelectorAll(`[data-fav="${CSS.escape(h)}"]`).forEach(b => { b.setAttribute("aria-pressed", on); b.setAttribute("aria-label", (on ? "Remove from" : "Save to") + " favorites"); });
-    counts(products()); toast(on ? "Saved to favorites." : "Removed from favorites."); if ((location.hash || "") === "#favorites" || (location.hash || "").startsWith("#dress-")) render(); return; }
+    counts(products()); toast(on ? "Saved to favorites." : "Removed from favorites."); const r = routeOf(); if (r === "favorites" || r.startsWith("item-")) render(); return; }
+  const g = e.target.closest("[data-guide]"); if (g){ openGuide(g.dataset.guide); return; }
   const ed = e.target.closest("[data-edit]"); if (ed){ openEditor(ed.dataset.edit); return; }
-  const so = e.target.closest("[data-sort]"); if (so){ UI.sort = so.dataset.sort; }
 });
 const scrollMemo = {};
 window.addEventListener("hashchange", e => {
-  const from = (new URL(e.oldURL).hash || "#home").slice(1), to = (location.hash || "#home").slice(1);
-  if (!from.startsWith("dress-")) scrollMemo[from] = scrollY;
-  window._cameFromList = !from.startsWith("dress-") && to.startsWith("dress-") ? true : (to.startsWith("dress-") ? window._cameFromList : false);
+  const h = u => { let r = (new URL(u).hash || "#home").slice(1); return r.startsWith("dress-") ? "item-" + r.slice(6) : r; };
+  const from = h(e.oldURL), to = routeOf();
+  if (!from.startsWith("item-")) scrollMemo[from] = scrollY;
+  window._cameFromList = !from.startsWith("item-") && to.startsWith("item-") ? true : (to.startsWith("item-") ? window._cameFromList : false);
+  if ($("#guide").open) $("#guide").close();
   render();
-  scrollTo(0, !to.startsWith("dress-") && from.startsWith("dress-") && scrollMemo[to] ? scrollMemo[to] : 0);
+  scrollTo(0, !to.startsWith("item-") && from.startsWith("item-") && scrollMemo[to] ? scrollMemo[to] : 0);
 });
 window.addEventListener("resize", () => document.documentElement.style.setProperty("--hh", $("#top").offsetHeight + "px"));
 document.addEventListener("visibilitychange", () => { if (!document.hidden && loaded && Date.now() - (window._lastLoad || 0) > 120000){ window._lastLoad = Date.now(); loadData(false); } });
 
-/* ---------- gate ---------- */
+/* ---------- gate + start ---------- */
 async function sha(t){ const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(t)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2,"0")).join(""); }
-function start(){ render(); loadData(false); schedulePoll(); window._lastLoad = Date.now(); }
-$("#gateForm").onsubmit = async e => { e.preventDefault(); const h = await sha($("#pass").value); if (h === PASS_HASH){ store.set("sp-unlock", h); OWNER = true; $("#pass").value = ""; render(); } else { $("#gateErr").textContent = "That passcode doesn't match. Try again."; } };
-start();
-/* load the newest version of the site when it changes (browsers may keep an old copy for 10 min) */
-const APP_VERSION = "8";
+$("#gateForm").onsubmit = async e => { e.preventDefault(); const h = await sha($("#pass").value); if (h === PASS_HASH){ store.set("sp-unlock", h); OWNER = true; $("#pass").value = ""; await loadData(false); } else { $("#gateErr").textContent = "That passcode doesn't match. Try again."; } };
+render(); loadData(false); schedulePoll(); window._lastLoad = Date.now();
 fetch("version.txt?t=" + Date.now(), { cache:"no-store" }).then(r => r.ok ? r.text() : "").then(v => {
   v = v.trim();
   if (v && v !== APP_VERSION && new URLSearchParams(location.search).get("v") !== v) location.replace(location.pathname + "?v=" + v + location.hash);
