@@ -186,7 +186,8 @@ def guide_images(page_html):
     # size-guide sketches are named like "DRESS---Short-Sleeve-Midi--1000x1200.jpg" or "Screenshot-…png";
     # colour swatches ("Black.png", "Light-yellow.png") come from the same host and must be skipped
     sketch = re.compile(r"dress|bag|clutch|tote|screenshot|sketch|garment|measure|size|\d{3,4}x\d{3,4}", re.I)
-    garment = [u for u in urls if "human-figure" not in u.lower() and sketch.search(name(u))]
+    swatch = re.compile(r"^[a-z]+(-[a-z]+)*-(dress|bag)\.(png|jpe?g|webp)$", re.I)   # e.g. "Pale-Pink-dress.png"
+    garment = [u for u in urls if "human-figure" not in u.lower() and sketch.search(name(u)) and not swatch.match(name(u))]
     return {"garment": garment[0] if garment else "", "body": body[0] if body else "", "all": urls[:12]}
 
 
