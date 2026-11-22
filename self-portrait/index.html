@@ -1005,7 +1005,7 @@ $("#guide").addEventListener("click", e => { if (e.target === $("#guide")) $("#g
 function viewAdmin(all){
   const m = DATA.meta, sizes = new Set(S.settings.sizes), cnt = m.counts || {}, sc = m.storeCounts || {};
   const log = (m.log || []).slice(0, 14).map(l => `<div><span>${when(l.at)}</span><span>+${l.added} new · −${l.removed} left · ${l.changed} changed${l.guides != null ? " · " + l.guides + " guides" : ""}</span></div>`).join("");
-  const removed = (DATA.removed || []).slice(0, 60).map(r => `<div><a href="${esc(url(r))}" target="_blank" rel="noopener">${esc(r.title)}</a><span>${CAT1[r.cat || "midi"]} · ${eur(r.price)} · left ${ago(r.removedAt)}</span></div>`).join("") || '<div><span>Nothing has left the sale yet.</span></div>';
+  const removed = (DATA.removed || []).slice(0, 60).map(r => `<div><a href="${esc(url(r))}" target="_blank" rel="noopener">${esc(r.title)}</a><span>${CAT1[r.cat || "midi"]} · ${r.brand === "md" ? "$" + r.price : eur(r.price)} · left ${ago(r.removedAt)}</span></div>`).join("") || '<div><span>Nothing has left the sale yet.</span></div>';
   const hidden = Object.keys(S.del).length;
   const withGuide = all.filter(p => p.guide && p.guide.length).length;
   return `<div class="list-head"><div><h2>Admin & settings</h2><p>Changes save instantly on this device${GH.token && GH.sync ? " and are published to customers" : ". Customers see your edits once sync is on (Sync & publish below)"}.</p></div>

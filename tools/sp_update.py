@@ -135,8 +135,8 @@ def fetch_md_collection(handle):
 def normalize_md(p, bf_handles):
     title = (p.get("title") or "").strip()
     ptype = (p.get("product_type") or "").upper()
-    if (p.get("vendor") or "").strip().lower() != "mac duggal":
-        return None  # only Mac Duggal's own label (not other labels sold on the site)
+    if "mac duggal" not in (p.get("vendor") or "").strip().lower():
+        return None  # only Mac Duggal's own lines (Mac Duggal, Ieena for Mac Duggal, Mac Duggal Collection)
     if MD_NOT_MAXI.search(title) or ptype in ("KIDS", "HANDBAGS", "READY TO WEAR", "SAMPLES"):
         return None
     variants = p.get("variants") or []
