@@ -17,6 +17,10 @@ on:
         description: "Re-read every size guide (1 = yes)"
         required: false
         default: "0"
+      fav_test:
+        description: "Test the shared favorites database (1 = yes)"
+        required: false
+        default: "0"
       probe:
         description: "Product handle to inspect for the size-guide illustration"
         required: false
@@ -38,6 +42,19 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Test shared favorites database
+        if: ${{ github.event.inputs.fav_test == '1' }}
+        run: |
+          U=https://qhuerltbkvihmqzsphpv.supabase.co/rest/v1; K=sb_publishable_K35x9gcJMqTGCuj2MFj_7w_PsQSF8mU
+          D=00000000-0000-4000-8000-000000000001
+          echo "totals:";  curl -s -w " [%{http_code}]\n" "$U/fav_totals?select=handle,total&limit=5" -H "apikey: $K"
+          echo "add:";     curl -s -w " [%{http_code}]\n" -X POST "$U/rpc/add_fav" -H "apikey: $K" -H "Content-Type: application/json" -d "{\"p_device\":\"$D\",\"p_handle\":\"__connection-test__\"}"
+          echo "add again (must not double count):"; curl -s -w " [%{http_code}]\n" -X POST "$U/rpc/add_fav" -H "apikey: $K" -H "Content-Type: application/json" -d "{\"p_device\":\"$D\",\"p_handle\":\"__connection-test__\"}"
+          echo "count:";   curl -s -w " [%{http_code}]\n" "$U/fav_totals?handle=eq.__connection-test__&select=handle,total" -H "apikey: $K"
+          echo "direct table read (must be refused):"; curl -s -w " [%{http_code}]\n" "$U/favs?select=*&limit=1" -H "apikey: $K"
+          echo "remove:";  curl -s -w " [%{http_code}]\n" -X POST "$U/rpc/remove_fav" -H "apikey: $K" -H "Content-Type: application/json" -d "{\"p_device\":\"$D\",\"p_handle\":\"__connection-test__\"}"
+          echo "count after remove:"; curl -s -w " [%{http_code}]\n" "$U/fav_totals?handle=eq.__connection-test__&select=handle,total" -H "apikey: $K"
+          echo "CORS:"; curl -s -o /dev/null -D - -X OPTIONS "$U/rpc/add_fav" -H "Origin: https://ranaa4117.github.io" -H "Access-Control-Request-Method: POST" -H "Access-Control-Request-Headers: apikey,content-type" | grep -i "access-control-allow-origin" || echo "no CORS header"
       - name: Read the Spain store (midi, maxi, bags), size guides and EUR/SAR rate
         env:
           SG_LIMIT: ${{ github.event.inputs.sg_limit || '60' }}

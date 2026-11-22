@@ -382,7 +382,7 @@ const PASS_HASH = "3c29f0bb09f7f11433b993fb3a8d945503758c57eacb6ecfe88c49e1ef74e
 const REPO = "ranaa4117/black-friday-deals";
 const WORKFLOW = "self-portrait-update.yml";
 const LS = "sp-edit-v1";
-const APP_VERSION = "11";
+const APP_VERSION = "12";
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
@@ -422,8 +422,36 @@ let REMOTE = null, SHOWCOSTS = false;
 const COSTS = () => OWNER && SHOWCOSTS;
 const C = () => OWNER ? S : (REMOTE || defaults());
 /* popularity = favorites the site can actually see: the published list (sync) plus this device's own */
-function favCount(h){ const pub = OWNER ? S.fav : ((REMOTE && REMOTE.fav) || {}); let n = pub[h] != null ? 1 : 0; if (!OWNER && S.fav[h] != null) n++; return n; }
-function favTime(h){ const a = favOf(h, OWNER ? S.fav : ((REMOTE && REMOTE.fav) || {})), b = favOf(h); return Math.max(a ? a.t || 0 : 0, b ? b.t || 0 : 0); }
+/* ---------- shared favorite counts (Supabase) ---------- */
+const SB_URL = "https://qhuerltbkvihmqzsphpv.supabase.co", SB_KEY = "sb_publishable_K35x9gcJMqTGCuj2MFj_7w_PsQSF8mU";
+let TOTALS = null;   // { handle: { n, t } } from every customer's device; null until loaded
+const deviceId = (() => { let d = store.get("sp-device"); if (!d){ d = (crypto.randomUUID ? crypto.randomUUID() : "xxxxxxxx-xxxx-4xxx-8xxx-xxxxxxxxxxxx".replace(/x/g, () => (Math.random() * 16 | 0).toString(16))); store.set("sp-device", d); } return d; })();
+async function sb(path, opts = {}){
+  const r = await fetch(SB_URL + "/rest/v1/" + path, Object.assign({}, opts, { headers: Object.assign({ apikey: SB_KEY, "Content-Type": "application/json" }, opts.headers || {}) }));
+  if (!r.ok) throw new Error("favorites service " + r.status);
+  return r.status === 204 ? null : r.json().catch(() => null);
+}
+async function loadTotals(){
+  try {
+    const rows = await sb("fav_totals?select=handle,total,last_at&limit=5000");
+    const t = {}; for (const r of rows || []) t[r.handle] = { n: r.total, t: Date.parse(r.last_at) || 0 };
+    TOTALS = t;
+  } catch { /* keep the last totals; fall back to local favorites if never loaded */ }
+}
+async function shareFav(h, on){
+  try { await sb("rpc/" + (on ? "add_fav" : "remove_fav"), { method:"POST", body: JSON.stringify({ p_device: deviceId, p_handle: h }) }); return true; } catch { return false; }
+}
+async function shareExistingFavs(){   // favorites saved before counting started are counted once
+  let done = []; try { done = JSON.parse(store.get("sp-fav-shared") || "[]"); } catch {}
+  const todo = Object.keys(S.fav).filter(h => !done.includes(h));
+  for (const h of todo) if (await shareFav(h, true)) done.push(h);
+  store.set("sp-fav-shared", JSON.stringify(done.filter(h => S.fav[h] != null)));
+}
+function favCount(h){
+  if (TOTALS) return TOTALS[h] ? TOTALS[h].n : 0;
+  return S.fav[h] != null ? 1 : 0;
+}
+function favTime(h){ if (TOTALS && TOTALS[h]) return TOTALS[h].t; const b = favOf(h); return b ? b.t || 0 : 0; }
 const popular = list => list.filter(p => favCount(p.handle) > 0).sort((a,b) => favCount(b.handle) - favCount(a.handle) || favTime(b.handle) - favTime(a.handle));
 let GH = JSON.parse(store.get("sp-gh") || '{"token":"","sync":false}');
 const UI = {};
@@ -468,7 +496,7 @@ async function loadData(manual){
     const r = await fetch("data.json?t=" + Date.now(), { cache:"no-store" });
     if (!r.ok) throw new Error("HTTP " + r.status);
     DATA = await r.json(); loaded = true;
-    await pullSync();
+    await Promise.all([pullSync(), loadTotals()]);
     if (manual) toast("Up to date.");
   } catch (e) {
     if (manual || !loaded) toast("Couldn't load the latest data (" + e.message + "). Check your connection and try again.");
@@ -898,7 +926,13 @@ function textDialog(title, value, onOk, okLabel){
 
 /* ---------- favorites with size ---------- */
 function setFav(h, val){
+  const was = S.fav[h] != null;
   if (val) S.fav[h] = val; else delete S.fav[h];
+  if (was !== (val != null)){
+    shareFav(h, !!val).then(ok => { if (!ok) return; let done = []; try { done = JSON.parse(store.get("sp-fav-shared") || "[]"); } catch {}
+      done = val ? [...new Set([...done, h])] : done.filter(x => x !== h); store.set("sp-fav-shared", JSON.stringify(done));
+      return loadTotals(); }).then(() => { const r = routeOf(); if (r === "popular" || r === "home") render(); else counts(products()); });
+  }
   save(); const on = S.fav[h] != null;
   document.querySelectorAll(`.heart[data-fav="${CSS.escape(h)}"]`).forEach(b => { b.setAttribute("aria-pressed", on); b.setAttribute("aria-label", (on ? "Change size or remove from" : "Save to") + " favorites"); });
   counts(products());
@@ -1023,7 +1057,7 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden && lo
 /* ---------- gate + start ---------- */
 async function sha(t){ const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(t)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2,"0")).join(""); }
 $("#gateForm").onsubmit = async e => { e.preventDefault(); const h = await sha($("#pass").value); if (h === PASS_HASH){ store.set("sp-unlock", h); OWNER = true; $("#pass").value = ""; await loadData(false); } else { $("#gateErr").textContent = "That passcode doesn't match. Try again."; } };
-render(); loadData(false); schedulePoll(); window._lastLoad = Date.now();
+render(); loadData(false).then(shareExistingFavs); schedulePoll(); window._lastLoad = Date.now();
 fetch("version.txt?t=" + Date.now(), { cache:"no-store" }).then(r => r.ok ? r.text() : "").then(v => {
   v = v.trim();
   if (v && v !== APP_VERSION && new URLSearchParams(location.search).get("v") !== v) location.replace(location.pathname + "?v=" + v + location.hash);
