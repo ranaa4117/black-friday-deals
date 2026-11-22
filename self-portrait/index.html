@@ -755,6 +755,12 @@ async function sha(t){ const b = await crypto.subtle.digest("SHA-256", new TextE
 function start(){ render(); loadData(false); schedulePoll(); window._lastLoad = Date.now(); }
 $("#gateForm").onsubmit = async e => { e.preventDefault(); const h = await sha($("#pass").value); if (h === PASS_HASH){ store.set("sp-unlock", h); OWNER = true; $("#pass").value = ""; render(); } else { $("#gateErr").textContent = "That passcode doesn't match. Try again."; } };
 start();
+/* load the newest version of the site when it changes (browsers may keep an old copy for 10 min) */
+const APP_VERSION = "5";
+fetch("version.txt?t=" + Date.now(), { cache:"no-store" }).then(r => r.ok ? r.text() : "").then(v => {
+  v = v.trim();
+  if (v && v !== APP_VERSION && new URLSearchParams(location.search).get("v") !== v) location.replace(location.pathname + "?v=" + v + location.hash);
+}).catch(() => {});
 })();
 </script>
 </body>
