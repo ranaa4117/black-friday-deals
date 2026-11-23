@@ -1,1 +1,47 @@
-{}
+{
+ "at": "2026-11-23T20:08:01Z",
+ "results": [
+  {
+   "n": 1,
+   "test": "Black Embellished Mesh Long Sleeve Gown vs its official page",
+   "result": "PASS",
+   "detail": "official price $598, label on its page: Extra 25% Off, system status: active, extra 25%"
+  },
+  {
+   "n": 2,
+   "test": "Mac Duggal dresses previously marked 'extra ended' (687)",
+   "result": "PASS",
+   "detail": "re-read the 40 most recent: label still shown on 1 (+2 checkout-verify) → these get their 25% back automatically; truly no label on 37; unreadable 0; e.g. Black Pleated Shimmering One Shoulder Gown, Dusty Rose Feather Embellished Long Sleeve Gown, Black Embellished Mesh Long Sleeve Gown"
+  },
+  {
+   "n": 3,
+   "test": "Genuinely expired discount (label not on the product page)",
+   "result": "PASS",
+   "detail": "«Vintage Lilac Embellished Lace Illusion Neck A-Line Gown» read live with no label; checks 1→3: unverified/25% → unverified/25% → expired/0% (removed only after 3 confirmations)"
+  },
+  {
+   "n": 4,
+   "test": "Discount returns",
+   "result": "PASS",
+   "detail": "previous status expired → live label found → active 25% at once"
+  },
+  {
+   "n": 5,
+   "test": "Official page unreachable (real failed request)",
+   "result": "PASS",
+   "detail": "request failed (URLError); status → unverified, discount kept 25%, product kept"
+  },
+  {
+   "n": 6,
+   "test": "Out of stock but still on the official site",
+   "result": "LIMIT",
+   "detail": "no fully sold-out product found to test"
+  },
+  {
+   "n": 7,
+   "test": "Permanently removed from the official site",
+   "result": "FAIL",
+   "detail": "«Brown Embellished Cap Sleeve Evening Gown»: product data and web page both 'not found' (live) — 1st check: kept; after 3 checks over 24h: deleted"
+  }
+ ]
+}
