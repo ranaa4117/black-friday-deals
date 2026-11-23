@@ -4,13 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-<title>Raghad Outlet — Discounted designer dresses, bags &amp; shoes</title>
-<meta name="description" content="Raghad Outlet (Saudi Arabia): Black Friday designer dresses, bags and shoes on sale — Self-Portrait, Mac Duggal, Lauren Ralph Lauren, Juicy Couture and more from official stores, with final prices in SAR.">
-<meta name="keywords" content="Raghad Outlet, Raghad Outlet Saudi Arabia, Black Friday dresses, discounted designer dresses, designer bags sale, designer shoes sale, Macy's sale, Self-Portrait sale, Mac Duggal sale, Lauren Ralph Lauren sale, Juicy Couture shoes">
+<title>Raghad Outlet رغد أوتلت — Designer dresses, bags &amp; shoes sale</title>
+<meta name="description" content="Raghad Outlet | رغد أوتلت — فساتين وشنط وجزم ماركات بتخفيضات البلاك فرايدي بالريال السعودي. Raghad Outlet (Saudi Arabia): Black Friday designer dresses, bags and shoes on sale — Self-Portrait, Mac Duggal, Lauren Ralph Lauren, Juicy Couture and more from official stores, with final prices in SAR.">
+<meta name="keywords" content="Raghad Outlet, رغد أوتلت, رغد اوتلت, رغد outlet, Raghad Outlet Saudi Arabia, فساتين بلاك فرايدي, تخفيضات فساتين ماركات, شنط ماركات تخفيضات, Black Friday dresses, discounted designer dresses, designer bags sale, designer shoes sale, Macy's sale, Self-Portrait sale, Mac Duggal sale, Lauren Ralph Lauren sale, Juicy Couture shoes">
 <link rel="canonical" id="canon" href="https://raghad-outlet.pages.dev/">
 <meta property="og:type" content="website"><meta property="og:site_name" content="Raghad Outlet"><meta property="og:title" content="Raghad Outlet — Discounted designer dresses, bags &amp; shoes"><meta property="og:description" content="Black Friday designer dresses, bags and shoes on sale, with final prices in SAR."><meta property="og:url" content="https://raghad-outlet.pages.dev/">
 <script>if (/github\.io$/.test(location.hostname)) document.write('<meta name="robots" content="noindex, follow">');</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://raghad-outlet.pages.dev/#org","name":"Raghad Outlet","url":"https://raghad-outlet.pages.dev/","contactPoint":{"@type":"ContactPoint","telephone":"+966594048036","contactType":"sales","areaServed":"SA","availableLanguage":["ar","en"]}},{"@type":"WebSite","@id":"https://raghad-outlet.pages.dev/#site","name":"Raghad Outlet","alternateName":"رغد أوتلت","url":"https://raghad-outlet.pages.dev/","publisher":{"@id":"https://raghad-outlet.pages.dev/#org"},"inLanguage":["en","ar"]}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://raghad-outlet.pages.dev/#org","name":"Raghad Outlet","url":"https://raghad-outlet.pages.dev/","contactPoint":{"@type":"ContactPoint","telephone":"+966594048036","contactType":"sales","areaServed":"SA","availableLanguage":["ar","en"]}},{"@type":"WebSite","@id":"https://raghad-outlet.pages.dev/#site","name":"Raghad Outlet","alternateName":["رغد أوتلت","رغد اوتلت","Raghad outlet"],"url":"https://raghad-outlet.pages.dev/","publisher":{"@id":"https://raghad-outlet.pages.dev/#org"},"inLanguage":["en","ar"]}]}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Jost:wght@300;400;500&family=Tajawal:wght@300;400;500&display=swap" rel="stylesheet">
@@ -493,7 +493,7 @@ const PASS_HASH = "3c29f0bb09f7f11433b993fb3a8d945503758c57eacb6ecfe88c49e1ef74e
 const REPO = "ranaa4117/black-friday-deals";
 const WORKFLOW = "self-portrait-update.yml";
 const LS = "sp-edit-v1";
-const APP_VERSION = "19";
+const APP_VERSION = "20";
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
@@ -1092,7 +1092,7 @@ function seo(route, all){
     if (!p) return setMeta("Raghad Outlet", "Discounted designer dresses, bags and shoes.", SITE, null);
     const b = BRANDS[brandOf(p)], cr = parseSec(crumbHref(p)), link = SITE + "?p=" + encodeURIComponent(p.handle);
     const desc = `${b} ${p.title} — ${kindOf(p).split(" · ")[1]} on sale at Raghad Outlet for ${fmt(finalSAR(p))} SAR${offShown(p) ? " (" + offShown(p) + "% off)" : ""}. Order on WhatsApp.`;
-    return setMeta(`${p.title} | ${b} sale | Raghad Outlet`, desc, link, { "@context":"https://schema.org", "@graph":[
+    return setMeta(`${p.title} | ${b} sale | Raghad Outlet رغد أوتلت`, desc, link, { "@context":"https://schema.org", "@graph":[
       { "@type":"Product", name:p.title, brand:{ "@type":"Brand", name:b }, image:[p.image].filter(Boolean), category:kindOf(p).split(" · ")[1], url:link,
         offers:{ "@type":"Offer", priceCurrency:"SAR", price:finalSAR(p), availability: isAvail(p) ? "https://schema.org/InStock" : "https://schema.org/OutOfStock", url:link, seller:{ "@id": SITE + "#org" } } },
       { "@type":"BreadcrumbList", itemListElement:[
@@ -1102,9 +1102,9 @@ function seo(route, all){
   }
   const sr = parseSec(route);
   if (sr){ const t = secTitle(sr);
-    return setMeta(`${t}${/sale/i.test(t) ? "" : " sale"} | Raghad Outlet`, `${t} on sale at Raghad Outlet — discounted designer pieces with final prices in SAR.`, SITE + "?c=" + route,
+    return setMeta(`${t}${/sale/i.test(t) ? "" : " sale"} | Raghad Outlet رغد أوتلت`, `${t} on sale at Raghad Outlet — discounted designer pieces with final prices in SAR.`, SITE + "?c=" + route,
       { "@context":"https://schema.org", "@type":"BreadcrumbList", itemListElement:[{ "@type":"ListItem", position:1, name:"Raghad Outlet", item:SITE }, { "@type":"ListItem", position:2, name:t, item:SITE + "?c=" + route }] }); }
-  setMeta("Raghad Outlet — Discounted designer dresses, bags & shoes", "Raghad Outlet (Saudi Arabia): Black Friday designer dresses, bags and shoes on sale — Self-Portrait, Mac Duggal, Lauren Ralph Lauren, Juicy Couture and more from official stores, with final prices in SAR.", SITE, null);
+  setMeta("Raghad Outlet رغد أوتلت — Designer dresses, bags & shoes sale", "Raghad Outlet | رغد أوتلت — فساتين وشنط وجزم ماركات بتخفيضات البلاك فرايدي بالريال السعودي. Raghad Outlet (Saudi Arabia): Black Friday designer dresses, bags and shoes on sale — Self-Portrait, Mac Duggal, Lauren Ralph Lauren, Juicy Couture and more from official stores, with final prices in SAR.", SITE, null);
 }
 
 function viewItem(all, handle){
