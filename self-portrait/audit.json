@@ -1,6 +1,18 @@
 {
  "audits": [
   {
+   "at": "2026-11-23T18:52:27Z",
+   "ok": false,
+   "problems": 2,
+   "fixed": 0,
+   "auto": true,
+   "notes": [
+    "Macy's — التخفيضات الشتوية: آخر تحديث قبل 4 ساعة",
+    "Macy's — الأحذية: آخر تحديث قبل 4 ساعة",
+    "تمت مقارنة 18 منتجاً مع المواقع الرسمية (Self-Portrait وMac Duggal وElisabetta Franchi)"
+   ]
+  },
+  {
    "at": "2026-11-23T18:49:51Z",
    "ok": true,
    "problems": 0,
