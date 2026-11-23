@@ -67,23 +67,29 @@ jobs:
         with:
           python-version: "3.12"
       - name: Macy's access test
+        continue-on-error: true
         if: ${{ github.event.inputs.macys_probe == '1' }}
         run: python3 tools/macys_probe.py
       - name: Elisabetta Franchi access test
+        continue-on-error: true
         if: ${{ github.event.inputs.ef_probe == '1' }}
         run: python3 tools/ef_probe.py
       - name: Elisabetta Franchi price diagnostics
+        continue-on-error: true
         if: ${{ github.event.inputs.ef_probe == '2' }}
         run: python3 tools/ef_price_probe.py
       - name: Elisabetta Franchi as a shopper sees it (real browser)
+        continue-on-error: true
         if: ${{ github.event.inputs.ef_probe == '3' }}
         run: |
           pip install -q playwright==1.48.0
           python3 tools/ef_render_probe.py
       - name: Mac Duggal diagnostics
+        continue-on-error: true
         if: ${{ github.event.inputs.md_probe == '1' }}
         run: python3 tools/md_probe.py
       - name: Mac Duggal product page diagnostics
+        continue-on-error: true
         if: ${{ github.event.inputs.md_probe == '2' }}
         run: python3 tools/md_page_probe.py
       - name: Test shared favorites database
@@ -135,7 +141,7 @@ jobs:
           touch self-portrait/changes.json self-portrait/selftest.json self-portrait/ef_verify.json; git add self-portrait/data.json self-portrait/more.json self-portrait/full.json self-portrait/sitemap.xml self-portrait/audit.json self-portrait/changes.json self-portrait/fixes.json self-portrait/selftest.json self-portrait/ef_verify.json
           if git diff --cached --quiet; then echo "No changes"; exit 0; fi
           git commit -m "Self-Portrait sale check $(date -u +%Y-%m-%dT%H:%MZ)"
-          for i in 1 2 3; do git pull --rebase -X theirs origin main && git push && exit 0; sleep 5; done
+          for i in 1 2 3; do git pull --rebase --autostash -X theirs origin main && git push && exit 0; sleep 5; done
           exit 1
       - name: Record a failed update for the Admin page
         if: failure()
