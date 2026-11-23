@@ -1815,7 +1815,7 @@ function drawChanges(){
   const box = $("#chgBox"); if (!box) return;
   if (!CHG.runs) { box.innerHTML = '<p class="small">جارٍ التحميل…</p>'; return; }
   const byH = new Map(products().map(p => [p.handle, p]));
-  const runs = CHG.runs.map(r => { const items = (r.items || []).map(it => Object.assign({ x: chgInfo(it, byH.get(it.h)), p: byH.get(it.h) }, it)); const kinds = new Set(); items.forEach(it => it.x.kinds.forEach(q => kinds.add(q))); if (r.ok === false) kinds.add("failed"); if (r.src === "site") kinds.add("site"); return Object.assign({}, r, { items, kinds }); });
+  const runs = CHG.runs.slice().sort((a, b) => (b.at || "").localeCompare(a.at || "")).map(r => { const items = (r.items || []).map(it => Object.assign({ x: chgInfo(it, byH.get(it.h)), p: byH.get(it.h) }, it)); const kinds = new Set(); items.forEach(it => it.x.kinds.forEach(q => kinds.add(q))); if (r.ok === false) kinds.add("failed"); if (r.src === "site") kinds.add("site"); return Object.assign({}, r, { items, kinds }); });
   const tally = {}; runs.forEach(r => r.kinds.forEach(q => tally[q] = (tally[q] || 0) + 1));
   const chips = `<div class="cgchips">${[["all", "الكل"]].concat(Object.keys(CHG_KIND).filter(q => tally[q]).map(q => [q, CHG_KIND[q]])).map(([q, l]) => `<button class="cgchip${CHG.f === q ? " on" : ""}" data-chg="${q}">${l}</button>`).join("")}</div>`;
   const src = r => r.src === "site" ? "تحديث الموقع" : r.src === "macys" ? "أسعار Macy's" : "تحديث الأسعار التلقائي";
