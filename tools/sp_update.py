@@ -146,7 +146,11 @@ def fetch_md_promo():
     m = re.search(r"cardHighlights\s*=\s*(\[.*?\])\s*;", h, re.S)
     if not m:
         return None
-    for label, tag, market in re.findall(r'label\s*:\s*"([^"]+)"\s*,\s*tag\s*:\s*"([^"]+)"(?:\s*,\s*market\s*:\s*"([^"]*)")?', m.group(1)):
+    for obj in re.findall(r"\{[^{}]*\}", m.group(1)):
+        val = lambda k: (re.search(k + r'\s*:\s*"([^"]*)"', obj) or [None, ""])[1]
+        label, tag, market = val("label"), val("tag"), val("market")
+        if not label or not tag:
+            continue
         pct = re.search(r"(\d{1,2})\s*%", label)
         if pct and (not market or market == "core"):
             return {"tag": tag, "pct": int(pct.group(1)), "label": label}
@@ -711,10 +715,12 @@ def main():
                 meta["mdPromoMiss"] = 0
             else:   # promo not seen: confirm on 3 checks in a row before removing it everywhere
                 meta["mdPromoMiss"] = meta.get("mdPromoMiss", 0) + 1
-                MD_PROMO = meta["mdPromo"]
+                MD_PROMO = dict(meta["mdPromo"])
+                MD_PROMO.setdefault("pct", int((re.search(r"(\d{1,2})\s*%", MD_PROMO.get("label", "")) or [0, 25])[1]))
             print("md promo:", MD_PROMO, "| misses", meta.get("mdPromoMiss"))
         except Exception as e:  # noqa: BLE001
-            MD_PROMO = meta.get("mdPromo") or MD_PROMO
+            MD_PROMO = dict(meta.get("mdPromo") or MD_PROMO)
+            MD_PROMO.setdefault("pct", 25)
             print("md promo page failed (keeping last known):", e)
         md_items, raw_counts["md"] = fetch_md()
         for n in md_items:
