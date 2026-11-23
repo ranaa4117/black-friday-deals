@@ -20,6 +20,7 @@ import os
 import re
 import time
 import urllib.request
+import urllib.error
 import urllib.parse
 from html.parser import HTMLParser
 
@@ -77,15 +78,17 @@ def keep(cat, p):
     return False
 
 
-def normalize(p, cat):
+def normalize(p, cat, retain=False):
     variants = p.get("variants") or []
     prices = [float(v["price"]) for v in variants if v.get("price")]
     comps = [float(v.get("compare_at_price") or 0) for v in variants]
-    if not prices or not keep(cat, p):
+    if not prices or (not retain and not keep(cat, p)):
         return None
     price, compare = min(prices), max(comps)
     if compare <= price:
-        return None  # not discounted
+        if not retain:
+            return None  # not discounted (sale lists only)
+        compare = price   # kept product, currently at its regular price
     imgs = [i["src"] for i in (p.get("images") or []) if i.get("src")]
     return {
         "handle": p["handle"],
@@ -133,12 +136,34 @@ def fetch_md_collection(handle):
     return items
 
 
-def normalize_md(p, bf_handles):
+MD_PROMO = {"tag": MD_PROMO_TAG, "pct": 25, "label": "+25% Off In Cart"}
+
+
+def fetch_md_promo():
+    """Mac Duggal's own product-label promotions (window.cardHighlights): which tag gets which extra % off.
+    Returns the promo, None when the store shows none, or raises when the page can't be read."""
+    h = fetch(MD_STORE + "/", accept="text/html")
+    m = re.search(r"cardHighlights\s*=\s*(\[.*?\])\s*;", h, re.S)
+    if not m:
+        return None
+    for label, tag, market in re.findall(r'label\s*:\s*"([^"]+)"\s*,\s*tag\s*:\s*"([^"]+)"(?:\s*,\s*market\s*:\s*"([^"]*)")?', m.group(1)):
+        pct = re.search(r"(\d{1,2})\s*%", label)
+        if pct and (not market or market == "core"):
+            return {"tag": tag, "pct": int(pct.group(1)), "label": label}
+    return None
+
+
+def tag_list(p):
+    t = p.get("tags") or []
+    return [x.strip() for x in t.split(",")] if isinstance(t, str) else list(t)
+
+
+def normalize_md(p, bf_handles, retain=False):
     title = (p.get("title") or "").strip()
     ptype = (p.get("product_type") or "").upper()
     if "mac duggal" not in (p.get("vendor") or "").strip().lower():
         return None  # only Mac Duggal's own lines (Mac Duggal, Ieena for Mac Duggal, Mac Duggal Collection)
-    if MD_NOT_MAXI.search(title) or ptype in ("KIDS", "HANDBAGS", "READY TO WEAR", "SAMPLES"):
+    if not retain and (MD_NOT_MAXI.search(title) or ptype in ("KIDS", "HANDBAGS", "READY TO WEAR", "SAMPLES")):
         return None
     variants = p.get("variants") or []
     if not variants:
@@ -150,8 +175,8 @@ def normalize_md(p, bf_handles):
     price = float(cheapest["price"])
     compare = float(cheapest.get("compare_at_price") or 0)
     markdown = compare > price
-    promo = MD_PROMO_TAG in (p.get("tags") or [])
-    if not markdown and not promo:
+    promo = bool(MD_PROMO) and MD_PROMO["tag"] in tag_list(p)
+    if not markdown and not promo and not retain:
         return None  # full price and not eligible for the cart promotion
     sizes, colors = {}, []
     for v in variants:
@@ -177,7 +202,8 @@ def normalize_md(p, bf_handles):
         "compare": round(compare if markdown else price, 2),
         "bf": markdown and p["handle"] in bf_handles,
         "markdown": markdown,
-        "extra25": promo,
+        "extra25": promo and MD_PROMO["pct"] == 25,
+        "extraPct": MD_PROMO["pct"] if promo else 0,
         "colors": colors[:8],
         "sizes": [{"s": k, "a": a} for k, a in sizes.items()],
         "publishedAt": (p.get("published_at") or "")[:10],
@@ -529,6 +555,39 @@ def load_prev():
         return {"meta": {}, "products": [], "removed": []}
 
 
+class Gone(Exception):
+    pass
+
+
+def refresh_product(p, bf_handles):
+    """Re-read a known product from its own official page. Returns the updated record; raises Gone when the store no longer has it."""
+    brand = p.get("brand", "sp")
+    try:
+        if brand == "sp":
+            raw = get_json(f"{STORE}/products/{p['handle']}.json").get("product")
+            n = raw and normalize(raw, p.get("cat", "midi"), retain=True)
+        elif brand == "md":
+            raw = get_json(f"{MD_STORE}/products/{p['handle'][3:]}.json").get("product")
+            n = raw and normalize_md(raw, bf_handles, retain=True)
+        elif brand == "ef":
+            d = ef_product(p["url"].replace(EF_SITE, ""))
+            n = dict(p, price=round(d["price"], 2), compare=round(d["compare"] if d["compare"] > d["price"] else d["price"], 2),
+                     sizes=[{"s": "IT " + k, "a": a} for k, a in d["sizes"].items()]) if d["price"] else None
+        else:
+            return None
+    except urllib.error.HTTPError as e:
+        if e.code in (404, 410):
+            raise Gone() from e
+        raise
+    if not n:
+        raise Gone()
+    keep_keys = ("firstSeen", "guide", "guideImg", "guideAt", "dims")
+    for k in keep_keys:
+        if k in p and k not in n:
+            n[k] = p[k]
+    return n
+
+
 def size_msgs(old, new):
     o = {x["s"]: x["a"] for x in old}
     return [f"{x['s']} {'back in stock' if x['a'] else 'sold out'}" for x in new if x["s"] in o and o[x["s"]] != x["a"]]
@@ -604,9 +663,13 @@ def main():
         promo = fetch_sp_promo()
         if promo:
             meta["spPromo"] = promo
+            meta["spPromoMiss"] = 0
         elif "spPromo" in meta:
-            print("Self-Portrait extra promotion no longer shown — removed")
-            meta.pop("spPromo", None)
+            meta["spPromoMiss"] = meta.get("spPromoMiss", 0) + 1
+            if meta["spPromoMiss"] >= 3:   # gone on 3 checks in a row: the promotion has ended
+                print("Self-Portrait extra promotion no longer shown — removed")
+                meta.pop("spPromo", None)
+                meta["spPromoMiss"] = 0
     except Exception as e:  # noqa: BLE001
         print("sp promo check failed (keeping last known):", e)
     print("sp promo:", meta.get("spPromo"))
@@ -640,6 +703,19 @@ def main():
     try:
         if os.environ.get("MD_ENABLE", "1") != "1":
             raise RuntimeError("Mac Duggal disabled")
+        global MD_PROMO
+        try:
+            found = fetch_md_promo()
+            if found or not meta.get("mdPromo") or meta.get("mdPromoMiss", 0) >= 2:
+                MD_PROMO = found
+                meta["mdPromoMiss"] = 0
+            else:   # promo not seen: confirm on 3 checks in a row before removing it everywhere
+                meta["mdPromoMiss"] = meta.get("mdPromoMiss", 0) + 1
+                MD_PROMO = meta["mdPromo"]
+            print("md promo:", MD_PROMO, "| misses", meta.get("mdPromoMiss"))
+        except Exception as e:  # noqa: BLE001
+            MD_PROMO = meta.get("mdPromo") or MD_PROMO
+            print("md promo page failed (keeping last known):", e)
         md_items, raw_counts["md"] = fetch_md()
         for n in md_items:
             fresh[n["handle"]] = n
@@ -667,6 +743,46 @@ def main():
     for h, p in old.items():
         if grp(p) not in ok_cats and h not in fresh:
             fresh[h] = p
+    for n in fresh.values():
+        if grp(n) in ok_cats:
+            n["listed"] = True     # in the store's sale list right now
+            n["status"] = "ok"
+
+    # PRODUCTS ARE NEVER DELETED AUTOMATICALLY. Anything known before (or removed by older versions of this
+    # script) that is not in this run's lists stays, and is re-checked on its own official page.
+    bf_set = set()
+    try:
+        bf_set = {p["handle"] for p in fetch_md_collection(MD_BF)} if os.environ.get("MD_ENABLE", "1") == "1" else set()
+    except Exception:  # noqa: BLE001
+        pass
+    missing = [p for h, p in old.items() if h not in fresh]
+    missing += [r for r in prev.get("removed", []) if r.get("handle") and r["handle"] not in fresh and r["handle"] not in old]
+    missing.sort(key=lambda p: p.get("pageCheckedAt", ""))   # least recently checked first
+    budget, refreshed, retired = int(os.environ.get("REFRESH_LIMIT", "60")), 0, 0
+    for p in missing:
+        h = p["handle"]
+        due = age_s(p.get("pageCheckedAt", "")) > 3 * 3600
+        if due and budget > 0 and grp(dict(p, cat=p.get("cat", "midi"))) in ok_cats:
+            budget -= 1
+            try:
+                n = refresh_product(p, bf_set)
+                if n:
+                    n.update(listed=False, status="ok", pageCheckedAt=ts)
+                    fresh[h] = n
+                    refreshed += 1
+                    time.sleep(0.6)
+                    continue
+            except Gone:
+                retired += 1
+                fresh[h] = dict(p, listed=False, status="discontinued", pageCheckedAt=ts, compare=p.get("price", 0),
+                                sizes=[dict(x, a=False) for x in p.get("sizes", [])], extra25=False, extraPct=0)
+                continue
+            except Exception as e:  # noqa: BLE001
+                print("  re-check failed (kept as is):", h, e)
+        if h in old:
+            fresh[h] = dict(old[h], listed=False)   # kept exactly as last verified until its page can be re-checked
+    print(f"kept off-list products: {sum(1 for p in fresh.values() if p.get('listed') is False)} "
+          f"(re-checked {refreshed}, no longer sold by the store {retired})")
 
     groups = ["sp:" + c for c, _ in CATEGORIES] + ["md:maxi", "ef:maxi"]
     baseline = {g for g in groups if not any(grp(p) == g for p in old.values())}
@@ -690,6 +806,10 @@ def main():
             msgs.append(f"Sale price {sym}{o.get('price', 0):g} → {sym}{n['price']:g}")
         if o.get("compare") != n["compare"]:
             msgs.append(f"Original price {sym}{o.get('compare', 0):g} → {sym}{n['compare']:g}")
+        if o.get("listed", True) != n.get("listed", True):
+            msgs.append("Back in the sale" if n.get("listed", True) else "Left the store's sale list")
+        if o.get("status", "ok") != n.get("status", "ok"):
+            msgs.append("No longer sold by the store" if n.get("status") == "discontinued" else "Available again")
         if o.get("extra25") != n.get("extra25") and n.get("brand") == "md":
             msgs.append("Extra 25% in cart " + ("now applies" if n.get("extra25") else "no longer applies"))
         if o.get("image") != n["image"]:
@@ -701,11 +821,8 @@ def main():
         else:
             n.update(lastChanged=o.get("lastChanged", ts), changes=o.get("changes", []))
 
-    gone = [dict(p, removedAt=ts) for h, p in old.items() if h not in fresh and grp(p) in ok_cats]
-    removed = (gone + [r for r in prev.get("removed", []) if r["handle"] not in fresh])[:120]
-    for r in removed:
-        r.pop("guide", None)
-        r.pop("guideImg", None)
+    gone = []          # nothing is ever removed automatically
+    removed = [r for r in prev.get("removed", []) if r["handle"] not in fresh][:120]   # older removals not restored yet
 
     products = sorted(fresh.values(), key=lambda p: p.get("firstSeen", ""), reverse=True)
     guides = read_guides(products, old)
@@ -716,7 +833,7 @@ def main():
     meta.update(lastSuccess=ts, lastError=("; ".join(errors) and f"{ts}: partial check — {'; '.join(errors)}"),
                 count=len(products), counts=counts, storeCounts=raw_counts,
                 collections=dict({c: f"{STORE}/collections/{h}" for c, h in CATEGORIES}, md=f"{MD_STORE}/collections/{MD_MAXI}"),
-                mdPromo={"tag": MD_PROMO_TAG, "label": "+25% Off In Cart", "source": f"{MD_STORE} (product label shown by the official store)"})
+                mdPromo=(dict(MD_PROMO, source=f"{MD_STORE} (product label shown by the official store)") if MD_PROMO else None))
     meta.setdefault("initialImport", ts)
     log = meta.get("log", [])
     log.insert(0, {"at": ts, "added": len(added), "removed": len(gone), "changed": len(changed), "guides": guides})
