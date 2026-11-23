@@ -1,1 +1,17 @@
-{"audits":[]}
+{
+ "audits": [
+  {
+   "at": "2026-11-23T18:03:36Z",
+   "ok": false,
+   "problems": 4,
+   "fixed": 1,
+   "notes": [
+    "Mac Duggal: the store changed its promotion — '+25% Off In Cart' (BFCM25) is no longer shown; it now shows 'Extra 25% Off' only on dresses tagged as sale (markdown). ~810 full-price dresses were still showing the old 25% — fixed in the updater (reads every label, ignores 'Price as marked'); now 133 sale dresses keep the 25%, the others show their real price. No product removed (983 kept).",
+    "Mac Duggal: 4 dresses no longer in the store feed still show 25% until their own page is re-checked by the updater.",
+    "Updater: all recent runs succeeded, no errors, nothing in 'removed'; counts steady (Self-Portrait 448, Mac Duggal 983, Elisabetta Franchi 18). But GitHub ran the 15-minute schedule only a few times today (gap 10:38→ manual runs), so data can be hours old between checks.",
+    "Spot-check vs official pages (Self-Portrait, Mac Duggal, Elisabetta Franchi, Macy's) and the live-site check could not run: page reading was not permitted in this unattended run. Mac Duggal was checked through the store's own data in the updater instead. Self-Portrait 'Extra 20% off sale' still detected.",
+    "Macy's winter.json/shoes.json last updated 14:28 UTC; files look valid (33 + 21 items) but were not compared with Macy's pages."
+   ]
+  }
+ ]
+}
