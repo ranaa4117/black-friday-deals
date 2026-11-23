@@ -493,7 +493,7 @@ const PASS_HASH = "3c29f0bb09f7f11433b993fb3a8d945503758c57eacb6ecfe88c49e1ef74e
 const REPO = "ranaa4117/black-friday-deals";
 const WORKFLOW = "self-portrait-update.yml";
 const LS = "sp-edit-v1";
-const APP_VERSION = "18";
+const APP_VERSION = "19";
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
@@ -619,8 +619,9 @@ const extraFor = p => isMC(p) ? extraShoes() : isRL(p) ? extraRL() : isMD(p) ? e
 /* Self-Portrait's store-wide extra (e.g. Black Friday "Extra 20% off sale") applies automatically to sale items only (not full price);
    it is read from the store's own banner by the updater and disappears when the store stops showing it */
 const spExtra = p => { const x = DATA.meta && DATA.meta.spPromo; return isSP(p) && x && x.pct > 0 && p.compare > p.price ? x.pct : 0; };
-const extraPct = p => isMD(p) && p.extra25 ? 25 : spExtra(p);
-const netPrice = p => isMD(p) && p.extra25 ? p.price * 0.75 : spExtra(p) ? p.price * (1 - spExtra(p) / 100) : p.price;
+const mcExtra = p => isMacys(p) && p.promo && p.promo.pct > 0 && p.promo.pct < 80 ? p.promo.pct : 0;   // a Macy's public code shown on that product's page
+const extraPct = p => isMD(p) && p.extra25 ? 25 : spExtra(p) || mcExtra(p);
+const netPrice = p => isMD(p) && p.extra25 ? p.price * 0.75 : extraPct(p) ? p.price * (1 - extraPct(p) / 100) : p.price;
 const finalSAR = p => Math.round(netPrice(p) * rateFor(p) + extraFor(p));
 const saleSAR = p => Math.round(p.price * rateFor(p) + extraFor(p));
 const wasSAR = p => Math.round(p.compare * rateFor(p) + extraFor(p));
@@ -766,6 +767,7 @@ function card(p, showCat){
     ${showCat ? `<p class="cat-tag">${esc(kindOf(p))}</p>` : ""}
     <h3><a href="${plink(p)}" class="plain">${esc(p.title)}</a></h3>
     ${isMacys(p) ? `
+    ${mcExtra(p) ? `<p class="ptags"><span class="ptag ptag-x">EXTRA ${mcExtra(p)}% OFF</span></p>` : ""}
     <p class="sar${pct(p) ? " hot" : ""}">${fmt(finalSAR(p))}<small>SAR</small></p>
     ${pct(p) ? `<p class="eur"><s>${fmt(wasSAR(p))} SAR</s></p>` : ""}
     ${COSTS() ? `<p class="calc">${money(p, p.price)} (was ${money(p, p.compare)}) × ${usdRate().toFixed(3)} + ${fmt(extraFor(p))} SAR</p>` : ""}` : isMD(p) ? `
@@ -995,7 +997,7 @@ function priceBreak(p){
   const sale = saleSAR(p), fin = finalSAR(p), was = p.compare > p.price ? wasSAR(p) : 0;
   return `<dl class="pbreak">${was ? `<div><dt>Original price</dt><dd><s>${fmt(was)} SAR</s></dd></div>` : ""}
     <div><dt>${was ? "Official sale price" : "Price"}</dt><dd>${fmt(sale)} SAR</dd></div>
-    <div><dt>Extra ${x}% off${isSP(p) ? " · Black Friday" : ""}</dt><dd>−${fmt(sale - fin)} SAR</dd></div>
+    <div><dt>Extra ${x}% off${isSP(p) ? " · Black Friday" : mcExtra(p) && p.promo.code ? " · code " + esc(p.promo.code) : ""}</dt><dd>−${fmt(sale - fin)} SAR</dd></div>
     <div class="fin"><dt>Final price</dt><dd>${fmt(fin)} SAR</dd></div></dl>`;
 }
 
@@ -1125,8 +1127,9 @@ function viewItem(all, handle){
     <div class="info">
       <p class="cat-tag">${esc(kindOf(p))}</p>
       <h1>${esc(p.title)}</h1>
-      ${isMacys(p) ? `<p class="sar big${pct(p) ? " hot" : ""}">${fmt(finalSAR(p))}<small>SAR</small></p>
+      ${isMacys(p) ? `${mcExtra(p) ? `<p class="ptags"><span class="ptag ptag-x">EXTRA ${mcExtra(p)}% OFF</span></p>` : ""}<p class="sar big${pct(p) ? " hot" : ""}">${fmt(finalSAR(p))}<small>SAR</small></p>
       ${pct(p) ? `<p class="eur"><s>${fmt(wasSAR(p))} SAR</s><span class="pct">−${off}%</span></p>` : ""}
+      ${priceBreak(p)}
       ${(p.colors || []).length ? `<p class="small" style="margin-top:10px">Colours: ${esc(p.colors.join(", "))}</p>` : ""}
       ${p.note && OWNER ? `<p class="warnline">${esc(p.note)}</p>` : ""}
       ${COSTS() ? `<p class="calc">${money(p, p.price)} (was ${money(p, p.compare)}, −${pct(p)}%) × ${usdRate().toFixed(3)} + ${fmt(extraFor(p))} SAR</p>` : ""}`
