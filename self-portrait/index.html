@@ -369,6 +369,11 @@ nav.tabs .dot{display:inline-block;width:6px;height:6px;border-radius:50%;backgr
 .st-t td.pc{display:flex;gap:8px;align-items:center;min-width:220px}.st-t td.pc img{width:30px;height:40px;object-fit:cover}
 .nodata{color:var(--stone);font-size:13px;margin:6px 0}
 .audit{border-left:3px solid #1e7a46;padding:6px 10px;margin:0 0 10px;font-size:13px}.audit.bad{border-color:var(--red)}.audit ul{margin:4px 0 0 18px;padding:0}
+.adm{font-family:"Tajawal",var(--sans)}.adm .panel h3{font-family:"Tajawal",var(--sans);font-weight:500;font-size:19px}.adm h4{font:500 14px "Tajawal",var(--sans);margin:14px 0 4px}
+.kvs{display:flex;flex-direction:column;border-top:1px solid var(--rule);margin:6px 0 12px}.kv{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;padding:9px 0;border-bottom:1px solid var(--rule);font-size:14px}.kv b{font:400 20px var(--serif);min-width:48px;text-align:left}.muted{color:var(--stone);font-size:12.5px}
+.prices .prow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--rule)}.prow div{display:flex;flex-direction:column;gap:2px}.prow b{font-weight:500;font-size:14px}
+.padd{display:flex;align-items:center;gap:6px;font-size:13px}.padd input{width:84px;border:1px solid var(--rule);padding:7px 8px;font:inherit;text-align:center}
+.adm details summary{cursor:pointer;font-size:13px;color:var(--stone)}.adm details.adv{display:block}.adm details.adv>summary{list-style:none;display:flex;flex-direction:column;gap:4px}.adm details.adv>summary h3::before{content:"▸ ";color:var(--stone)}.adm details.adv[open]>summary h3::before{content:"▾ "}
 .consent{position:fixed;left:12px;right:12px;bottom:12px;z-index:60;background:#fff;border:1px solid var(--rule);box-shadow:0 6px 24px rgba(0,0,0,.08);padding:10px 14px;display:flex;gap:10px;align-items:center;font:400 13px/1.5 "Tajawal",var(--sans);max-width:620px;margin:0 auto}
 .consent span{flex:1}.consent button{border:1px solid var(--ink);background:var(--ink);color:#fff;padding:6px 14px;font:inherit;cursor:pointer}.consent button.q{background:#fff;color:var(--ink)}
 /* ---- size guide illustration ---- */
@@ -536,7 +541,7 @@ const PASS_HASH = "d6f7961e955b42afb04e910ef174ce7b82af4efe180a05605bc68aee28cad
 const REPO = "ranaa4117/black-friday-deals";
 const WORKFLOW = "self-portrait-update.yml";
 const LS = "sp-edit-v1";
-const APP_VERSION = "27";
+const APP_VERSION = "28";
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
@@ -727,9 +732,9 @@ async function loadData(manual){
     const w = side("winter.json"), sh = side("shoes.json");
     DATA = await r.json(); WINTER = (await w).products || WINTER; SHOES = (await sh).products || SHOES; loaded = true;
     await Promise.all([pullSync(), loadScores().then(() => SCORES ? null : loadTotals())]);
-    if (manual) toast("Up to date.");
+    if (manual) toast("البيانات محدّثة.");
   } catch (e) {
-    if (manual || !loaded) toast("Couldn't load the latest data (" + e.message + "). Check your connection and try again.");
+    if (manual || !loaded) toast("تعذّر تحميل آخر البيانات. تأكدي من الاتصال وحاولي مرة أخرى.");
   }
   render();
 }
@@ -758,22 +763,22 @@ async function pushSync(){
     const sha = cur.status === 200 ? (await cur.json()).sha : undefined;
     const body = btoa(unescape(encodeURIComponent(JSON.stringify(S))));
     await gh("/contents/self-portrait/personal.json", { method:"PUT", body: JSON.stringify({ message:"Update personal edits", content: body, sha }) });
-    toast("Saved and published.");
-  } catch (e) { toast("Saved on this device. Sync failed: " + e.message); }
+    toast("تم الحفظ والنشر.");
+  } catch (e) { toast("تم الحفظ على هذا الجهاز، لكن النشر لم ينجح: " + e.message); }
 }
 async function runCheck(kind){
-  const label = kind === "all" ? "Refresh of all products" : "Check for new deals";
-  if (!GH.token){ await loadData(true); toast("Reloaded the latest data. To start a live store check from here, add a GitHub token in Admin › Sync & publish."); return; }
+  const label = kind === "all" ? "تحديث كل المنتجات" : "البحث عن عروض جديدة";
+  if (!GH.token){ await loadData(true); toast("تم تحميل آخر البيانات. لتشغيل فحص مباشر للمتاجر من هنا، فعّلي المزامنة في الإعدادات المتقدمة."); return; }
   try {
     const r = await gh("/actions/workflows/" + WORKFLOW + "/dispatches", { method:"POST", body: JSON.stringify({ ref:"main", inputs:{ sg_limit: kind === "all" ? "120" : "40" } }) });
     if (r.status === 404) throw new Error("workflow not found");
-    toast(label + " started. Results usually arrive within 2–5 minutes.");
+    toast("بدأ " + label + ". تظهر النتيجة عادة خلال ٢–٥ دقائق.");
     const before = DATA.meta.lastCheck, beforeCount = recentList(products()).length; let n = 0;
     const iv = setInterval(async () => { n++; await loadData(false);
       if (DATA.meta.lastCheck !== before){ clearInterval(iv); const l = DATA.meta.log && DATA.meta.log[0];
-        toast(label + " finished: " + (l ? `${l.added} new, ${l.changed} changed, ${l.removed} left the sale.` : "data updated.")); }
+        toast("انتهى " + label + ": " + (l ? `${l.added} جديد، ${l.changed} تغيّر.` : "تم تحديث البيانات.")); }
       else if (n > 14) clearInterval(iv); }, 30000);
-  } catch (e) { toast("Couldn't start the store check: " + e.message); }
+  } catch (e) { toast("تعذّر بدء فحص المتاجر: " + e.message); }
 }
 function schedulePoll(){ clearInterval(pollTimer); const m = Math.max(2, Number(S.settings.poll) || 5); pollTimer = setInterval(() => loadData(false), m * 60000); }
 
@@ -1507,65 +1512,77 @@ function wireStats(){
 }
 
 function viewAdmin(all){
-  const m = DATA.meta, sizes = new Set(S.settings.sizes), cnt = m.counts || {}, sc = m.storeCounts || {};
-  const log = (m.log || []).slice(0, 14).map(l => `<div><span>${when(l.at)}</span><span>+${l.added} new · −${l.removed} left · ${l.changed} changed${l.guides != null ? " · " + l.guides + " guides" : ""}</span></div>`).join("");
-  const removed = (DATA.removed || []).slice(0, 60).map(r => `<div><a href="${esc(url(r))}" target="_blank" rel="noopener">${esc(r.title)}</a><span>${CAT1[r.cat || "midi"]} · ${r.brand === "md" ? "$" + r.price : eur(r.price)} · left ${ago(r.removedAt)}</span></div>`).join("") || '<div><span>Nothing has left the sale yet.</span></div>';
+  const m = DATA.meta, sizes = new Set(S.settings.sizes), cnt = m.counts || {};
+  const n = f => all.filter(f).length;
+  const log = (m.log || []).slice(0, 14).map(l => `<div><span>${when(l.at)}</span><span>${l.added} جديد · ${l.changed} تغيّر${l.removed ? " · " + l.removed + " خرج" : ""}</span></div>`).join("");
+  const removed = (DATA.removed || []).slice(0, 60);
   const hidden = Object.keys(S.del).length;
-  const withGuide = all.filter(p => p.guide && p.guide.length).length;
-  return `<div class="list-head"><div><h2>Admin & settings</h2><p>Changes save instantly on this device${GH.token && GH.sync ? " and are published to customers" : ". Customers see your edits once sync is on (Sync & publish below)"}.</p></div>
-    <div class="owner-tools"><button class="btn quiet" id="aCosts">${SHOWCOSTS ? "Hide my costs" : "Show my costs"}</button><button class="btn quiet" id="aLeave">View as a customer</button><a class="btn solid" href="#stats">الإحصاءات</a></div></div>
+  const brandRow = (name, detail, count) => `<div class="kv"><span dir="auto">${name}</span><span class="muted">${detail}</span><b>${arN(count)}</b></div>`;
+  const priceRow = (id, brand, how, val) => `<div class="prow"><div><b dir="auto">${brand}</b><span class="muted">${how}</span></div><label class="padd"><span>+</span><input id="${id}" type="number" inputmode="decimal" step="1" value="${val}" aria-label="المبلغ المضاف لـ ${esc(brand)}"><span>ر.س</span></label></div>`;
+  return `<div class="adm" dir="rtl" lang="ar">
+  <div class="st-head"><div><h2>الإدارة</h2><p>كل ما تغيّرينه هنا يُحفظ فوراً على هذا الجهاز${GH.token && GH.sync ? " ويُنشر للعملاء" : ". لنشر تعديلاتك للعملاء فعّلي «المزامنة» في آخر الصفحة"}.</p></div>
+    <div class="owner-tools"><a class="btn solid" href="#stats">الإحصاءات</a><button class="btn quiet" id="aCosts">${SHOWCOSTS ? "إخفاء تكاليفي" : "إظهار تكاليفي"}</button><button class="btn quiet" id="aLeave">عرض الموقع كعميلة</button></div></div>
 
-  <section class="panel"><div><h3>Brand health checks</h3><p class="why">Four times a day every brand is compared with its official site: missing or wrongly removed pieces, prices, extra discounts and stock. Problems are fixed and listed here.</p></div>
-    <div class="fields" id="auditBox"><p class="small">Loading…</p></div></section>
-
-  <section class="panel"><div><h3>Updates</h3><p class="why">GitHub checks the Spain store every 15 minutes: new sale items, prices, discounts, sizes, stock, photos and the exchange rate.</p></div>
+  <section class="panel"><div><h3>حالة المنتجات</h3><p class="why">يتم تحديث المنتجات والأسعار والمقاسات تلقائياً كل ١٥ دقيقة (منتجات Macy's كل ساعة). لا يُحذف أي منتج تلقائياً.</p></div>
     <div class="fields">
-      <div class="row"><button class="btn solid" id="aRefreshAll">Refresh all products</button><button class="btn" id="aNewDeals">Check for new deals</button></div>
-      <p class="small">Last store check ${when(m.lastCheck)} · last successful ${when(m.lastSuccess)} (Riyadh).<br>Tracked now: Self-Portrait ${cnt.midi || 0} midi · ${cnt.maxi || 0} maxi · ${cnt.bags || 0} bags · Mac Duggal ${cnt.md || 0} maxi. Store sale lists: ${sc.midi ?? "—"} · ${sc.maxi ?? "—"} · ${sc.bags ?? "—"}. Size guides collected: ${withGuide} of ${all.length}.${m.lastError ? `<br><span style="color:var(--sale)">${esc(m.lastError)}</span>` : ""}</p>
-      <label class="f">Reload this page's data every<select id="sPoll">${[2,5,10,15,30].map(n => `<option value="${n}" ${Number(S.settings.poll) === n ? "selected" : ""}>${n} minutes</option>`).join("")}</select></label>
-      <div class="mono-list">${log || "<div>No runs logged yet.</div>"}</div>
+      <p class="small">آخر تحديث ناجح: <b>${when(m.lastSuccess)}</b> (بتوقيت الرياض).${m.lastError ? `<br><span class="warnline">${esc(m.lastError)}</span>` : ""}</p>
+      <div class="kvs">
+        ${brandRow("Self-Portrait", "ميدي · ماكسي · شنط", n(isSP))}
+        ${brandRow("Mac Duggal", "فساتين ماكسي", n(isMD))}
+        ${brandRow("ELISABETTA FRANCHI", "فساتين ماكسي", n(isEF))}
+        ${brandRow("التخفيضات الشتوية", "Lauren Ralph Lauren", n(isRL))}
+        ${brandRow("الجزم", "Macy's", n(isMC))}</div>
+      <div class="row"><button class="btn solid" id="aRefreshAll">تحديث كل المنتجات الآن</button><button class="btn" id="aNewDeals">البحث عن عروض جديدة</button></div>
+      <p class="small">الزرّان يعملان فوراً عند تفعيل المزامنة؛ بدونها يعيدان تحميل آخر البيانات فقط. النتيجة تظهر خلال ٢–٥ دقائق.</p>
+      <details><summary>سجل التحديثات</summary><div class="mono-list">${log || "<div>لا يوجد سجل بعد.</div>"}</div></details>
     </div></section>
 
-  <section class="panel"><div><h3>Pricing</h3><p class="why">Final price = discounted € × EUR/SAR rate + fixed amount, rounded to the nearest riyal. Dresses and bags have separate fixed amounts.</p></div>
-    <div class="fields">
-      <label class="f">Clothing — fixed amount added to every dress (SAR)<input id="sExtra" type="number" inputmode="decimal" step="1" value="${extra()}"></label>
-      <label class="f">Bags — fixed amount added to every bag (SAR)<input id="sExtraBags" type="number" inputmode="decimal" step="1" value="${extraBags()}"></label>
-      <label class="f">Mac Duggal — fixed amount added to every dress (SAR)<input id="sExtraMD" type="number" inputmode="decimal" step="1" value="${extraMD()}"></label>
-      <label class="f">Winter Sale (Lauren Ralph Lauren) — fixed amount added to every piece (SAR)<input id="sExtraRL" type="number" inputmode="decimal" step="1" value="${extraRL()}"></label>
-      <label class="f">Shoes (Macy's) — fixed amount added to every pair (SAR)<input id="sExtraShoes" type="number" inputmode="decimal" step="1" value="${extraShoes()}"></label>
-      <label class="f">Elisabetta Franchi — fixed amount added to every dress (SAR)<input id="sExtraEF" type="number" inputmode="decimal" step="1" value="${extraEF()}"></label>
-      <p class="small">Mac Duggal: US price, less any Black Friday markdown, less the extra 25% where Mac Duggal labels it “+25% Off In Cart”, × USD/SAR ${usdRate().toFixed(4)} (${esc(m.usdRate && m.usdRate.source || "peg 3.75")}) + the fixed amount.</p>
-      <label class="f">EUR → SAR rate<input id="sRate" type="number" inputmode="decimal" step="0.0001" placeholder="Live: ${Number(m.rate && m.rate.value || 0).toFixed(4)}" value="${S.settings.rate || ""}"></label>
-      <p class="small">Live rate ${Number(m.rate && m.rate.value || 0).toFixed(4)} from ${esc(m.rate && m.rate.source || "—")}${m.rate && m.rate.asOf ? ", " + esc(m.rate.asOf) : ""}. Leave empty to use the live rate.</p>
-      <p class="small">Example: €200 × ${rate().toFixed(3)} = ${fmt(Math.round(200 * rate()))} SAR, + ${fmt(extra())} = <b>${fmt(Math.round(200 * rate() + extra()))} SAR</b> for a dress, ${fmt(Math.round(200 * rate() + extraBags()))} SAR for a bag.</p>
+  <section class="panel"><div><h3>فحص الماركات</h3><p class="why">أربع مرات يومياً تتم مقارنة كل ماركة بموقعها الرسمي: منتجات ناقصة، أسعار، خصومات إضافية، ومخزون. أي مشكلة تُصلَّح وتظهر هنا.</p></div>
+    <div class="fields" id="auditBox"><p class="small">جارٍ التحميل…</p></div></section>
+
+  <section class="panel"><div><h3>الأسعار</h3><p class="why">السعر النهائي للعميلة = سعر المتجر بعد الخصم × سعر الصرف + المبلغ الذي تضيفينه. غيّري المبلغ المضاف لأي ماركة وسيتحدث كل شيء فوراً.</p></div>
+    <div class="fields prices">
+      ${priceRow("sExtra", "Self-Portrait — فساتين", "اليورو × سعر الصرف، بعد أي خصم إضافي من المتجر", extra())}
+      ${priceRow("sExtraBags", "Self-Portrait — شنط", "اليورو × سعر الصرف", extraBags())}
+      ${priceRow("sExtraMD", "Mac Duggal", "الدولار × ٣٫٧٥، بعد خصم ٢٥٪ الإضافي حيث يظهر", extraMD())}
+      ${priceRow("sExtraEF", "ELISABETTA FRANCHI", "اليورو × سعر الصرف", extraEF())}
+      ${priceRow("sExtraRL", "التخفيضات الشتوية", "الدولار × ٣٫٧٥", extraRL())}
+      ${priceRow("sExtraShoes", "الجزم (Macy's)", "الدولار × ٣٫٧٥", extraShoes())}
+      <label class="f">سعر اليورو بالريال<input id="sRate" type="number" inputmode="decimal" step="0.0001" dir="ltr" placeholder="${Number(m.rate && m.rate.value || 0).toFixed(4)}" value="${S.settings.rate || ""}"></label>
+      <p class="small">السعر الحالي تلقائياً: ${Number(m.rate && m.rate.value || 0).toFixed(4)}. اتركي الخانة فارغة لاستخدام السعر التلقائي. الدولار ثابت: ${usdRate().toFixed(2)}.</p>
+      <p class="small">مثال: فستان بـ €200 → ${fmt(Math.round(200 * rate()))} ر.س + ${fmt(extra())} = <b>${fmt(Math.round(200 * rate() + extra()))} ر.س</b></p>
     </div></section>
 
-  <section class="panel"><div><h3>My sizes</h3><p class="why">Highlighted on cards and used by the “My sizes” filter.</p></div>
-    <div class="fields"><div class="size-edit" id="mySizes">${UKS.map(n => `<button data-my="${n}" class="${sizes.has(n) ? "" : "off"}" aria-pressed="${sizes.has(n)}">UK ${n}</button>`).join("")}</div>
-    <p class="small">Self-Portrait's chart: FR 32–44 = UK 4–16; knits XS = UK 4, S = UK 6–8, M = UK 10–12, L = UK 14–16.</p></div></section>
-
-  <section class="panel"><div><h3>Products</h3><p class="why">Edit names, photos, prices, sizes and notes, or add a piece by hand.${hidden ? " " + hidden + " deleted." : ""}</p></div>
+  <section class="panel"><div><h3>المنتجات</h3><p class="why">عدّلي اسم أو صورة أو سعر أو مقاسات أي منتج، أو أضيفي منتجاً يدوياً.${hidden ? " لديك " + hidden + " منتج محذوف يدوياً." : ""}</p></div>
     <div class="fields" style="max-width:none">
-      <div class="row"><button class="btn solid" id="aAdd">Add a product</button><label class="search" style="flex:1"><input id="aQ" type="search" placeholder="Find a product to edit"></label></div>
+      <div class="row"><button class="btn solid" id="aAdd">إضافة منتج</button><label class="search" style="flex:1"><input id="aQ" type="search" placeholder="ابحثي عن منتج لتعديله" dir="auto"></label></div>
       <div class="edit-list" id="editList"></div>
-      ${hidden ? `<div class="row"><button class="btn quiet" id="aRestore">Restore ${hidden} deleted</button></div>` : ""}
+      ${hidden ? `<div class="row"><button class="btn quiet" id="aRestore">استرجاع ${hidden} منتج محذوف</button></div>` : ""}
     </div></section>
 
-  <section class="panel"><div><h3>Waiting to be re-checked</h3><p class="why">Pieces an older version removed. Each is re-checked on its own official page and put back automatically; nothing is deleted.</p></div>
-    <div class="fields" style="max-width:none"><div class="mono-list">${removed}</div></div></section>
+  ${removed.length ? `<section class="panel"><div><h3>بانتظار إعادة الفحص</h3><p class="why">منتجات أزالتها نسخة قديمة من الموقع. تتم إعادتها تلقائياً بعد فحصها في موقعها الرسمي.</p></div>
+    <div class="fields" style="max-width:none"><div class="mono-list">${removed.map(r => `<div><a href="${esc(url(r))}" target="_blank" rel="noopener" dir="auto">${esc(r.title)}</a><span>${esc(BRANDS[r.brand || "sp"] || "")}</span></div>`).join("")}</div></div></section>` : ""}
 
-  <section class="panel"><div><h3>Sync & publish</h3><p class="why">Publishes your price, photo, size, add and delete edits to customers and shares them across your devices. Also lets the two update buttons start a live store check.</p></div>
+  <details class="panel adv"><summary><h3>إعدادات متقدمة</h3><span class="why">المزامنة، النسخ الاحتياطي، والمقاسات</span></summary>
     <div class="fields">
-      <label class="f">GitHub fine-grained token (Contents: read & write, Actions: read & write for ${REPO})<input id="ghTok" type="password" autocomplete="off" value="${esc(GH.token)}" placeholder="github_pat_…"></label>
-      <label class="row small"><input type="checkbox" id="ghSync" ${GH.sync ? "checked" : ""}> Sync my edits through the repo</label>
-      <p class="small">The token stays on this device only. Notes and favorites never show on the customer site, but the repo is public, so keep private details out of notes.</p>
-      <div class="row"><button class="btn" id="ghSave">Save sync settings</button><button class="btn quiet" id="bCopy">Copy backup</button><button class="btn quiet" id="bImport">Import backup</button></div>
-    </div></section>`;
+      <h4>المزامنة والنشر</h4>
+      <p class="small">تنشر تعديلاتك (الأسعار، الصور، المقاسات، الإضافة والحذف) للعملاء، وتنقلها لأجهزتك الأخرى، وتشغّل زرَّي التحديث أعلاه.</p>
+      <label class="f">رمز GitHub (صلاحيات Contents و Actions: قراءة وكتابة لـ ${REPO})<input id="ghTok" type="password" autocomplete="off" dir="ltr" value="${esc(GH.token)}" placeholder="github_pat_…"></label>
+      <label class="row small"><input type="checkbox" id="ghSync" ${GH.sync ? "checked" : ""}> تفعيل المزامنة</label>
+      <p class="small">الرمز يبقى على هذا الجهاز فقط. الملاحظات والمفضلة لا تظهر للعملاء، لكن المستودع عام، فلا تكتبي معلومات خاصة في الملاحظات.</p>
+      <div class="row"><button class="btn" id="ghSave">حفظ إعدادات المزامنة</button><button class="btn quiet" id="bCopy">نسخ نسخة احتياطية</button><button class="btn quiet" id="bImport">استيراد نسخة احتياطية</button></div>
+      <h4>تحديث الصفحة المفتوحة</h4>
+      <label class="f">إعادة تحميل البيانات في هذه الصفحة كل<select id="sPoll">${[2,5,10,15,30].map(x => `<option value="${x}" ${Number(S.settings.poll) === x ? "selected" : ""}>${x} دقائق</option>`).join("")}</select></label>
+      <h4>مقاساتي (Self-Portrait)</h4>
+      <p class="small">تُميَّز هذه المقاسات في البطاقات عندك فقط.</p>
+      <div class="size-edit" id="mySizes" dir="ltr">${UKS.map(x => `<button data-my="${x}" class="${sizes.has(x) ? "" : "off"}" aria-pressed="${sizes.has(x)}">UK ${x}</button>`).join("")}</div>
+    </div></details>
+  </div>`;
 }
 function editList(all){
   const q = ($("#aQ") && $("#aQ").value || "").toLowerCase();
   $("#editList").innerHTML = all.filter(p => !q || p.title.toLowerCase().includes(q)).slice(0, 150).map(p =>
-    `<button data-edit="${esc(p.handle)}"><img loading="lazy" src="${esc(img(p.image,100))}" alt=""><span>${esc(p.title)}<br><span class="tag">${esc(kindOf(p))} · ${money(p, p.price)} · ${fmt(finalSAR(p))} SAR${p.edited ? " · edited" : ""}${p.manual ? " · added by you" : ""}${S.fav[p.handle] ? " · ♥" : ""}</span></span><span class="tag">Edit</span></button>`).join("");
+    `<button data-edit="${esc(p.handle)}"><img loading="lazy" src="${esc(img(p.image,100))}" alt=""><span dir="auto">${esc(p.title)}<br><span class="tag">${esc(kindOf(p))} · ${money(p, p.price)} · ${fmt(finalSAR(p))} ر.س${p.edited ? " · معدّل" : ""}${p.manual ? " · مضاف يدوياً" : ""}${S.fav[p.handle] ? " · ♥" : ""}</span></span><span class="tag">تعديل</span></button>`).join("");
 }
 
 /* ---------- editor ---------- */
@@ -1577,24 +1594,24 @@ function openEditor(handle){
   const isNewItem = !p;
   if (!p) p = { handle:"manual-" + Date.now(), cat:"midi", title:"", image:"", images:[], price:0, compare:0, sizes: FR.map(s => ({ s, a:true })), url:"", manual:true, firstSeen:new Date().toISOString(), lastChanged:new Date().toISOString(), changes:[] };
   let sizes = (p.sizes || []).map(s => Object.assign({}, s));
-  $("#dlgBody").innerHTML = `<h3>${isNewItem ? "Add a product" : "Edit product"}</h3>
+  $("#dlgBody").innerHTML = `<div dir="rtl" lang="ar"><h3>${isNewItem ? "إضافة منتج" : "تعديل المنتج"}</h3>
     <div class="fields">
-      ${p.manual ? `<label class="f">Category<select id="eCat">${Object.entries(CAT1).map(([k,v]) => opt(k, v, p.cat || "midi")).join("")}</select></label>` : ""}
-      <label class="f">Name<input id="eT" value="${esc(p.title)}"></label>
-      <label class="f">Image URL<input id="eI" value="${esc(p.image)}" placeholder="https://…jpg"></label>
-      ${p.manual ? `<label class="f">Product page link<input id="eU" value="${esc(p.url || "")}" placeholder="https://eu.self-portrait.com/es-es/products/…"></label>` : ""}
-      <div class="row"><label class="f" style="flex:1">Original price (${isUS(p) ? "$" : "€"})<input id="eC" type="number" step="0.01" inputmode="decimal" value="${p.compare || ""}"></label>
-      <label class="f" style="flex:1">Discounted price (${isUS(p) ? "$" : "€"})<input id="eP" type="number" step="0.01" inputmode="decimal" value="${p.price || ""}"></label></div>
-      <div><p class="small" style="margin-bottom:6px">Sizes — tap to mark in stock or sold out</p><div class="size-edit" id="eS"></div>
-        <div class="row" style="margin-top:8px"><button class="btn quiet" id="eSys">Switch size set</button></div></div>
-      <label class="f">Personal note (only you see this)<textarea id="eN" placeholder="Fit, colour, occasion…">${esc(S.notes[p.handle] || "")}</textarea></label>
-      <label class="row small"><input type="checkbox" id="eF" ${S.fav[p.handle] ? "checked" : ""}> Favorite</label>
+      ${p.manual ? `<label class="f">القسم<select id="eCat">${Object.entries(CAT1).map(([k,v]) => opt(k, v, p.cat || "midi")).join("")}</select></label>` : ""}
+      <label class="f">الاسم<input id="eT" dir="auto" value="${esc(p.title)}"></label>
+      <label class="f">رابط الصورة<input id="eI" dir="ltr" value="${esc(p.image)}" placeholder="https://…jpg"></label>
+      ${p.manual ? `<label class="f">رابط صفحة المنتج<input id="eU" dir="ltr" value="${esc(p.url || "")}" placeholder="https://eu.self-portrait.com/es-es/products/…"></label>` : ""}
+      <div class="row"><label class="f" style="flex:1">السعر الأصلي (${isUS(p) ? "$" : "€"})<input id="eC" type="number" step="0.01" inputmode="decimal" value="${p.compare || ""}"></label>
+      <label class="f" style="flex:1">السعر بعد الخصم (${isUS(p) ? "$" : "€"})<input id="eP" type="number" step="0.01" inputmode="decimal" value="${p.price || ""}"></label></div>
+      <div><p class="small" style="margin-bottom:6px">المقاسات — اضغطي لتحديد المتوفر أو النافد</p><div class="size-edit" id="eS" dir="ltr"></div>
+        <div class="row" style="margin-top:8px"><button class="btn quiet" id="eSys">تغيير نوع المقاسات</button></div></div>
+      <label class="f">ملاحظة خاصة (لك وحدك)<textarea id="eN" placeholder="المقاس، اللون، المناسبة…">${esc(S.notes[p.handle] || "")}</textarea></label>
+      <label class="row small"><input type="checkbox" id="eF" ${S.fav[p.handle] ? "checked" : ""}> في المفضلة</label>
       <p class="small" id="eErr" style="color:var(--sale)"></p>
     </div>
     <div class="foot">
-      <div class="row">${!isNewItem ? `<button class="btn danger" id="eDel">Delete</button>` : ""}${S.ov[p.handle] && !p.manual ? `<button class="btn quiet" id="eReset">Reset to store data</button>` : ""}</div>
-      <div class="row"><button class="btn quiet" id="eCancel">Cancel</button><button class="btn solid" id="eSave">${isNewItem ? "Add product" : "Save changes"}</button></div>
-    </div>`;
+      <div class="row">${!isNewItem ? `<button class="btn danger" id="eDel">حذف</button>` : ""}${S.ov[p.handle] && !p.manual ? `<button class="btn quiet" id="eReset">الرجوع لبيانات المتجر</button>` : ""}</div>
+      <div class="row"><button class="btn quiet" id="eCancel">إلغاء</button><button class="btn solid" id="eSave">${isNewItem ? "إضافة المنتج" : "حفظ التغييرات"}</button></div>
+    </div></div>`;
   const drawSizes = () => { $("#eS").innerHTML = sizes.map((s,i) => `<button data-i="${i}" class="${s.a ? "" : "off"}" aria-pressed="${s.a}" title="${esc(s.s)}">${ukRange(s.s) ? "UK " + esc(ukLabel(s.s)) : esc(s.s)}</button>`).join(""); };
   drawSizes();
   $("#eS").onclick = e => { const b = e.target.closest("button"); if (!b) return; const s = sizes[b.dataset.i]; s.a = !s.a; drawSizes(); };
@@ -1602,9 +1619,9 @@ function openEditor(handle){
   $("#eCancel").onclick = () => $("#dlg").close();
   $("#eSave").onclick = () => {
     const t = $("#eT").value.trim(), price = Number($("#eP").value), compare = Number($("#eC").value);
-    if (!t) return $("#eErr").textContent = "Add a name.";
-    if (!(price > 0)) return $("#eErr").textContent = "Enter the discounted price in euros.";
-    if (compare && compare < price) return $("#eErr").textContent = "The original price should be higher than the discounted price.";
+    if (!t) return $("#eErr").textContent = "أضيفي اسماً.";
+    if (!(price > 0)) return $("#eErr").textContent = "أدخلي السعر بعد الخصم.";
+    if (compare && compare < price) return $("#eErr").textContent = "السعر الأصلي يجب أن يكون أعلى من السعر بعد الخصم.";
     const fields = { title:t, image:$("#eI").value.trim(), price, compare: compare || price, sizes };
     if (p.manual){
       const rec = Object.assign({}, p, fields, { cat: $("#eCat") ? $("#eCat").value : p.cat, url: ($("#eU") && $("#eU").value.trim()) || "", lastChanged:new Date().toISOString() });
@@ -1619,17 +1636,17 @@ function openEditor(handle){
     }
     const n = $("#eN").value.trim(); if (n) S.notes[p.handle] = n; else delete S.notes[p.handle];
     if ($("#eF").checked){ if (S.fav[p.handle] == null) S.fav[p.handle] = { t: Date.now() }; } else delete S.fav[p.handle];
-    save(); $("#dlg").close(); toast(isNewItem ? "Product added." : "Changes saved."); render();
+    save(); $("#dlg").close(); toast(isNewItem ? "تمت إضافة المنتج." : "تم حفظ التغييرات."); render();
   };
   if ($("#eDel")) $("#eDel").onclick = () => { const b = $("#eDel");
-    if (b.dataset.sure){ S.del[p.handle] = Date.now(); delete S.fav[p.handle]; save(); $("#dlg").close(); toast("Deleted. Restore it from Admin › Products."); render(); }
-    else { b.dataset.sure = 1; b.textContent = "Tap again to delete"; } };
-  if ($("#eReset")) $("#eReset").onclick = () => { delete S.ov[p.handle]; save(); $("#dlg").close(); toast("Back to the store's data."); render(); };
+    if (b.dataset.sure){ S.del[p.handle] = Date.now(); delete S.fav[p.handle]; save(); $("#dlg").close(); toast("تم الحذف. يمكنك استرجاعه من الإدارة › المنتجات."); render(); }
+    else { b.dataset.sure = 1; b.textContent = "اضغطي مرة أخرى للتأكيد"; } };
+  if ($("#eReset")) $("#eReset").onclick = () => { delete S.ov[p.handle]; save(); $("#dlg").close(); toast("تم الرجوع لبيانات المتجر."); render(); };
   $("#dlg").showModal();
 }
 function textDialog(title, value, onOk, okLabel){
   $("#dlgBody").innerHTML = `<h3>${title}</h3><label class="f"><textarea id="tA" style="min-height:220px;font-size:12px">${esc(value)}</textarea></label><p class="small" id="tErr" style="color:var(--sale)"></p>
-    <div class="foot"><span></span><div class="row"><button class="btn quiet" id="tC">Close</button>${onOk ? `<button class="btn solid" id="tO">${okLabel}</button>` : ""}</div></div>`;
+    <div class="foot"><span></span><div class="row"><button class="btn quiet" id="tC">إغلاق</button>${onOk ? `<button class="btn solid" id="tO">${okLabel}</button>` : ""}</div></div>`;
   $("#tC").onclick = () => $("#dlg").close();
   if (onOk) $("#tO").onclick = () => onOk($("#tA").value);
   $("#dlg").showModal();
@@ -1749,28 +1766,28 @@ function wireAdmin(list){
   fetch(BASE + "audit.json?t=" + Date.now(), { cache:"no-store" }).then(r => r.ok ? r.json() : { audits: [] }).catch(() => ({ audits: [] })).then(a => {
     const box = $("#auditBox"); if (!box) return;
     const list = (a.audits || []).slice(0, 8);
-    box.innerHTML = list.length ? list.map(x => `<div class="audit ${x.ok ? "ok" : "bad"}"><b>${when(x.at)} · ${x.ok ? "All brands OK" : (x.problems || 0) + " problem" + (x.problems === 1 ? "" : "s") + " found" + (x.fixed ? ", " + x.fixed + " fixed" : "")}</b>${(x.notes || []).length ? `<ul>${x.notes.map(n => `<li>${esc(n)}</li>`).join("")}</ul>` : ""}</div>`).join("")
-      : '<p class="small">The first health check hasn\'t run yet.</p>';
+    box.innerHTML = list.length ? list.map(x => `<div class="audit ${x.ok ? "ok" : "bad"}"><b>${when(x.at)} · ${x.ok ? "كل الماركات سليمة" : "وُجدت " + (x.problems || 0) + " مشكلة" + (x.fixed ? "، تم إصلاح " + x.fixed : "")}</b>${(x.notes || []).length ? `<ul>${x.notes.map(n => `<li>${esc(n)}</li>`).join("")}</ul>` : ""}</div>`).join("")
+      : '<p class="small">لم يتم أول فحص بعد.</p>';
   });
   editList(list); $("#aQ").oninput = () => editList(products());
-  $("#aCosts").onclick = () => { SHOWCOSTS = !SHOWCOSTS; render(); toast(SHOWCOSTS ? "Showing your € costs on every page. Only you can see this." : "Costs hidden."); };
-  $("#aLeave").onclick = () => { store.set("sp-unlock", ""); OWNER = false; SHOWCOSTS = false; location.hash = "#home"; render(); loadData(false); toast("Customer view. Open #admin to sign back in."); };
+  $("#aCosts").onclick = () => { SHOWCOSTS = !SHOWCOSTS; render(); toast(SHOWCOSTS ? "تظهر تكاليفك الآن في كل الصفحات، لك وحدك." : "تم إخفاء التكاليف."); };
+  $("#aLeave").onclick = () => { store.set("sp-unlock", ""); OWNER = false; SHOWCOSTS = false; location.hash = "#home"; render(); loadData(false); toast("أنتِ الآن تشاهدين الموقع كعميلة. للعودة افتحي ‎#admin‎"); };
   $("#aRefreshAll").onclick = () => runCheck("all");
   $("#aNewDeals").onclick = () => runCheck("new");
-  $("#sExtra").onchange = e => { const v = Number(e.target.value); if (!Number.isFinite(v) || v < 0) return toast("Enter a number of riyals, 0 or more."); S.settings.extra = v; save(); render(); toast("Every dress now adds " + fmt(v) + " SAR."); };
-  $("#sExtraEF").onchange = e => { const v = Number(e.target.value); if (!Number.isFinite(v) || v < 0) return toast("Enter a number of riyals, 0 or more."); S.settings.extraEF = v; save(); render(); toast("Every Elisabetta Franchi dress now adds " + fmt(v) + " SAR."); };
-  $("#sExtraShoes").onchange = e => { const v = Number(e.target.value); if (!Number.isFinite(v) || v < 0) return toast("Enter a number of riyals, 0 or more."); S.settings.extraShoes = v; save(); render(); toast("Every pair of shoes now adds " + fmt(v) + " SAR."); };
-  $("#sExtraRL").onchange = e => { const v = Number(e.target.value); if (!Number.isFinite(v) || v < 0) return toast("Enter a number of riyals, 0 or more."); S.settings.extraRL = v; save(); render(); toast("Every Winter Sale piece now adds " + fmt(v) + " SAR."); };
-  $("#sExtraMD").onchange = e => { const v = Number(e.target.value); if (!Number.isFinite(v) || v < 0) return toast("Enter a number of riyals, 0 or more."); S.settings.extraMD = v; save(); render(); toast("Every Mac Duggal dress now adds " + fmt(v) + " SAR."); };
-  $("#sExtraBags").onchange = e => { const v = Number(e.target.value); if (!Number.isFinite(v) || v < 0) return toast("Enter a number of riyals, 0 or more."); S.settings.extraBags = v; save(); render(); toast("Every bag now adds " + fmt(v) + " SAR."); };
-  $("#sRate").onchange = e => { const v = Number(e.target.value); S.settings.rate = v > 0 ? v : null; save(); render(); toast(v > 0 ? "Using your rate " + v + "." : "Using the live rate."); };
-  $("#sPoll").onchange = e => { S.settings.poll = Number(e.target.value); save(); schedulePoll(); toast("Reloading every " + e.target.value + " minutes."); };
+  $("#sExtra").onchange = e => { const v = Number(e.target.value); if (!Number.isFinite(v) || v < 0) return toast("أدخلي رقماً بالريال، صفر أو أكثر."); S.settings.extra = v; save(); render(); toast("يُضاف الآن " + fmt(v) + " ر.س لكل فستان Self-Portrait."); };
+  $("#sExtraEF").onchange = e => { const v = Number(e.target.value); if (!Number.isFinite(v) || v < 0) return toast("أدخلي رقماً بالريال، صفر أو أكثر."); S.settings.extraEF = v; save(); render(); toast("يُضاف الآن " + fmt(v) + " ر.س لكل فستان ELISABETTA FRANCHI."); };
+  $("#sExtraShoes").onchange = e => { const v = Number(e.target.value); if (!Number.isFinite(v) || v < 0) return toast("أدخلي رقماً بالريال، صفر أو أكثر."); S.settings.extraShoes = v; save(); render(); toast("يُضاف الآن " + fmt(v) + " ر.س لكل جزمة."); };
+  $("#sExtraRL").onchange = e => { const v = Number(e.target.value); if (!Number.isFinite(v) || v < 0) return toast("أدخلي رقماً بالريال، صفر أو أكثر."); S.settings.extraRL = v; save(); render(); toast("يُضاف الآن " + fmt(v) + " ر.س لكل قطعة في التخفيضات الشتوية."); };
+  $("#sExtraMD").onchange = e => { const v = Number(e.target.value); if (!Number.isFinite(v) || v < 0) return toast("أدخلي رقماً بالريال، صفر أو أكثر."); S.settings.extraMD = v; save(); render(); toast("يُضاف الآن " + fmt(v) + " ر.س لكل فستان Mac Duggal."); };
+  $("#sExtraBags").onchange = e => { const v = Number(e.target.value); if (!Number.isFinite(v) || v < 0) return toast("أدخلي رقماً بالريال، صفر أو أكثر."); S.settings.extraBags = v; save(); render(); toast("يُضاف الآن " + fmt(v) + " ر.س لكل شنطة."); };
+  $("#sRate").onchange = e => { const v = Number(e.target.value); S.settings.rate = v > 0 ? v : null; save(); render(); toast(v > 0 ? "يُستخدم سعرك: " + v : "يُستخدم السعر التلقائي."); };
+  $("#sPoll").onchange = e => { S.settings.poll = Number(e.target.value); save(); schedulePoll(); toast("تحديث كل " + e.target.value + " دقائق."); };
   $("#mySizes").onclick = e => { const b = e.target.closest("[data-my]"); if (!b) return; const s = Number(b.dataset.my), set = new Set(S.settings.sizes); set.has(s) ? set.delete(s) : set.add(s); S.settings.sizes = UKS.filter(x => set.has(x)); save(); render(); };
   $("#aAdd").onclick = () => openEditor(null);
-  if ($("#aRestore")) $("#aRestore").onclick = () => { S.del = {}; save(); render(); toast("Deleted products restored."); };
-  $("#ghSave").onclick = () => { GH = { token: $("#ghTok").value.trim(), sync: $("#ghSync").checked }; store.set("sp-gh", JSON.stringify(GH)); toast(GH.sync && GH.token ? "Sync on. Publishing now…" : "Sync settings saved."); if (GH.sync && GH.token) pushSync(); render(); };
-  $("#bCopy").onclick = async () => { const txt = JSON.stringify(S); try { await navigator.clipboard.writeText(txt); toast("Backup copied. Paste it somewhere safe."); } catch { textDialog("Your backup", txt); } };
-  $("#bImport").onclick = () => textDialog("Import backup", "", txt => { try { const d = JSON.parse(txt); if (!d || typeof d !== "object" || !("fav" in d)) throw 0; S = Object.assign(defaults(), d); S.settings = Object.assign(defaults().settings, d.settings || {}); save(); $("#dlg").close(); render(); toast("Backup imported."); } catch { $("#tErr").textContent = "That isn't a backup from this site. Paste the full text you copied."; } }, "Import");
+  if ($("#aRestore")) $("#aRestore").onclick = () => { S.del = {}; save(); render(); toast("تم استرجاع المنتجات المحذوفة."); };
+  $("#ghSave").onclick = () => { GH = { token: $("#ghTok").value.trim(), sync: $("#ghSync").checked }; store.set("sp-gh", JSON.stringify(GH)); toast(GH.sync && GH.token ? "المزامنة مفعّلة، جارٍ النشر…" : "تم حفظ إعدادات المزامنة."); if (GH.sync && GH.token) pushSync(); render(); };
+  $("#bCopy").onclick = async () => { const txt = JSON.stringify(S); try { await navigator.clipboard.writeText(txt); toast("تم نسخ النسخة الاحتياطية. احفظيها في مكان آمن."); } catch { textDialog("نسختك الاحتياطية", txt); } };
+  $("#bImport").onclick = () => textDialog("استيراد نسخة احتياطية", "", txt => { try { const d = JSON.parse(txt); if (!d || typeof d !== "object" || !("fav" in d)) throw 0; S = Object.assign(defaults(), d); S.settings = Object.assign(defaults().settings, d.settings || {}); save(); $("#dlg").close(); render(); toast("تم استيراد النسخة الاحتياطية."); } catch { $("#tErr").textContent = "هذا ليس نسخة احتياطية من هذا الموقع. الصقي النص كاملاً."; } }, "استيراد");
 }
 
 document.addEventListener("click", e => {
