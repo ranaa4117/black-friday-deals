@@ -1,5 +1,5 @@
 {
- "at": "2026-11-23T20:12:11Z",
+ "at": "2026-11-23T20:17:05Z",
  "results": [
   {
    "n": 1,
@@ -11,7 +11,7 @@
    "n": 2,
    "test": "Mac Duggal dresses previously marked 'extra ended' (687)",
    "result": "PASS",
-   "detail": "re-read the 40 most recent: label still shown on 1 (+2 checkout-verify) → these get their 25% back automatically; truly no label on 37; unreadable 0; e.g. Black Pleated Shimmering One Shoulder Gown, Dusty Rose Feather Embellished Long Sleeve Gown, Black Embellished Mesh Long Sleeve Gown"
+   "detail": "re-read the 40 most recent: label still shown on 1 (+2 checkout-verify) → the updater gives these their 25% back; truly no label on 37; unreadable 0; e.g. Black Pleated Shimmering One Shoulder Gown, Dusty Rose Feather Embellished Long Sleeve Gown, Black Embellished Mesh Long Sleeve Gown"
   },
   {
    "n": 3,
@@ -41,7 +41,7 @@
    "n": 7,
    "test": "Permanently removed from the official site",
    "result": "FAIL",
-   "detail": "«Brown Embellished Cap Sleeve Evening Gown»: product data and web page both 'not found' (live) — 1st check: kept; after 3 checks over 24h: deleted"
+   "detail": "«Brown Embellished Cap Sleeve Evening Gown»: product data 'not found'; its web page could not be confirmed as not found (live) — 1st check: kept; after 3 checks over 24h: deleted"
   }
  ]
 }
