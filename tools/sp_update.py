@@ -215,6 +215,103 @@ def fetch_md_chart():
     return {"tables": tables[:8], "headings": [x for x in titles if x][:12], "url": f"{MD_STORE}/pages/size-chart", "at": now_iso()}
 
 
+EF_SITE = "https://outlet.elisabettafranchi.com"
+EF_PAGE = EF_SITE + "/it-it/abbigliamento/abiti/abiti-lunghi/?page=2"   # the owner's exact page — never other pages
+EF_NOT_MAXI = re.compile(r"\b(mini ?abito|miniabito|mini|midi|longuette|corto|body|tuta|jumpsuit|top|gonna|blazer|giacca)\b", re.I)
+EF_LIST_KEYS = ("listPrice", "standardPrice", "originalPrice", "fullPrice", "compareAtPrice", "strikePrice", "regularPrice", "priceBefore")
+
+
+def ef_page_links():
+    html = fetch(EF_PAGE, accept="text/html")
+    links = []
+    for href in re.findall(r'href="(/it-it/[^"#?]+\.html)"', html):
+        if href not in links:
+            links.append(href)
+    return links
+
+
+def ef_product(href, debug=False):
+    url = EF_SITE + href
+    h = fetch(url, accept="text/html")
+    ld = None
+    for blk in re.findall(r'<script type="application/ld\+json">(.*?)</script>', h, re.S):
+        try:
+            j = json.loads(blk)
+        except Exception:  # noqa: BLE001
+            continue
+        if isinstance(j, dict) and j.get("@type") == "Product":
+            ld = j
+            break
+    if not ld:
+        raise RuntimeError("no product data")
+    name = html.unescape(ld.get("name") or "").strip()
+    color = html.unescape(str(ld.get("color") or "")).strip()
+    desc = html.unescape(ld.get("description") or "")
+    length = re.search(r"Lunghezza\s+(\d{2,3})\s*cm", h)
+    length = int(length.group(1)) if length else None
+    variants = re.findall(r'\{"orderable":(true|false),"price":([\d.]+),"productId":"\d+".{0,600}?"size":"([^"]+)","color":"([^"]+)"\}', h)
+    prices = sorted({float(v[1]) for v in variants})
+    sizes = {}
+    for orderable, _, size, _ in variants:
+        sizes[size] = sizes.get(size, False) or orderable == "true"
+    offers = ld.get("offers") or {}
+    if isinstance(offers, list):
+        offers = offers[0] if offers else {}
+    price = prices[0] if prices else float(offers.get("price") or 0)
+    compare = 0.0
+    for k in EF_LIST_KEYS:   # a crossed-out official price, only if the store publishes one
+        m = re.search(r'"%s"\s*:\s*\{?[^}]{0,80}?"?(?:value|amount)?"?\s*:?\s*"?([\d.]+)' % k, h)
+        if m and float(m.group(1)) > price:
+            compare = float(m.group(1))
+            break
+    imgs = ld.get("image") or []
+    imgs = list(dict.fromkeys([i for i in (imgs if isinstance(imgs, list) else [imgs]) if i]))
+    if debug:
+        print("  EF", name, color, "| length", length, "| prices", prices, "| sizes", sizes, "| compare", compare,
+              "| keys:", {k: h.count('"' + k + '"') for k in EF_LIST_KEYS}, "| pricebooks", sorted(set(re.findall(r'"pricebook":"([^"]+)"', h))))
+    return {"url": url, "name": name, "color": color, "desc": desc, "length": length, "price": price, "compare": compare,
+            "sizes": sizes, "images": imgs, "avail": "InStock" in str(offers.get("availability", "")) or any(sizes.values())}
+
+
+def fetch_ef(debug=False):
+    """Maxi dresses listed on the owner's exact Elisabetta Franchi outlet page (page 2 only)."""
+    out, links = [], ef_page_links()
+    print("EF page links:", len(links))
+    for href in links:
+        try:
+            d = ef_product(href, debug)
+        except Exception as e:  # noqa: BLE001
+            print("  EF product failed:", href, e)
+            continue
+        time.sleep(1)
+        why = None
+        if EF_NOT_MAXI.search(d["name"]):
+            why = "not a maxi dress (name)"
+        elif not d["name"].lower().startswith("abito"):
+            why = "not a dress"
+        elif d["length"] is not None and d["length"] < 125:
+            why = f"length {d['length']} cm — not maxi"
+        elif d["length"] is None and not re.search(r"\b(lungo|lunga|maxi|fino ai piedi|floor)\b", d["desc"], re.I):
+            why = "length not stated — maxi not confirmed"
+        if not d["price"]:
+            why = why or "no price"
+        if why:
+            print("  EF excluded:", d["name"], d["color"], "—", why)
+            continue
+        code = href.rsplit("-", 1)[-1].replace(".html", "")
+        out.append({
+            "handle": "ef-" + code.lower(), "brand": "ef", "cat": "maxi", "cur": "EUR", "url": d["url"],
+            "title": d["name"] + (" — " + d["color"] if d["color"] else ""), "image": d["images"][0] if d["images"] else "",
+            "images": d["images"][:6], "details": d["desc"][:500], "price": round(d["price"], 2),
+            "compare": round(d["compare"] if d["compare"] > d["price"] else d["price"], 2),
+            "colors": [d["color"]] if d["color"] else [], "sizes": [{"s": "IT " + k, "a": a} for k, a in d["sizes"].items()],
+            "lengthCm": d["length"], "publishedAt": "",
+        })
+    if not links:
+        raise RuntimeError("page listed no products")
+    return out, len(links)
+
+
 SP_PROMO_PAGES = ["/collections/sale-last-chance", "/collections/sale", ""]
 SP_PROMO_RE = re.compile(r"extra\s+(\d{1,2})\s*%\s*(?:off\s+)?(?:sale|rebajas)|(\d{1,2})\s*%\s*(?:extra|adicional)\s+(?:en\s+)?(?:sale|rebajas)", re.I)
 
@@ -542,6 +639,15 @@ def main():
     except Exception as e:  # noqa: BLE001
         errors.append(f"macduggal: {e}")
 
+    if os.environ.get("EF_ENABLE", "1") == "1":
+        try:
+            ef_items, raw_counts["ef"] = fetch_ef(DEBUG)
+            for n in ef_items:
+                fresh[n["handle"]] = n
+            ok_cats.add("ef:maxi")
+        except Exception as e:  # noqa: BLE001
+            errors.append(f"elisabettafranchi: {e}")
+
     if not ok_cats:
         meta["lastError"] = f"{ts}: could not read the store ({'; '.join(errors)}). Showing data from the last successful check."
         prev["meta"] = meta
@@ -554,7 +660,7 @@ def main():
         if grp(p) not in ok_cats and h not in fresh:
             fresh[h] = p
 
-    groups = ["sp:" + c for c, _ in CATEGORIES] + ["md:maxi"]
+    groups = ["sp:" + c for c, _ in CATEGORIES] + ["md:maxi", "ef:maxi"]
     baseline = {g for g in groups if not any(grp(p) == g for p in old.values())}
     added, changed = [], []
     for h, n in fresh.items():
@@ -598,6 +704,7 @@ def main():
 
     counts = {c: sum(1 for p in products if p["cat"] == c and p.get("brand", "sp") == "sp") for c, _ in CATEGORIES}
     counts["md"] = sum(1 for p in products if p.get("brand") == "md")
+    counts["ef"] = sum(1 for p in products if p.get("brand") == "ef")
     meta.update(lastSuccess=ts, lastError=("; ".join(errors) and f"{ts}: partial check — {'; '.join(errors)}"),
                 count=len(products), counts=counts, storeCounts=raw_counts,
                 collections=dict({c: f"{STORE}/collections/{h}" for c, h in CATEGORIES}, md=f"{MD_STORE}/collections/{MD_MAXI}"),
