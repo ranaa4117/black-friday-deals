@@ -72,6 +72,9 @@ jobs:
       - name: Elisabetta Franchi access test
         if: ${{ github.event.inputs.ef_probe == '1' }}
         run: python3 tools/ef_probe.py
+      - name: Elisabetta Franchi price diagnostics
+        if: ${{ github.event.inputs.ef_probe == '2' }}
+        run: python3 tools/ef_price_probe.py
       - name: Mac Duggal diagnostics
         if: ${{ github.event.inputs.md_probe == '1' }}
         run: python3 tools/md_probe.py
