@@ -11,7 +11,6 @@ import datetime as dt
 import json
 import os
 import random
-import subprocess
 import sys
 import time
 
@@ -30,10 +29,17 @@ def load(name):
 
 
 def last_commit_age_h(path):
+    """Hours since the file last changed on GitHub (the checkout is shallow, so ask GitHub)."""
     try:
-        t = subprocess.check_output(["git", "log", "-1", "--format=%ct", "--", path], cwd=os.path.join(ROOT, ".."), text=True).strip()
-        return (time.time() - int(t)) / 3600 if t else None
-    except Exception:  # noqa: BLE001
+        repo = os.environ.get("GITHUB_REPOSITORY", "ranaa4117/black-friday-deals")
+        req = U.urllib.request.Request(f"https://api.github.com/repos/{repo}/commits?path={path}&per_page=1",
+                                       headers={"User-Agent": U.UA, "Accept": "application/vnd.github+json",
+                                                **({"Authorization": "Bearer " + os.environ["GH_TOKEN"]} if os.environ.get("GH_TOKEN") else {})})
+        with U.urllib.request.urlopen(req, timeout=30) as r:
+            t = json.load(r)[0]["commit"]["committer"]["date"]
+        return U.age_s(t) / 3600
+    except Exception as e:  # noqa: BLE001
+        print("audit: could not read file history", path, e)
         return None
 
 

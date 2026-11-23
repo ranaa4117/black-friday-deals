@@ -100,6 +100,7 @@ jobs:
         continue-on-error: true
         env:
           AUDIT_FORCE: ${{ github.event.inputs.audit || '0' }}
+          GH_TOKEN: ${{ github.token }}
         run: python3 tools/brand_audit.py
       - name: Publish new data
         run: |
