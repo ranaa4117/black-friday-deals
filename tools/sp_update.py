@@ -583,15 +583,31 @@ class Gone(Exception):
     pass
 
 
+def product_json(store, handle):
+    """One product from a Shopify store's own page data. /products/<h>.json has no stock flags,
+    so stock is taken from the same product's /products/<h>.js (per variant)."""
+    raw = get_json(f"{store}/products/{handle}.json").get("product")
+    if raw:
+        try:
+            js = get_json(f"{store}/products/{handle}.js")
+            avail = {v.get("id"): bool(v.get("available")) for v in js.get("variants") or []}
+            for v in raw.get("variants") or []:
+                if v.get("id") in avail:
+                    v["available"] = avail[v["id"]]
+        except Exception as e:  # noqa: BLE001
+            print("  stock read failed:", handle, e)
+    return raw
+
+
 def refresh_product(p, bf_handles):
     """Re-read a known product from its own official page. Returns the updated record; raises Gone when the store no longer has it."""
     brand = p.get("brand", "sp")
     try:
         if brand == "sp":
-            raw = get_json(f"{STORE}/products/{p['handle']}.json").get("product")
+            raw = product_json(STORE, p["handle"])
             n = raw and normalize(raw, p.get("cat", "midi"), retain=True)
         elif brand == "md":
-            raw = get_json(f"{MD_STORE}/products/{p['handle'][3:]}.json").get("product")
+            raw = product_json(MD_STORE, p["handle"][3:])
             n = raw and normalize_md(raw, bf_handles, retain=True)
         elif brand == "ef":
             d = ef_product(p["url"].replace(EF_SITE, ""))

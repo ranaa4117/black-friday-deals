@@ -71,11 +71,11 @@ def check_brand(code, items, meta):
         h = p["handle"]
         try:
             if code == "sp":
-                raw = U.get_json(f"{U.STORE}/products/{h}.json").get("product")
+                raw = U.product_json(U.STORE, h)
                 live = raw and U.normalize(raw, p.get("cat", "midi"), retain=True)
                 keys = ("price", "compare")
             elif code == "md":
-                raw = U.get_json(f"{U.MD_STORE}/products/{h[3:]}.json").get("product")
+                raw = U.product_json(U.MD_STORE, h[3:])
                 live = raw and U.normalize_md(raw, set(), retain=True)
                 keys = ("price", "compare", "extraPct")
             else:
