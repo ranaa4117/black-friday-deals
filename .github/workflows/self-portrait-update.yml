@@ -111,3 +111,21 @@ jobs:
           git commit -m "Self-Portrait sale check $(date -u +%Y-%m-%dT%H:%MZ)"
           for i in 1 2 3; do git pull --rebase -X theirs origin main && git push && exit 0; sleep 5; done
           exit 1
+      - name: Record a failed update for the Admin page
+        if: failure()
+        run: |
+          git fetch -q origin main && git reset -q --hard origin/main
+          python3 - <<'PY'
+          import json, datetime
+          p = "self-portrait/changes.json"
+          try:
+              d = json.load(open(p, encoding="utf-8"))
+          except Exception:
+              d = {"runs": []}
+          at = datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+          d.setdefault("runs", []).insert(0, {"at": at, "src": "auto", "ok": False, "err": "التحديث لم يكتمل ولم يتغيّر شيء في الموقع — يُعاد تلقائياً بعد ١٥ دقيقة", "items": []})
+          json.dump(d, open(p, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
+          PY
+          git config user.name "self-portrait-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add self-portrait/changes.json && git commit -qm "Record failed update" && git push -q || true

@@ -645,16 +645,19 @@ def change_item(n, msgs, o=None):
 CHANGES = os.path.join(os.path.dirname(__file__), "..", "self-portrait", "changes.json")
 
 
-def save_changes(ts, items, keep_items=800):
-    """Admin page history: each update that changed something, with every product that changed in it."""
-    if not items:
+def save_changes(ts, items, errors=None, keep_items=800):
+    """Admin page history: each update that changed something (or failed in part), with every product that changed in it."""
+    if not items and not errors:
         return
     try:
         with open(CHANGES, encoding="utf-8") as f:
             runs = json.load(f).get("runs", [])
     except Exception:  # noqa: BLE001
         runs = []
-    runs.insert(0, {"at": ts, "src": "auto", "items": items[:200]})
+    run = {"at": ts, "src": "auto", "ok": not errors, "items": items[:200]}
+    if errors:
+        run["err"] = "; ".join(errors)[:300]
+    runs.insert(0, run)
     out, total = [], 0
     for r in runs:
         if total >= keep_items:
@@ -698,7 +701,7 @@ def write(data):
             extra["guideImg"] = {k: v for k, v in extra["guideImg"].items() if k != "all"}
         more[p["handle"]] = extra
     removed = [{k: r.get(k) for k in ("handle", "title", "cat", "brand", "price", "url", "removedAt")} for r in data.get("removed", [])]
-    _dump(OUT, {"meta": {k: v for k, v in data.get("meta", {}).items() if k != "everSeen"}, "products": light, "removed": removed})
+    _dump(OUT, {"meta": {k: v for k, v in data.get("meta", {}).items() if k not in ("everSeen", "verifyFail")}, "products": light, "removed": removed})
     _dump(MORE, more)
 
 
@@ -858,12 +861,14 @@ def main():
                 n.update(listed=False, status="ok", pageCheckedAt=ts)
                 fresh[h] = n
                 refreshed += 1
+                (meta.get("verifyFail") or {}).pop(h, None)
                 continue
         due = age_s(p.get("pageCheckedAt", "")) > 3 * 3600 or os.environ.get("RECHECK_ALL") == "1"
         if due and budget > 0 and grp(dict(p, cat=p.get("cat", "midi"))) in ok_cats:
             budget -= 1
             try:
                 n = refresh_product(p, bf_set)
+                (meta.get("verifyFail") or {}).pop(h, None)
                 if n:
                     n.update(listed=False, status="ok", pageCheckedAt=ts)
                     if h not in old:   # restored after an older version removed it: not new to the sale
@@ -879,6 +884,8 @@ def main():
                 continue
             except Exception as e:  # noqa: BLE001
                 print("  re-check failed (kept as is):", h, e)
+                vf = meta.setdefault("verifyFail", {})
+                vf.setdefault(h, {"t": p.get("title", h), "b": p.get("brand", "sp"), "since": ts})["last"] = ts
         if h in old:
             fresh[h] = dict(old[h], listed=False)   # kept exactly as last verified until its page can be re-checked
     print(f"kept off-list products: {sum(1 for p in fresh.values() if p.get('listed') is False)} "
@@ -893,6 +900,7 @@ def main():
         o = old.get(h)
         if grp(n) in ok_cats:
             n["verifiedAt"] = ts
+            (meta.get("verifyFail") or {}).pop(h, None)
         if not o:
             if n.pop("restored", False) or h in known_before:
                 n.update(lastChanged=ts, changes=["Restored (kept permanently)"])
@@ -953,7 +961,7 @@ def main():
     log.insert(0, {"at": ts, "added": len(added), "removed": len(gone), "changed": len(changed), "guides": guides})
     meta["log"] = log[:40]
     try:
-        save_changes(ts, run_items)
+        save_changes(ts, run_items, errors)
     except Exception as e:  # noqa: BLE001
         print("changes log failed:", e)
     write({"meta": meta, "products": products, "removed": removed})

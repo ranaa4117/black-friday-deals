@@ -368,6 +368,7 @@ nav.tabs .dot{display:inline-block;width:6px;height:6px;border-radius:50%;backgr
 .two{display:grid;grid-template-columns:1fr 1fr;gap:4px 32px}@media (max-width:760px){ .two{grid-template-columns:1fr} .bar{grid-template-columns:minmax(90px,42%) 1fr auto} }
 .st-t td.pc{display:flex;gap:8px;align-items:center;min-width:220px}.st-t td.pc img{width:30px;height:40px;object-fit:cover}
 .nodata{color:var(--stone);font-size:13px;margin:6px 0}
+.okb{font-size:11px;padding:1px 7px;border-radius:10px;background:#e3f1e8;color:#1e7a46;white-space:nowrap}.okb.bad{background:#fbe5e5;color:var(--red)}.cg{border-top:1px solid #eee;padding:8px 0;font-size:13px}.cg a{color:inherit;font-weight:600}.cg .orig{font-weight:400}.cgsz{margin-top:8px}.cgsz summary{cursor:pointer;font-size:13px}.red{color:var(--red)}.fixes{display:grid;gap:8px}.fx{display:grid;grid-template-columns:1fr auto;gap:4px 10px;border:1px solid var(--rule);border-right:4px solid #1e7a46;padding:8px 10px;font-size:13px}.fx.bad{border-right-color:var(--red)}.fx.mid{border-right-color:#d9a400}.fxs{white-space:nowrap;font-size:12px;align-self:start}.fxf{grid-column:1/-1}.erow{border-bottom:1px solid var(--rule)}.erow button{border-bottom:0!important;width:100%}.orig{display:inline-block;font-size:12px;padding:0 10px 8px;padding-inline-start:62px;color:var(--ink);text-decoration:underline}.orig.bad{color:var(--red);text-decoration:none}.dtag{font-size:11px;color:var(--stone)}.dtag.red{color:var(--red)}
 .cgchips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}.cgchip{border:1px solid #ccc;background:#fff;border-radius:16px;padding:4px 10px;font:inherit;font-size:12px;cursor:pointer}.cgchip.on{background:#111;color:#fff;border-color:#111}.chgrun{border-top:1px solid #eee;padding:8px 0}.chgrun summary{cursor:pointer;font-size:13px}.chg{margin:8px 0 0;font-size:13px}.chg a{color:inherit;font-weight:600}.chg ul{margin:2px 0 0 18px;padding:0}.fixtag{white-space:nowrap;font-size:11px;padding:1px 7px;border-radius:10px;background:#e3f1e8;color:#1e7a46}.fixtag.bad{background:#fbe5e5;color:var(--red)}.audit p{margin:4px 0 0}
 .audit{border-left:3px solid #1e7a46;padding:6px 10px;margin:0 0 10px;font-size:13px}.audit.bad{border-color:var(--red)}.audit ul{margin:4px 0 0 18px;padding:0}
 .adm{font-family:"Tajawal",var(--sans)}.adm .panel h3{font-family:"Tajawal",var(--sans);font-weight:500;font-size:19px}.adm h4{font:500 14px "Tajawal",var(--sans);margin:14px 0 4px}
@@ -542,7 +543,7 @@ const PASS_HASH = "d6f7961e955b42afb04e910ef174ce7b82af4efe180a05605bc68aee28cad
 const REPO = "ranaa4117/black-friday-deals";
 const WORKFLOW = "self-portrait-update.yml";
 const LS = "sp-edit-v1";
-const APP_VERSION = "29";
+const APP_VERSION = "30";
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
@@ -1524,7 +1525,20 @@ function viewAdmin(all){
   <div class="st-head"><div><h2>الإدارة</h2><p>كل ما تغيّرينه هنا يُحفظ فوراً على هذا الجهاز${GH.token && GH.sync ? " ويُنشر للعملاء" : ". لنشر تعديلاتك للعملاء فعّلي «المزامنة» في آخر الصفحة"}.</p></div>
     <div class="owner-tools"><a class="btn solid" href="#stats">الإحصاءات</a><button class="btn quiet" id="aCosts">${SHOWCOSTS ? "إخفاء تكاليفي" : "إظهار تكاليفي"}</button><button class="btn quiet" id="aLeave">عرض الموقع كعميلة</button></div></div>
 
-  <section class="panel"><div><h3>حالة المنتجات</h3><p class="why">يتم تحديث المنتجات والأسعار والمقاسات تلقائياً كل ١٥ دقيقة (منتجات Macy's كل ساعة). لا يُحذف أي منتج تلقائياً.</p></div>
+  <section class="panel"><div><h3>المشاكل والحلول</h3><p class="why">كل مشكلة في الموقع أو الماركات في مكان واحد، الأحدث أولاً: المشكلة، حالتها، وكيف حُلّت. لا تُعلَّم «تم الحل» إلا بعد التحقق.</p></div>
+    <div class="fields" id="fixBox"><p class="small">جارٍ التحميل…</p></div></section>
+
+  <section class="panel"><div><h3>سجل التحديثات</h3><p class="why">ماذا تغيّر في كل تحديث للموقع أو بياناته: السعر السابق والجديد، الخصومات المنتهية، المنتجات الجديدة، والتحديثات التي فشلت. اضغطي على أي تحديث لرؤية التفاصيل.</p></div>
+    <div class="fields" id="chgBox"><p class="small">جارٍ التحميل…</p></div></section>
+
+  <section class="panel"><div><h3>إدارة المنتجات</h3><p class="why">السعر الحالي وحالة الخصم ورابط القطعة في المتجر الأصلي لكل منتج. اضغطي على المنتج لتعديله، أو أضيفي منتجاً يدوياً.${hidden ? " لديك " + hidden + " منتج محذوف يدوياً." : ""}</p></div>
+    <div class="fields" style="max-width:none">
+      <div class="row"><button class="btn solid" id="aAdd">إضافة منتج</button><label class="search" style="flex:1"><input id="aQ" type="search" placeholder="ابحثي عن منتج لتعديله" dir="auto"></label></div>
+      <div class="edit-list" id="editList"></div>
+      ${hidden ? `<div class="row"><button class="btn quiet" id="aRestore">استرجاع ${hidden} منتج محذوف</button></div>` : ""}
+    </div></section>
+
+  <section class="panel"><div><h3>حالة الماركات</h3><p class="why">يتم تحديث المنتجات والأسعار والمقاسات تلقائياً كل ١٥ دقيقة (منتجات Macy's كل ساعة). لا يُحذف أي منتج تلقائياً.</p></div>
     <div class="fields">
       <p class="small">آخر تحديث ناجح: <b>${when(m.lastSuccess)}</b> (بتوقيت الرياض).${m.lastError ? `<br><span class="warnline">${esc(m.lastError)}</span>` : ""}</p>
       <div class="kvs">
@@ -1535,17 +1549,7 @@ function viewAdmin(all){
         ${brandRow("الجزم", "Macy's", n(isMC))}</div>
       <div class="row"><button class="btn solid" id="aRefreshAll">تحديث كل المنتجات الآن</button><button class="btn" id="aNewDeals">البحث عن عروض جديدة</button></div>
       <p class="small">الزرّان يعملان فوراً عند تفعيل المزامنة؛ بدونها يعيدان تحميل آخر البيانات فقط. النتيجة تظهر خلال ٢–٥ دقائق.</p>
-      <details><summary>سجل التحديثات</summary><div class="mono-list">${log || "<div>لا يوجد سجل بعد.</div>"}</div></details>
     </div></section>
-
-  <section class="panel"><div><h3>فحص الماركات</h3><p class="why">أربع مرات يومياً تتم مقارنة كل ماركة بموقعها الرسمي: منتجات ناقصة، أسعار، خصومات إضافية، ومخزون. أي مشكلة تُصلَّح وتظهر هنا.</p></div>
-    <div class="fields" id="auditBox"><p class="small">جارٍ التحميل…</p></div></section>
-
-  <section class="panel"><div><h3>المشاكل وكيف حُلّت</h3><p class="why">كل مشكلة واجهت الموقع بكلام بسيط: ماذا حدث، وكيف تم حلّها.</p></div>
-    <div class="fields" id="fixBox"><p class="small">جارٍ التحميل…</p></div></section>
-
-  <section class="panel"><div><h3>ماذا تغيّر في كل تحديث</h3><p class="why">المنتجات التي تغيّر سعرها، أو انتهى خصمها، أو خرجت من التخفيضات أو رجعت لها. لا يُحذف أي منتج: إذا انتهى خصمه يبقى في الموقع بسعره الأصلي + المبلغ الذي تضيفينه.</p></div>
-    <div class="fields" id="chgBox"><p class="small">جارٍ التحميل…</p></div></section>
 
   <section class="panel"><div><h3>الأسعار</h3><p class="why">السعر النهائي للعميلة = سعر المتجر بعد الخصم × سعر الصرف + المبلغ الذي تضيفينه. غيّري المبلغ المضاف لأي ماركة وسيتحدث كل شيء فوراً.</p></div>
     <div class="fields prices">
@@ -1558,13 +1562,6 @@ function viewAdmin(all){
       <label class="f">سعر اليورو بالريال<input id="sRate" type="number" inputmode="decimal" step="0.0001" dir="ltr" placeholder="${Number(m.rate && m.rate.value || 0).toFixed(4)}" value="${S.settings.rate || ""}"></label>
       <p class="small">السعر الحالي تلقائياً: ${Number(m.rate && m.rate.value || 0).toFixed(4)}. اتركي الخانة فارغة لاستخدام السعر التلقائي. الدولار ثابت: ${usdRate().toFixed(2)}.</p>
       <p class="small">مثال: فستان بـ €200 → ${fmt(Math.round(200 * rate()))} ر.س + ${fmt(extra())} = <b>${fmt(Math.round(200 * rate() + extra()))} ر.س</b></p>
-    </div></section>
-
-  <section class="panel"><div><h3>المنتجات</h3><p class="why">عدّلي اسم أو صورة أو سعر أو مقاسات أي منتج، أو أضيفي منتجاً يدوياً.${hidden ? " لديك " + hidden + " منتج محذوف يدوياً." : ""}</p></div>
-    <div class="fields" style="max-width:none">
-      <div class="row"><button class="btn solid" id="aAdd">إضافة منتج</button><label class="search" style="flex:1"><input id="aQ" type="search" placeholder="ابحثي عن منتج لتعديله" dir="auto"></label></div>
-      <div class="edit-list" id="editList"></div>
-      ${hidden ? `<div class="row"><button class="btn quiet" id="aRestore">استرجاع ${hidden} منتج محذوف</button></div>` : ""}
     </div></section>
 
   ${removed.length ? `<section class="panel"><div><h3>بانتظار إعادة الفحص</h3><p class="why">منتجات أزالتها نسخة قديمة من الموقع. تتم إعادتها تلقائياً بعد فحصها في موقعها الرسمي.</p></div>
@@ -1588,8 +1585,9 @@ function viewAdmin(all){
 }
 function editList(all){
   const q = ($("#aQ") && $("#aQ").value || "").toLowerCase();
+  const disc = p => p.status === "discontinued" || p.status === "unavailable" ? '<span class="dtag">غير متوفر</span>' : offShown(p) > 0 ? `<span class="dtag red">مخفّض <bdi dir="ltr">${offShown(p)}%</bdi></span>` : '<span class="dtag">بسعره الأصلي — بدون خصم</span>';
   $("#editList").innerHTML = all.filter(p => !q || p.title.toLowerCase().includes(q)).slice(0, 150).map(p =>
-    `<button data-edit="${esc(p.handle)}"><img loading="lazy" src="${esc(img(p.image,100))}" alt=""><span dir="auto">${esc(p.title)}<br><span class="tag">${esc(kindOf(p))} · ${money(p, p.price)} · ${fmt(finalSAR(p))} ر.س${p.edited ? " · معدّل" : ""}${p.manual ? " · مضاف يدوياً" : ""}${S.fav[p.handle] ? " · ♥" : ""}</span></span><span class="tag">تعديل</span></button>`).join("");
+    `<div class="erow"><button data-edit="${esc(p.handle)}"><img loading="lazy" src="${esc(img(p.image,100))}" alt=""><span dir="auto">${esc(p.title)}<br><span class="tag">${esc(kindOf(p))} · ${money(p, p.price)} · ${fmt(finalSAR(p))} ر.س${p.edited ? " · معدّل" : ""}${p.manual ? " · مضاف يدوياً" : ""}${S.fav[p.handle] ? " · ♥" : ""}</span><br>${disc(p)}</span><span class="tag">تعديل</span></button>${origLink(p)}</div>`).join("");
 }
 
 /* ---------- editor ---------- */
@@ -1769,72 +1767,85 @@ function wireList(route){
   if ($("#more")) $("#more").onclick = () => { u.limit += 48; const y = scrollY; render(); scrollTo(0, y); };
 }
 
-const CHG_KIND = { ended:"انتهى الخصم", extraEnd:"انتهى الخصم الإضافي", left:"خرج من التخفيضات", price:"تغيّر السعر", fresh:"جديد", back:"رجع للتخفيض", gone:"لم يعد يُباع", stock:"المقاسات" };
-function chgText(it, p){
-  const out = [], kinds = new Set(), o = it.o, n = it.n || {}, m = it.m || [];
-  const add = (k, t) => { kinds.add(k); out.push(t); };
-  if (m.some(x => /Newly discovered/.test(x))) add("fresh", "دخل التخفيضات لأول مرة");
-  if (m.some(x => /^Restored/.test(x))) add("back", "أُعيد للموقع (لا يُحذف أي منتج)");
+const CHG_KIND = { fresh:"منتج جديد", ended:"انتهى الخصم", extraEnd:"انتهى الخصم الإضافي", price:"تغيّر السعر", left:"خرج من قائمة التخفيضات", back:"رجع للتخفيض", gone:"لم يعد يُباع", stock:"المقاسات", failed:"تحديث فشل", site:"تحديث الموقع" };
+const origOk = p => { if (!p) return false; if (p.manual) return /^https:\/\/[^/]+\/.+/.test(p.url || ""); const u = url(p), h = p.handle, b = p.brand || "sp";
+  if (b === "sp") return u === "https://eu.self-portrait.com/es-es/products/" + h;
+  if (b === "md") return u === "https://macduggal.com/products/" + h.slice(3);
+  if (b === "ef") return u.indexOf("https://outlet.elisabettafranchi.com/") === 0 && /\.html$/.test(u) && u.toUpperCase().includes(h.slice(3).toUpperCase());
+  if (isMacys(p)) return u.indexOf("https://www.macys.com/shop/product/") === 0 && new RegExp("[?&]ID=" + h.split("-").slice(1).join("-") + "(&|$)").test(u);
+  return /^https:\/\//.test(u); };
+const origLink = (p, label) => origOk(p) ? `<a class="orig" href="${esc(url(p))}" target="_blank" rel="noopener">${label || "عرض القطعة في المتجر الأصلي ↗"}</a>` : '<span class="orig bad">⚠ لا يوجد رابط مباشر مؤكد للقطعة</span>';
+const sarAt = (p, s) => finalSAR(Object.assign({}, p, s, { extra25: s.extraPct === 25, promo: s.extraPct ? p.promo : null }));
+function chgInfo(it, p){
+  const o = it.o, n = it.n || {}, m = it.m || [], kinds = [], lines = [];
+  let head = "", reason = "";
+  const k = (x, h, r) => { kinds.push(x); if (!head){ head = h; reason = r || ""; } };
+  if (m.some(x => /Newly discovered/.test(x))) k("fresh", "منتج جديد", "أُضيف إلى قسمه في الموقع.");
+  if (m.some(x => /^Restored/.test(x))) k("back", "أُعيد للموقع", "لا يُحذف أي منتج.");
   if (o){
-    if (o.compare > o.price && !(n.compare > n.price)) add("ended", "انتهى خصم المتجر — يظهر الآن بسعره الأصلي + إضافتك");
-    if (!(o.compare > o.price) && n.compare > n.price) add("back", "رجع عليه خصم في المتجر");
-    if (o.extraPct && !n.extraPct) add("extraEnd", "انتهى الخصم الإضافي " + o.extraPct + "%");
-    if (!o.extraPct && n.extraPct) add("back", "صار عليه خصم إضافي " + n.extraPct + "%");
-    if (o.listed !== false && n.listed === false) add("left", "خرج من قائمة تخفيضات المتجر — لم يُحذف، باقٍ في موقعك بسعره الحالي من المتجر + إضافتك");
-    if (o.listed === false && n.listed !== false) add("back", "رجع لقائمة تخفيضات المتجر");
-    if (o.status !== "discontinued" && n.status === "discontinued") add("gone", "لم يعد المتجر يبيعه — يظهر «غير متوفر» ولم يُحذف");
-    if (o.status === "discontinued" && n.status !== "discontinued") add("back", "صار متوفراً من جديد");
-    if (o.status !== "unavailable" && n.status === "unavailable") add("gone", "غير متوفر في المتجر حالياً — لم يُحذف");
-    if (p){
-      const sx = s => finalSAR(Object.assign({}, p, s, { extra25: s.extraPct === 25, promo: s.extraPct ? p.promo : null }));
-      const a = sx(o), b = sx(n);
-      if (a !== b) add("price", "السعر للعميلة: من " + arN(a) + " إلى " + arN(b) + " ر.س" + (b < a ? " (أرخص)" : " (أغلى)"));
-    }
+    if (o.status !== "discontinued" && n.status === "discontinued") k("gone", "لم يعد المتجر الأصلي يبيعه", "يظهر «غير متوفر» وبقي في الموقع مع رابطه.");
+    if (o.status !== "unavailable" && n.status === "unavailable") k("gone", "غير متوفر في المتجر الأصلي", "بقي في الموقع مع رابطه.");
+    if (o.compare > o.price && !(n.compare > n.price)) k("ended", "انتهى الخصم", "أُزيل الخصم ورجع السعر الأصلي + إضافتك.");
+    if (o.extraPct && !n.extraPct) k("extraEnd", "انتهى الخصم الإضافي " + o.extraPct + "%", "المتجر لم يعد يطبّق الخصم الإضافي على هذه القطعة.");
+    if (!(o.compare > o.price) && n.compare > n.price) k("back", "رجع عليه خصم", "المتجر الأصلي خفّض سعرها.");
+    if (!o.extraPct && n.extraPct) k("back", "صار عليه خصم إضافي " + n.extraPct + "%", "يظهر في المتجر الأصلي على هذه القطعة.");
+    if (o.listed !== false && n.listed === false) k("left", "خرج من قائمة تخفيضات المتجر", "لم يُحذف: يبقى بسعره في صفحته الأصلية + إضافتك.");
+    if (o.listed === false && n.listed !== false) k("back", "رجع لقائمة التخفيضات", "");
+    if (o.status === "discontinued" && n.status !== "discontinued") k("back", "صار متوفراً من جديد", "");
+    if (p){ const a = sarAt(p, o), b = sarAt(p, n); if (a !== b){ k("price", "تغيّر السعر", b < a ? "المتجر الأصلي خفّض السعر." : "المتجر الأصلي رفع السعر."); lines.push(`السعر السابق: <b>${arN(a)} ر.س</b> ← السعر الجديد: <b class="${b < a ? "red" : ""}">${arN(b)} ر.س</b>`); } }
   } else {
-    m.forEach(x => {
-      let r;
-      if ((r = x.match(/^Sale price (\S+) → (\S+)/))) add("price", "سعر المتجر بعد الخصم: من " + r[1] + " إلى " + r[2]);
-      else if ((r = x.match(/^Original price (\S+) → (\S+)/))) add("price", "السعر الأصلي في المتجر: من " + r[1] + " إلى " + r[2]);
-      else if (/Left the store/.test(x)) add("left", "خرج من قائمة تخفيضات المتجر — لم يُحذف");
-      else if (/Back in the sale/.test(x)) add("back", "رجع لقائمة التخفيضات");
-      else if (/No longer sold/.test(x)) add("gone", "لم يعد المتجر يبيعه — يظهر «غير متوفر» ولم يُحذف");
-      else if (/Available again/.test(x)) add("back", "صار متوفراً من جديد");
-      else if (/Extra 25% in cart no longer/.test(x)) add("extraEnd", "انتهى الخصم الإضافي 25%");
-      else if (/Extra 25% in cart now/.test(x)) add("back", "صار عليه خصم إضافي 25%");
-    });
+    m.forEach(x => { let r;
+      if ((r = x.match(/^Sale price (\S+) → (\S+)/))){ k("price", "تغيّر السعر", "تغيّر سعر المتجر الأصلي."); lines.push("سعر المتجر الأصلي: من " + r[1] + " إلى " + r[2]); }
+      else if ((r = x.match(/^Original price (\S+) → (\S+)/))){ k("price", "تغيّر السعر", "تغيّر السعر الأصلي في المتجر."); lines.push("السعر الأصلي في المتجر: من " + r[1] + " إلى " + r[2]); }
+      else if (/Left the store/.test(x)) k("left", "خرج من قائمة تخفيضات المتجر", "لم يُحذف من الموقع.");
+      else if (/Back in the sale/.test(x)) k("back", "رجع لقائمة التخفيضات", "");
+      else if (/No longer sold/.test(x)) k("gone", "لم يعد المتجر الأصلي يبيعه", "يظهر «غير متوفر» ولم يُحذف.");
+      else if (/Available again/.test(x)) k("back", "صار متوفراً من جديد", "");
+      else if (/Extra 25% in cart no longer/.test(x)) k("extraEnd", "انتهى الخصم الإضافي 25%", "");
+      else if (/Extra 25% in cart now/.test(x)) k("back", "صار عليه خصم إضافي 25%", ""); });
   }
-  const soldOut = m.filter(x => / sold out$/.test(x)).map(x => x.replace(/ sold out$/, "")), backIn = m.filter(x => / back in stock$/.test(x)).map(x => x.replace(/ back in stock$/, ""));
-  if (soldOut.length) add("stock", "مقاسات نفدت: " + soldOut.join("، "));
-  if (backIn.length) add("stock", "مقاسات رجعت: " + backIn.join("، "));
-  if (m.includes("Image updated")) out.push("تحدّثت صورة المنتج");
-  return { lines: out, kinds };
+  const so = m.filter(x => / sold out$/.test(x)).map(x => x.replace(/ sold out$/, "")), bi = m.filter(x => / back in stock$/.test(x)).map(x => x.replace(/ back in stock$/, ""));
+  const sizes = [so.length ? "نفد: " + so.join("، ") : "", bi.length ? "رجع: " + bi.join("، ") : ""].filter(Boolean).join(" · ");
+  if (sizes) kinds.push("stock");
+  if (m.includes("Image updated") && !head) head = "تحدّثت الصورة";
+  return { head, reason, lines, sizes, kinds };
 }
-const CHG = { runs: null, f: "all", open: 0 };
+const CHG = { runs: null, f: "all" };
 function drawChanges(){
   const box = $("#chgBox"); if (!box) return;
   if (!CHG.runs) { box.innerHTML = '<p class="small">جارٍ التحميل…</p>'; return; }
   const byH = new Map(products().map(p => [p.handle, p]));
-  const runs = CHG.runs.map(r => ({ at: r.at, src: r.src, items: (r.items || []).map(it => Object.assign({ x: chgText(it, byH.get(it.h)) }, it)) }));
-  const tally = {}; runs.forEach(r => r.items.forEach(it => it.x.kinds.forEach(k => tally[k] = (tally[k] || 0) + 1)));
-  const chips = `<div class="cgchips">${[["all", "الكل"]].concat(Object.keys(CHG_KIND).filter(k => tally[k]).map(k => [k, CHG_KIND[k] + " (" + arN(tally[k]) + ")"])).map(([k, l]) => `<button class="cgchip${CHG.f === k ? " on" : ""}" data-chg="${k}">${l}</button>`).join("")}</div>`;
-  const shown = runs.map(r => Object.assign({}, r, { items: r.items.filter(it => it.x.lines.length && (CHG.f === "all" || it.x.kinds.has(CHG.f))) })).filter(r => r.items.length).slice(0, 20);
-  box.innerHTML = chips + (shown.length ? shown.map((r, i) => `<details class="chgrun"${i === 0 ? " open" : ""}><summary><b><bdi dir="ltr">${when(r.at)}</bdi></b> · ${r.src === "macys" ? "Macy's · " : ""}${arN(r.items.length)} منتج تغيّر</summary>${r.items.slice(0, 60).map(it => `<div class="chg"><a href="#item-${encodeURIComponent(it.h)}" dir="auto">${esc(it.t || it.h)}</a> <span class="muted" dir="auto">${esc(BRANDS[it.b] || it.b || "")}</span><ul>${it.x.lines.map(t => `<li>${esc(t)}</li>`).join("")}</ul></div>`).join("")}${r.items.length > 60 ? `<p class="small">و${arN(r.items.length - 60)} منتجات أخرى.</p>` : ""}</details>`).join("") : '<p class="small">لا توجد تغييرات من هذا النوع بعد.</p>');
+  const runs = CHG.runs.map(r => { const items = (r.items || []).map(it => Object.assign({ x: chgInfo(it, byH.get(it.h)), p: byH.get(it.h) }, it)); const kinds = new Set(); items.forEach(it => it.x.kinds.forEach(q => kinds.add(q))); if (r.ok === false) kinds.add("failed"); if (r.src === "site") kinds.add("site"); return Object.assign({}, r, { items, kinds }); });
+  const tally = {}; runs.forEach(r => r.kinds.forEach(q => tally[q] = (tally[q] || 0) + 1));
+  const chips = `<div class="cgchips">${[["all", "الكل"]].concat(Object.keys(CHG_KIND).filter(q => tally[q]).map(q => [q, CHG_KIND[q]])).map(([q, l]) => `<button class="cgchip${CHG.f === q ? " on" : ""}" data-chg="${q}">${l}</button>`).join("")}</div>`;
+  const src = r => r.src === "site" ? "تحديث الموقع" : r.src === "macys" ? "أسعار Macy's" : "تحديث الأسعار التلقائي";
+  const card = it => `<div class="cg"><b>${esc(it.x.head)}</b> — <a href="#item-${encodeURIComponent(it.h)}" dir="auto">${esc(it.t || it.h)}</a><div class="muted small" dir="auto">${esc(it.p ? kindOf(it.p) : BRANDS[it.b] || it.b || "")}</div>${it.x.lines.map(l => `<div>${l}</div>`).join("")}${it.x.reason ? `<div class="small">${esc(it.x.reason)}</div>` : ""}${it.x.sizes ? `<div class="small muted">المقاسات — ${esc(it.x.sizes)}</div>` : ""}${it.p ? origLink(it.p) : ""}</div>`;
+  const shown = runs.filter(r => CHG.f === "all" || r.kinds.has(CHG.f)).slice(0, 30);
+  box.innerHTML = chips + (shown.length ? shown.map((r, i) => {
+    const main = r.items.filter(it => it.x.head && (CHG.f === "all" || CHG.f === "stock" || it.x.kinds.includes(CHG.f))), sizeOnly = r.items.filter(it => !it.x.head && it.x.sizes);
+    const cnt = q => r.items.filter(it => it.x.kinds.includes(q)).length;
+    const sum = r.src === "site" ? esc(r.title || "") : r.ok === false ? esc(r.err || "لم يكتمل التحديث") : [["price", "سعر"], ["ended", "انتهى خصم"], ["extraEnd", "انتهى خصم إضافي"], ["fresh", "جديد"], ["left", "خرج من القائمة"], ["back", "رجع للتخفيض"], ["gone", "لم يعد يُباع"]].map(([q, l]) => cnt(q) ? l + " " + arN(cnt(q)) : "").filter(Boolean).concat(sizeOnly.length ? ["مقاسات " + arN(sizeOnly.length)] : []).join(" · ") || "تغييرات بسيطة";
+    const body = r.src === "site" ? "" : (main.slice(0, 80).map(card).join("") + (main.length > 80 ? `<p class="small">و${arN(main.length - 80)} تغييرات أخرى.</p>` : "") + (sizeOnly.length ? `<details class="cgsz"><summary>تغيّر توفر المقاسات في ${arN(sizeOnly.length)} منتج</summary>${sizeOnly.slice(0, 150).map(it => `<div class="small"><a href="#item-${encodeURIComponent(it.h)}" dir="auto">${esc(it.t || it.h)}</a> — ${esc(it.x.sizes)}</div>`).join("")}</details>` : ""));
+    return `<details class="chgrun"${i === 0 && body ? " open" : ""}><summary><span class="okb ${r.ok === false ? "bad" : ""}">${r.ok === false ? "✗ فشل" : "✓ تم"}</span> <b><bdi dir="ltr">${when(r.at)}</bdi></b> · ${src(r)}<div class="small muted">${sum}</div></summary>${body || '<p class="small">لا تفاصيل إضافية.</p>'}</details>`; }).join("") : '<p class="small">لا توجد تحديثات من هذا النوع.</p>');
   box.querySelectorAll("[data-chg]").forEach(b => b.onclick = () => { CHG.f = b.dataset.chg; drawChanges(); });
 }
-function drawFixes(list){
+const FIX = { list: null, f: "all", more: false };
+const FIX_ST = { resolved:["🟢 تم الحل", "ok"], solved:["🟢 تم الحل", "ok"], watching:["🟢 تم الحل", "ok"], progress:["🟡 جارٍ الحل", "mid"], open:["🔴 لم يتم الحل", "bad"] };
+const fixSt = x => FIX_ST[x.status] ? (FIX_ST[x.status][1] === "ok" ? "resolved" : x.status) : "resolved";
+function drawFixes(){
   const box = $("#fixBox"); if (!box) return;
-  const st = { solved:["تم الحل", "ok"], watching:["تم الحل — تحت المراقبة", "ok"], open:["لم يُحل بعد", "bad"] };
-  box.innerHTML = list.length ? list.slice(0, 30).map(x => { const s = st[x.status] || st.solved; return `<div class="audit ${s[1]}"><b>${esc(x.title)}</b> <span class="fixtag ${s[1]}">${s[0]}</span><span class="small muted"> · <bdi dir="ltr">${when(x.at)}</bdi></span><p class="small"><b>ماذا حدث:</b> ${esc(x.what)}</p><p class="small"><b>كيف حُلّت:</b> ${esc(x.fix)}</p></div>`; }).join("") : '<p class="small">لا توجد مشاكل مسجّلة.</p>';
+  if (!FIX.list) { box.innerHTML = '<p class="small">جارٍ التحميل…</p>'; return; }
+  const all = FIX.list.slice().sort((a, b) => (b.at || "").localeCompare(a.at || ""));
+  const c = s => all.filter(x => fixSt(x) === s).length;
+  const chips = `<div class="cgchips">${[["all", "الكل (" + arN(all.length) + ")"], ["open", "🔴 لم يتم الحل (" + arN(c("open")) + ")"], ["progress", "🟡 جارٍ الحل (" + arN(c("progress")) + ")"], ["resolved", "🟢 تم الحل (" + arN(c("resolved")) + ")"]].map(([q, l]) => `<button class="cgchip${FIX.f === q ? " on" : ""}" data-fix="${q}">${l}</button>`).join("")}</div>`;
+  const list = all.filter(x => FIX.f === "all" || fixSt(x) === FIX.f), lim = FIX.more ? 200 : 25;
+  box.innerHTML = chips + (list.length ? `<div class="fixes">${list.slice(0, lim).map(x => { const s = FIX_ST[x.status] || FIX_ST.resolved; return `<div class="fx ${s[1]}"><div class="fxp"><b>${esc(x.problem || x.title || "")}</b>${x.n > 1 ? ` <span class="small muted">(تكررت — المرة ${arN(x.n)})</span>` : ""}<span class="small muted"> · <bdi dir="ltr">${when(x.at)}</bdi></span></div><span class="fxs ${s[1]}">${s[0]}</span><div class="fxf small"><b>الحل:</b> ${esc(x.fix || "")}</div></div>`; }).join("")}</div>${list.length > lim ? '<button class="btn quiet" id="fixMore">عرض الكل</button>' : ""}` : '<p class="small">لا توجد مشاكل بهذه الحالة.</p>');
+  box.querySelectorAll("[data-fix]").forEach(b => b.onclick = () => { FIX.f = b.dataset.fix; drawFixes(); });
+  if ($("#fixMore")) $("#fixMore").onclick = () => { FIX.more = true; drawFixes(); };
 }
 function wireAdmin(list){
-  fetch(BASE + "fixes.json?t=" + Date.now(), { cache:"no-store" }).then(r => r.ok ? r.json() : { fixes: [] }).catch(() => ({ fixes: [] })).then(a => drawFixes(a.fixes || []));
+  fetch(BASE + "fixes.json?t=" + Date.now(), { cache:"no-store" }).then(r => r.ok ? r.json() : { fixes: [] }).catch(() => ({ fixes: [] })).then(a => { FIX.list = a.fixes || []; drawFixes(); });
   fetch(BASE + "changes.json?t=" + Date.now(), { cache:"no-store" }).then(r => r.ok ? r.json() : { runs: [] }).catch(() => ({ runs: [] })).then(a => { CHG.runs = a.runs || []; drawChanges(); });
-  fetch(BASE + "audit.json?t=" + Date.now(), { cache:"no-store" }).then(r => r.ok ? r.json() : { audits: [] }).catch(() => ({ audits: [] })).then(a => {
-    const box = $("#auditBox"); if (!box) return;
-    const list = (a.audits || []).slice(0, 8);
-    box.innerHTML = list.length ? list.map(x => `<div class="audit ${x.ok ? "ok" : "bad"}"><b>${when(x.at)} · ${x.ok ? "كل الماركات سليمة" : "وُجدت " + (x.problems || 0) + " مشكلة" + (x.fixed ? "، تم إصلاح " + x.fixed : "")}</b>${(x.notes || []).length ? `<ul>${x.notes.map(n => `<li>${esc(n)}</li>`).join("")}</ul>` : ""}</div>`).join("")
-      : '<p class="small">لم يتم أول فحص بعد.</p>';
-  });
   editList(list); $("#aQ").oninput = () => editList(products());
   $("#aCosts").onclick = () => { SHOWCOSTS = !SHOWCOSTS; render(); toast(SHOWCOSTS ? "تظهر تكاليفك الآن في كل الصفحات، لك وحدك." : "تم إخفاء التكاليف."); };
   $("#aLeave").onclick = () => { store.set("sp-unlock", ""); OWNER = false; SHOWCOSTS = false; location.hash = "#home"; render(); loadData(false); toast("أنتِ الآن تشاهدين الموقع كعميلة. للعودة افتحي ‎#admin‎"); };
