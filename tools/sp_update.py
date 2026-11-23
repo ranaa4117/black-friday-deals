@@ -626,7 +626,7 @@ def write(data):
             extra["guideImg"] = {k: v for k, v in extra["guideImg"].items() if k != "all"}
         more[p["handle"]] = extra
     removed = [{k: r.get(k) for k in ("handle", "title", "cat", "brand", "price", "url", "removedAt")} for r in data.get("removed", [])]
-    _dump(OUT, {"meta": data.get("meta", {}), "products": light, "removed": removed})
+    _dump(OUT, {"meta": {k: v for k, v in data.get("meta", {}).items() if k != "everSeen"}, "products": light, "removed": removed})
     _dump(MORE, more)
 
 
@@ -795,12 +795,13 @@ def main():
     groups = ["sp:" + c for c, _ in CATEGORIES] + ["md:maxi", "ef:maxi"]
     baseline = {g for g in groups if not any(grp(p) == g for p in old.values())}
     added, changed = [], []
+    known_before = {r.get("handle") for r in prev.get("removed", [])} | set(meta.get("everSeen", []))
     for h, n in fresh.items():
         o = old.get(h)
         if grp(n) in ok_cats:
             n["verifiedAt"] = ts
         if not o:
-            if n.pop("restored", False):
+            if n.pop("restored", False) or h in known_before:
                 n.update(lastChanged=ts, changes=["Restored (kept permanently)"])
                 continue
             if grp(n) in baseline:  # first time this category is tracked: starting stock, not "new"
@@ -811,6 +812,12 @@ def main():
                 added.append(h)
             continue
         n["firstSeen"] = o.get("firstSeen", ts)
+        if n.get("brand") == "md" and MD_PROMO and (o.get("extraPct") or o.get("extra25")) and not n.get("extraPct"):
+            miss = o.get("extraMiss", 0) + 1
+            if miss < 3:
+                n.update(extraPct=o.get("extraPct") or 25, extra25=o.get("extra25", True), extraMiss=miss)
+        else:
+            n.pop("extraMiss", None)
         msgs = []
         sym = "$" if n.get("cur") == "USD" else "€"
         if o.get("price") != n["price"]:
@@ -846,6 +853,7 @@ def main():
                 collections=dict({c: f"{STORE}/collections/{h}" for c, h in CATEGORIES}, md=f"{MD_STORE}/collections/{MD_MAXI}"),
                 mdPromo=(dict(MD_PROMO, source=f"{MD_STORE} (product label shown by the official store)") if MD_PROMO else None))
     meta.setdefault("initialImport", ts)
+    meta["everSeen"] = sorted(set(meta.get("everSeen", [])) | set(fresh.keys()))
     log = meta.get("log", [])
     log.insert(0, {"at": ts, "added": len(added), "removed": len(gone), "changed": len(changed), "guides": guides})
     meta["log"] = log[:40]
