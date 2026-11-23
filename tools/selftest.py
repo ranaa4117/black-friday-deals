@@ -73,7 +73,7 @@ def main():
             exp += 1
         time.sleep(1.5)
     rec(2, f"Mac Duggal dresses previously marked 'extra ended' ({len(ended)})", True if ended else None,
-        f"re-read the {act + chk + exp} most recent: label still shown on {act} (+{chk} checkout-verify) → these get their 25% back automatically; truly no label on {exp}; unreadable {err}"
+        f"re-read the {act + chk + exp} most recent: label still shown on {act} (+{chk} checkout-verify) → the updater gives these their 25% back; truly no label on {exp}; unreadable {err}"
         + (f"; e.g. {', '.join(wrong[:4])}" if wrong else ""))
 
     # 3. a genuinely expired discount: label really gone from the product page
@@ -130,7 +130,16 @@ def main():
     if not oos:   # look in the store's own feed for a dress that exists but is sold out in every size
         try:
             feed = U.fetch_md_collection(U.MD_MAXI)
-            raw6 = next((x for x in feed if x.get("variants") and not any(v.get("available") for v in x["variants"])), None)
+            raw6 = None
+            for x in feed[:120]:
+                try:
+                    js = U.get_json(f"{U.MD_STORE}/products/{x['handle']}.js")
+                except Exception:  # noqa: BLE001
+                    continue
+                if js.get("variants") and not any(v.get("available") for v in js["variants"]):
+                    raw6 = x
+                    break
+                time.sleep(0.7)
             if raw6:
                 n6 = U.refresh_product({"handle": "md-" + raw6["handle"], "brand": "md", "title": raw6["title"]}, set())
                 oos = ({"title": raw6["title"]}, n6)
@@ -157,11 +166,13 @@ def main():
         except Exception:  # noqa: BLE001
             continue
         tested = True
+        time.sleep(5)
         page404 = U.page_gone(p)
         first = U.removal_confirmed([ts])
         later = U.removal_confirmed([iso(25), iso(12), ts])
         rec(7, "Permanently removed from the official site", page404 and not first and later,
-            f"«{p['title']}»: product data and web page both 'not found' (live) — 1st check: kept; after 3 checks over 24h: deleted")
+            f"«{p['title']}»: product data 'not found'; its web page {'also not found' if page404 else 'could not be confirmed as not found'} (live) — "
+            f"1st check: {'deleted' if first else 'kept'}; after 3 checks over 24h: {'deleted' if later else 'kept'}")
         break
     if not tested:
         rec(7, "Permanently removed from the official site", None, "no product currently answers 'not found' on its official page — deletion rule tested only by its timing condition"

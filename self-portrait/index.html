@@ -368,7 +368,7 @@ nav.tabs .dot{display:inline-block;width:6px;height:6px;border-radius:50%;backgr
 .two{display:grid;grid-template-columns:1fr 1fr;gap:4px 32px}@media (max-width:760px){ .two{grid-template-columns:1fr} .bar{grid-template-columns:minmax(90px,42%) 1fr auto} }
 .st-t td.pc{display:flex;gap:8px;align-items:center;min-width:220px}.st-t td.pc img{width:30px;height:40px;object-fit:cover}
 .nodata{color:var(--stone);font-size:13px;margin:6px 0}
-.okb{font-size:11px;padding:1px 7px;border-radius:10px;background:#e3f1e8;color:#1e7a46;white-space:nowrap}.okb.bad{background:#fbe5e5;color:var(--red)}.cg{border-top:1px solid #eee;padding:8px 0;font-size:13px}.cg a{color:inherit;font-weight:600}.cg .orig{font-weight:400}.cgsz{margin-top:8px}.cgsz summary{cursor:pointer;font-size:13px}.red{color:var(--red)}.fixes{display:grid;gap:8px}.fx{display:grid;grid-template-columns:1fr auto;gap:4px 10px;border:1px solid var(--rule);border-right:4px solid #1e7a46;padding:8px 10px;font-size:13px}.fx.bad{border-right-color:var(--red)}.fx.mid{border-right-color:#d9a400}.fxs{white-space:nowrap;font-size:12px;align-self:start}.fxf{grid-column:1/-1}.erow{border-bottom:1px solid var(--rule)}.erow button{border-bottom:0!important;width:100%}.orig{display:inline-block;font-size:12px;padding:0 10px 8px;padding-inline-start:62px;color:var(--ink);text-decoration:underline}.orig.bad{color:var(--red);text-decoration:none}.dtag{font-size:11px;color:var(--stone)}.dtag.red{color:var(--red)}
+.okb{font-size:11px;padding:1px 7px;border-radius:10px;background:#e3f1e8;color:#1e7a46;white-space:nowrap}.okb.bad{background:#fbe5e5;color:var(--red)}.cg{border-top:1px solid #eee;padding:8px 0;font-size:13px}.cg a{color:inherit;font-weight:600}.cg .orig{font-weight:400}.cgsz{margin-top:8px}.cgsz summary{cursor:pointer;font-size:13px}.red{color:var(--red)}.fixes{display:grid;gap:8px}.fx{display:grid;grid-template-columns:1fr auto;gap:4px 10px;border:1px solid var(--rule);border-right:4px solid #1e7a46;padding:8px 10px;font-size:13px}.fx.bad{border-right-color:var(--red)}.fx.mid{border-right-color:#d9a400}.fxs{white-space:nowrap;font-size:12px;align-self:start}.fxf{grid-column:1/-1}.erow{border-bottom:1px solid var(--rule)}.erow button{border-bottom:0!important;width:100%}.orig{display:inline-block;font-size:12px;padding:0 10px 8px;padding-inline-start:62px;color:var(--ink);text-decoration:underline}.orig.bad{color:var(--red);text-decoration:none}.dtag{font-size:11px;color:var(--stone)}.dtag.red{color:var(--red)}.dtag.warn{color:#9a6b00}
 .cgchips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}.cgchip{border:1px solid #ccc;background:#fff;border-radius:16px;padding:4px 10px;font:inherit;font-size:12px;cursor:pointer}.cgchip.on{background:#111;color:#fff;border-color:#111}.chgrun{border-top:1px solid #eee;padding:8px 0}.chgrun summary{cursor:pointer;font-size:13px}.chg{margin:8px 0 0;font-size:13px}.chg a{color:inherit;font-weight:600}.chg ul{margin:2px 0 0 18px;padding:0}.fixtag{white-space:nowrap;font-size:11px;padding:1px 7px;border-radius:10px;background:#e3f1e8;color:#1e7a46}.fixtag.bad{background:#fbe5e5;color:var(--red)}.audit p{margin:4px 0 0}
 .audit{border-left:3px solid #1e7a46;padding:6px 10px;margin:0 0 10px;font-size:13px}.audit.bad{border-color:var(--red)}.audit ul{margin:4px 0 0 18px;padding:0}
 .adm{font-family:"Tajawal",var(--sans)}.adm .panel h3{font-family:"Tajawal",var(--sans);font-weight:500;font-size:19px}.adm h4{font:500 14px "Tajawal",var(--sans);margin:14px 0 4px}
@@ -543,7 +543,7 @@ const PASS_HASH = "d6f7961e955b42afb04e910ef174ce7b82af4efe180a05605bc68aee28cad
 const REPO = "ranaa4117/black-friday-deals";
 const WORKFLOW = "self-portrait-update.yml";
 const LS = "sp-edit-v1";
-const APP_VERSION = "30";
+const APP_VERSION = "31";
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
@@ -1538,7 +1538,7 @@ function viewAdmin(all){
       ${hidden ? `<div class="row"><button class="btn quiet" id="aRestore">استرجاع ${hidden} منتج محذوف</button></div>` : ""}
     </div></section>
 
-  <section class="panel"><div><h3>حالة الماركات</h3><p class="why">يتم تحديث المنتجات والأسعار والمقاسات تلقائياً كل ١٥ دقيقة (منتجات Macy's كل ساعة). لا يُحذف أي منتج تلقائياً.</p></div>
+  <section class="panel"><div><h3>حالة الماركات</h3><p class="why">يتم تحديث المنتجات والأسعار والمقاسات تلقائياً كل ١٥ دقيقة (منتجات Macy's كل ساعة). لا يُحذف منتج إلا إذا تأكدنا ٣ مرات خلال ٢٤ ساعة أن المتجر الأصلي حذفه نهائياً.</p></div>
     <div class="fields">
       <p class="small">آخر تحديث ناجح: <b>${when(m.lastSuccess)}</b> (بتوقيت الرياض).${m.lastError ? `<br><span class="warnline">${esc(m.lastError)}</span>` : ""}</p>
       <div class="kvs">
@@ -1585,7 +1585,8 @@ function viewAdmin(all){
 }
 function editList(all){
   const q = ($("#aQ") && $("#aQ").value || "").toLowerCase();
-  const disc = p => p.status === "discontinued" || p.status === "unavailable" ? '<span class="dtag">غير متوفر</span>' : offShown(p) > 0 ? `<span class="dtag red">مخفّض <bdi dir="ltr">${offShown(p)}%</bdi></span>` : '<span class="dtag">بسعره الأصلي — بدون خصم</span>';
+  const ps = p => isMD(p) && p.promoStatus && p.promoStatus !== "none" ? ` · الخصم الإضافي: ${PS_AR[p.promoStatus] || p.promoStatus}` : "";
+  const disc = p => (p.status === "discontinued" || p.status === "unavailable" ? '<span class="dtag">غير متوفر</span>' : offShown(p) > 0 ? `<span class="dtag red">مخفّض <bdi dir="ltr">${offShown(p)}%</bdi></span>` : '<span class="dtag">بسعره الأصلي — بدون خصم</span>') + (ps(p) ? `<span class="dtag${p.promoStatus === "unverified" || p.promoStatus === "checkout" ? " warn" : ""}">${ps(p)}</span>` : "");
   $("#editList").innerHTML = all.filter(p => !q || p.title.toLowerCase().includes(q)).slice(0, 150).map(p =>
     `<div class="erow"><button data-edit="${esc(p.handle)}"><img loading="lazy" src="${esc(img(p.image,100))}" alt=""><span dir="auto">${esc(p.title)}<br><span class="tag">${esc(kindOf(p))} · ${money(p, p.price)} · ${fmt(finalSAR(p))} ر.س${p.edited ? " · معدّل" : ""}${p.manual ? " · مضاف يدوياً" : ""}${S.fav[p.handle] ? " · ♥" : ""}</span><br>${disc(p)}</span><span class="tag">تعديل</span></button>${origLink(p)}</div>`).join("");
 }
@@ -1767,6 +1768,7 @@ function wireList(route){
   if ($("#more")) $("#more").onclick = () => { u.limit += 48; const y = scrollY; render(); scrollTo(0, y); };
 }
 
+const PS_AR = { active:"نشط", checkout:"نشط — يُتحقق منه عند الدفع", unverified:"غير مؤكد — يُعاد فحصه", expired:"منتهي", none:"بدون خصم إضافي" };
 const CHG_KIND = { fresh:"منتج جديد", ended:"انتهى الخصم", extraEnd:"انتهى الخصم الإضافي", price:"تغيّر السعر", left:"خرج من قائمة التخفيضات", back:"رجع للتخفيض", gone:"لم يعد يُباع", stock:"المقاسات", failed:"تحديث فشل", site:"تحديث الموقع" };
 const origOk = p => { if (!p) return false; if (p.manual) return /^https:\/\/[^/]+\/.+/.test(p.url || ""); const u = url(p), h = p.handle, b = p.brand || "sp";
   if (b === "sp") return u === "https://eu.self-portrait.com/es-es/products/" + h;
@@ -1780,18 +1782,20 @@ function chgInfo(it, p){
   const o = it.o, n = it.n || {}, m = it.m || [], kinds = [], lines = [];
   let head = "", reason = "";
   const k = (x, h, r) => { kinds.push(x); if (!head){ head = h; reason = r || ""; } };
+  if (it.removed){ k("gone", "حُذف من الموقع", "تأكدنا ٣ مرات خلال ٢٤ ساعة أن المتجر الأصلي حذف القطعة نهائياً."); if (it.url) lines.push(`الرابط السابق: <span dir="ltr">${esc(it.url)}</span>`); return { head, reason, lines, sizes:"", kinds }; }
   if (m.some(x => /Newly discovered/.test(x))) k("fresh", "منتج جديد", "أُضيف إلى قسمه في الموقع.");
-  if (m.some(x => /^Restored/.test(x))) k("back", "أُعيد للموقع", "لا يُحذف أي منتج.");
+  if (m.some(x => /^Restored/.test(x))) k("back", "أُعيد للموقع", "");
   if (o){
-    if (o.status !== "discontinued" && n.status === "discontinued") k("gone", "لم يعد المتجر الأصلي يبيعه", "يظهر «غير متوفر» وبقي في الموقع مع رابطه.");
+    if (o.status !== "discontinued" && n.status === "discontinued") k("gone", "صفحتها في المتجر الأصلي «غير موجودة»", "تظهر «غير متوفرة» ويُعاد التأكد. تُحذف فقط إذا تأكد ذلك ٣ مرات خلال ٢٤ ساعة.");
     if (o.status !== "unavailable" && n.status === "unavailable") k("gone", "غير متوفر في المتجر الأصلي", "بقي في الموقع مع رابطه.");
     if (o.compare > o.price && !(n.compare > n.price)) k("ended", "انتهى الخصم", "أُزيل الخصم ورجع السعر الأصلي + إضافتك.");
-    if (o.extraPct && !n.extraPct) k("extraEnd", "انتهى الخصم الإضافي " + o.extraPct + "%", "المتجر لم يعد يطبّق الخصم الإضافي على هذه القطعة.");
+    if (o.extraPct && !n.extraPct) k("extraEnd", "انتهى الخصم الإضافي " + o.extraPct + "%", "تأكدنا ٣ مرات متتالية أن صفحة القطعة الأصلية لم تعد تعرض الخصم.");
     if (!(o.compare > o.price) && n.compare > n.price) k("back", "رجع عليه خصم", "المتجر الأصلي خفّض سعرها.");
     if (!o.extraPct && n.extraPct) k("back", "صار عليه خصم إضافي " + n.extraPct + "%", "يظهر في المتجر الأصلي على هذه القطعة.");
     if (o.listed !== false && n.listed === false) k("left", "خرج من قائمة تخفيضات المتجر", "لم يُحذف: يبقى بسعره في صفحته الأصلية + إضافتك.");
     if (o.listed === false && n.listed !== false) k("back", "رجع لقائمة التخفيضات", "");
     if (o.status === "discontinued" && n.status !== "discontinued") k("back", "صار متوفراً من جديد", "");
+    if ((o.ps || "") !== (n.ps || "") && n.ps){ if (!o.extraPct && n.extraPct && !head) k("back", "رجع الخصم الإضافي", ""); lines.push("حالة الخصم: " + (PS_AR[o.ps] || "—") + " ← " + (PS_AR[n.ps] || "—")); if (n.ps === "unverified" && !head) k("price", "الخصم يحتاج إعادة تحقق", "لم يظهر الخصم في آخر قراءة؛ يبقى كما هو حتى نتأكد ٣ مرات."); }
     if (p){ const a = sarAt(p, o), b = sarAt(p, n); if (a !== b){ k("price", "تغيّر السعر", b < a ? "المتجر الأصلي خفّض السعر." : "المتجر الأصلي رفع السعر."); lines.push(`السعر السابق: <b>${arN(a)} ر.س</b> ← السعر الجديد: <b class="${b < a ? "red" : ""}">${arN(b)} ر.س</b>`); } }
   } else {
     m.forEach(x => { let r;
@@ -1801,8 +1805,8 @@ function chgInfo(it, p){
       else if (/Back in the sale/.test(x)) k("back", "رجع لقائمة التخفيضات", "");
       else if (/No longer sold/.test(x)) k("gone", "لم يعد المتجر الأصلي يبيعه", "يظهر «غير متوفر» ولم يُحذف.");
       else if (/Available again/.test(x)) k("back", "صار متوفراً من جديد", "");
-      else if (/Extra 25% in cart no longer/.test(x)) k("extraEnd", "انتهى الخصم الإضافي 25%", "");
-      else if (/Extra 25% in cart now/.test(x)) k("back", "صار عليه خصم إضافي 25%", ""); });
+      else if (/Extra \d+% (in cart )?no longer/.test(x)) k("extraEnd", "انتهى الخصم الإضافي", "");
+      else if (/Extra \d+% (in cart )?now/.test(x)) k("back", "صار عليه خصم إضافي", ""); });
   }
   const so = m.filter(x => / sold out$/.test(x)).map(x => x.replace(/ sold out$/, "")), bi = m.filter(x => / back in stock$/.test(x)).map(x => x.replace(/ back in stock$/, ""));
   const sizes = [so.length ? "نفد: " + so.join("، ") : "", bi.length ? "رجع: " + bi.join("، ") : ""].filter(Boolean).join(" · ");

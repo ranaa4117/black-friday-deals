@@ -776,7 +776,7 @@ def size_msgs(old, new):
     return [f"{x['s']} {'back in stock' if x['a'] else 'sold out'}" for x in new if x["s"] in o and o[x["s"]] != x["a"]]
 
 
-HEAVY = ("images", "details", "guide", "guideImg", "guideAt", "changes", "verifiedAt")
+HEAVY = ("images", "details", "guide", "guideImg", "guideAt", "changes", "verifiedAt", "goneChecks", "promoTag", "promoCheckedAt", "promoLabel")
 
 
 def _dump(path, obj):
