@@ -333,6 +333,25 @@ nav.tabs .dot{display:inline-block;width:6px;height:6px;border-radius:50%;backgr
 .pick button{border:1px solid var(--ink);min-width:64px;padding:10px 12px;font-size:14px}
 .pick button[aria-pressed="true"]{background:var(--ink);color:#fff}
 .pick button:disabled{border-color:var(--rule);color:#bdb6ae;text-decoration:line-through;cursor:not-allowed}
+.stats{font-family:"Tajawal",var(--sans)}
+.st-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin:8px 0 14px}.st-head h2{font:400 clamp(28px,4vw,40px)/1.1 var(--serif);margin:0}.st-head p{color:var(--stone);font-size:13.5px;margin:6px 0 0}
+.stats .st-filters .sp{flex:1}.stats .seg{display:flex;gap:6px;margin-bottom:6px}
+.stats .chip{border:1px solid var(--rule);background:#fff;padding:6px 12px;font:inherit;cursor:pointer}.stats .chip[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.stats .cap{font-size:12px;color:var(--stone);margin:0 0 8px}
+.stats .st h3{font-family:"Tajawal",var(--sans);font-weight:500;font-size:20px}.stats .st h4{letter-spacing:0;font-size:14px}
+.stats .tiles{grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px}.stats .tile{padding:16px;min-height:118px;gap:6px}
+.stats .tile b{font:400 30px/1.1 var(--serif)}.stats .tile .tn{font:500 18px/1.3 var(--sans)}.stats .tile .th{line-height:1.5}
+.stats .tile .tp{display:flex;gap:8px;align-items:center;font:400 14px/1.35 "Tajawal",var(--sans);color:var(--ink);text-decoration:none}.stats .tile .tp img{width:34px;height:44px;object-fit:cover}
+.stats .minis{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin:14px 0 6px}.stats .minis div{border-top:1px solid var(--rule);padding-top:8px;display:flex;flex-direction:column}.stats .minis b{font:400 22px var(--serif)}.stats .minis span{font-size:12px;color:var(--stone)}
+.stats .three{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}.stats .four{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:10px}
+.rank{list-style:none;margin:0;padding:0;counter-reset:r}.rank li{counter-increment:r;border-bottom:1px solid var(--rule)}.rank a{display:grid;grid-template-columns:auto 34px 1fr auto;gap:10px;align-items:center;padding:8px 0;color:var(--ink);text-decoration:none}
+.rank a::before{content:counter(r);color:var(--stone);font-size:12px;width:14px}.rank img,.rank .noimg{width:34px;height:44px;object-fit:cover;background:var(--ivory);display:block}
+.rank .rn{font-size:13px;line-height:1.35;overflow:hidden}.rank .rn small,.rank .rv small{display:block;color:var(--stone);font-size:11px}.rank .rv{text-align:left;font:400 16px var(--serif);white-space:nowrap}
+.funnel{display:flex;flex-direction:column;gap:8px;max-width:760px;margin-bottom:8px}.fs{display:grid;grid-template-columns:130px 1fr 90px 80px;gap:10px;align-items:center;font-size:13px}.fs .fv small{color:var(--stone)}.fs .fd{font-size:11.5px;color:var(--red)}
+.sortb{background:none;border:0;font:inherit;cursor:pointer;padding:0;color:inherit}.stats .st-t th{white-space:nowrap}.stats .st-t td.pc img,.stats .st-t .noimg{width:30px;height:40px;object-fit:cover;background:var(--ivory)}
+.stats .bar{grid-template-columns:minmax(110px,40%) 1fr auto}
+@media (max-width:900px){ .stats .three,.stats .four{grid-template-columns:1fr 1fr} }
+@media (max-width:600px){ .stats .three,.stats .four{grid-template-columns:1fr} .fs{grid-template-columns:96px 1fr 70px} .fs .fd{grid-column:2 / -1} .st-head{flex-direction:column} }
 .st-filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0 14px;font-size:13px}
 .st-filters .chip{border:1px solid var(--rule);background:#fff;padding:6px 12px;font:inherit;cursor:pointer}.st-filters .chip[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
 .st-filters label{display:flex;gap:6px;align-items:center}.st-filters input,.st-filters select{border:1px solid var(--rule);padding:5px 8px;font:inherit}
@@ -517,7 +536,7 @@ const PASS_HASH = "d6f7961e955b42afb04e910ef174ce7b82af4efe180a05605bc68aee28cad
 const REPO = "ranaa4117/black-friday-deals";
 const WORKFLOW = "self-portrait-update.yml";
 const LS = "sp-edit-v1";
-const APP_VERSION = "26";
+const APP_VERSION = "27";
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
@@ -1178,7 +1197,7 @@ const routeName = r => r.startsWith("item-") ? "item" : r;
 function trackRoute(route){
   const name = routeName(route), prev = AN.route;
   endEngage();
-  if (name === "item"){ const h = route.slice(5); if (once("pv:" + h)) track("product_view", { handle:h, route:"item", meta: prev ? { from: prev } : undefined }); startEngage(h); }
+  if (name === "item"){ const h = route.slice(5), bc = prodMeta(h); if (once("pv:" + h)) track("product_view", { handle:h, route:"item", meta: Object.assign({}, bc, prev ? { from: prev } : {}) }); startEngage(h); }
   if (prev !== name || name === "item"){
     const s = session(), landing = s.n === 0; s.n++; try { sessionStorage.setItem("ro-session", JSON.stringify(s)); } catch {}
     track("pageview", { route: name, meta: Object.assign({}, prev ? { from: prev } : {}, landing ? { landing: "1" } : {}) });
@@ -1188,7 +1207,8 @@ function trackRoute(route){
 /* engaged time on a product page: counted only while the page is visible */
 function startEngage(h){ AN.eng = { h, ms: 0, at: document.visibilityState === "visible" ? Date.now() : null }; }
 function pauseEngage(){ if (AN.eng && AN.eng.at){ AN.eng.ms += Date.now() - AN.eng.at; AN.eng.at = null; } }
-function endEngage(){ pauseEngage(); if (AN.eng && AN.eng.ms >= 1000) track("engage", { handle: AN.eng.h, ms: Math.min(Math.round(AN.eng.ms), 600000) }); AN.eng = null; }
+function endEngage(){ pauseEngage(); if (AN.eng && AN.eng.ms >= 1000) track("engage", { handle: AN.eng.h, ms: Math.min(Math.round(AN.eng.ms), 600000), meta: prodMeta(AN.eng.h) }); AN.eng = null; }
+function prodMeta(h){ const p = loaded ? products().find(x => x.handle === h) : null; return p ? { b: brandOf(p), c: secOf(p) } : {}; }
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden"){ if (AN.eng){ const h = AN.eng.h; endEngage(); startEngage(h); AN.eng.at = null; } flush(); }
   else if (AN.eng && !AN.eng.at) AN.eng.at = Date.now();
@@ -1343,17 +1363,21 @@ function openMDChart(p){
 $("#guide").addEventListener("click", e => { if (e.target === $("#guide")) $("#guide").close(); });
 
 /* ---------- admin ---------- */
-/* ======================= private analytics dashboard (#stats) ======================= */
-const ST = { range: "7", from: "", to: "", data: null, err: "", loading: false, f: { brand:"", cat:"", q:"" } };
-const adminKey = () => store.get("ro-admin-key") || "";
-const msFmt = ms => { ms = Math.round(Number(ms) || 0); if (ms < 1000) return ms ? "<1s" : "0s"; const s0 = Math.round(ms / 1000), m = Math.floor(s0 / 60), h = Math.floor(m / 60); return h ? h + "h " + (m % 60) + "m" : m ? m + "m " + String(s0 % 60).padStart(2, "0") + "s" : s0 + "s"; };
-const nfmt = n => Number(n || 0).toLocaleString("en-US");
-const chg = (cur, prev) => { cur = Number(cur) || 0; prev = Number(prev) || 0; if (!prev) return cur ? '<span class="chg up">new</span>' : '<span class="chg">—</span>'; const d = Math.round((cur - prev) / prev * 100); return `<span class="chg ${d > 0 ? "up" : d < 0 ? "down" : ""}">${d > 0 ? "▲" : d < 0 ? "▼" : ""}${Math.abs(d)}%</span>`; };
+/* ======================= private analytics dashboard (#stats) — people first, Arabic ======================= */
+const ST = { range: "7", from: "", to: "", data: null, err: "", loading: false, f: { brand:"", cat:"" }, trend: "day", sort: { k: "uv", dir: -1 } };
+const adminKey = () => store.get("ro-admin-k") || "";
+const NODATA = '<p class="nodata">لا توجد بيانات كافية حتى الآن</p>';
+const arN = n => Number(n || 0).toLocaleString("en-US");
+const msAr = ms => { ms = Math.round(Number(ms) || 0); if (!ms) return "٠ ث"; const s0 = Math.max(1, Math.round(ms / 1000)), m = Math.floor(s0 / 60), h = Math.floor(m / 60);
+  return h ? h + " س " + (m % 60) + " د" : m ? m + " د " + (s0 % 60) + " ث" : s0 + " ث"; };
+const chgAr = (cur, prev) => { cur = Number(cur) || 0; prev = Number(prev) || 0; if (!prev) return cur ? '<span class="chg up">جديد</span>' : ""; const d = Math.round((cur - prev) / prev * 100);
+  return d ? `<span class="chg ${d > 0 ? "up" : "down"}" dir="ltr">${d > 0 ? "▲" : "▼"} ${Math.abs(d)}%</span>` : '<span class="chg">بدون تغيير</span>'; };
+const brandAr = b => b === "mc" ? "Macy's" : BRANDS[b] || b || "—";
+const catAr = c => SECTIONS[c] ? SECTIONS[c].ar : c ? c : "—";
 function stRange(){
   const now = new Date(), end = new Date(now.getTime() + 60e3);
-  const riyadhMidnight = d => { const k = new Date(d.toLocaleString("en-US", { timeZone:"Asia/Riyadh" })); const off = d - k; k.setHours(0,0,0,0); return new Date(k.getTime() + off); };
   if (ST.range === "custom" && ST.from && ST.to) return [new Date(ST.from + "T00:00:00+03:00"), new Date(new Date(ST.to + "T00:00:00+03:00").getTime() + 864e5)];
-  if (ST.range === "today") return [riyadhMidnight(now), end];
+  if (ST.range === "today"){ const ymd = now.toLocaleDateString("en-CA", { timeZone:"Asia/Riyadh" }); return [new Date(ymd + "T00:00:00+03:00"), end]; }
   return [new Date(now - Number(ST.range) * 864e5), end];
 }
 async function loadStats(){
@@ -1361,121 +1385,124 @@ async function loadStats(){
   ST.loading = true; ST.err = ""; if (routeOf() === "stats") render();
   const [a, b] = stRange();
   try { ST.data = await sb("rpc/admin_stats", { method:"POST", body: JSON.stringify({ p_key: adminKey(), p_from: a.toISOString(), p_to: b.toISOString() }) }); }
-  catch (e) { ST.data = null; ST.err = /401|403|42501/.test(String(e.message)) ? "That admin key isn't accepted. Check it and try again." : /404/.test(String(e.message)) ? "The analytics database isn't set up yet — run the analytics SQL in Supabase first." : "Couldn't load the statistics (" + e.message + "). Try again."; }
+  catch (e) { ST.data = null; const m = String(e.message);
+    ST.err = /401|403|42501/.test(m) ? "قاعدة البيانات لم تقبل رمز الدخول بعد. شغّلي ملف الإحصاءات المحدّث في Supabase ثم حاولي مرة أخرى." : /404/.test(m) ? "قاعدة بيانات الإحصاءات غير جاهزة بعد — شغّلي ملف الإحصاءات في Supabase أولاً." : "تعذّر تحميل الإحصاءات. حاولي مرة أخرى."; }
   ST.loading = false; if (routeOf() === "stats") render();
 }
-function barList(rows, opts = {}){   // horizontal bars: one hue, value labels in text ink, tooltip on hover
-  rows = rows.filter(r => r.v > 0); if (!rows.length) return '<p class="nodata">Not enough data yet</p>';
-  const max = Math.max(...rows.map(r => r.v)), f = opts.fmt || nfmt;
-  return `<div class="bars">${rows.map(r => `<div class="bar" title="${esc(r.label)}: ${esc(f(r.v))}${r.tip ? " · " + esc(r.tip) : ""}"><span class="bl">${r.img ? `<img src="${esc(img(r.img, 80))}" alt="">` : ""}${esc(r.label)}</span><span class="bt"><i style="width:${Math.max(2, r.v / max * 100)}%"></i></span><span class="bv">${esc(f(r.v))}</span></div>`).join("")}</div>`;
+function barList(rows, fmt = arN){   // horizontal bars, one calm hue; labels stay in text ink
+  rows = rows.filter(r => r.v > 0); if (!rows.length) return NODATA;
+  const max = Math.max(...rows.map(r => r.v));
+  return `<div class="bars">${rows.map(r => `<div class="bar" title="${esc(r.label)}: ${esc(fmt(r.v))}${r.tip ? " — " + esc(r.tip) : ""}"><span class="bl" dir="auto">${esc(r.label)}</span><span class="bt"><i style="width:${Math.max(3, r.v / max * 100)}%"></i></span><span class="bv">${esc(fmt(r.v))}</span></div>`).join("")}</div>`;
 }
-function lineChart(points, key, label){   // single series line with hover crosshair + tooltip
-  if (!points.length) return '<p class="nodata">Not enough data yet</p>';
-  const W = 640, H = 180, P = { l: 34, r: 12, t: 12, b: 26 }, n = points.length, max = Math.max(1, ...points.map(p => p[key]));
-  const x = i => P.l + (n === 1 ? (W - P.l - P.r) / 2 : i * (W - P.l - P.r) / (n - 1)), y = v => P.t + (H - P.t - P.b) * (1 - v / max);
-  const path = points.map((p, i) => (i ? "L" : "M") + x(i).toFixed(1) + " " + y(p[key]).toFixed(1)).join(" ");
-  const ticks = [0, Math.round(max / 2), max];
-  const every = Math.max(1, Math.ceil(n / 7));
-  return `<div class="lc" data-key="${key}"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(label)} per day">
-    ${ticks.map(t => `<line x1="${P.l}" x2="${W - P.r}" y1="${y(t)}" y2="${y(t)}" class="grid"/><text x="${P.l - 6}" y="${y(t) + 4}" class="ax" text-anchor="end">${t}</text>`).join("")}
-    <path d="${path}" class="ln"/>
-    ${points.map((p, i) => `<g class="pt"><rect x="${x(i) - (W / n) / 2}" y="0" width="${W / n}" height="${H}" fill="transparent"><title>${p.d}: ${p[key]} ${label.toLowerCase()}</title></rect><circle cx="${x(i)}" cy="${y(p[key])}" r="4"/></g>`).join("")}
+function lineChart(points){   // unique visitors over time: one series, hover shows the value
+  if (points.length < 2) return points.length ? `<p class="small">${arN(points[0].v)} زائر فريد في ${points[0].d}. يظهر الخط عندما تتوفر أكثر من فترة.</p>` : NODATA;
+  const W = 640, H = 190, P = { l: 30, r: 14, t: 14, b: 26 }, n = points.length, max = Math.max(1, ...points.map(p => p.v)), step = (W - P.l - P.r) / (n - 1);
+  const x = i => P.l + i * step, y = v => P.t + (H - P.t - P.b) * (1 - v / max);
+  const every = Math.max(1, Math.ceil(n / 6));
+  return `<div class="lc" dir="ltr"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="الزوار الفريدون عبر الوقت">
+    ${[0, Math.round(max / 2), max].map(t => `<line x1="${P.l}" x2="${W - P.r}" y1="${y(t)}" y2="${y(t)}" class="grid"/><text x="${P.l - 6}" y="${y(t) + 4}" class="ax" text-anchor="end">${t}</text>`).join("")}
+    <path d="${points.map((p, i) => (i ? "L" : "M") + x(i).toFixed(1) + " " + y(p.v).toFixed(1)).join(" ")}" class="ln"/>
+    ${points.map((p, i) => `<g class="pt"><rect x="${x(i) - step / 2}" y="0" width="${step}" height="${H}" fill="transparent"><title>${p.d}: ${p.v} زائر فريد</title></rect><circle cx="${x(i)}" cy="${y(p.v)}" r="3.5"/></g>`).join("")}
     ${points.map((p, i) => i % every === 0 || i === n - 1 ? `<text x="${x(i)}" y="${H - 6}" class="ax" text-anchor="middle">${p.d.slice(5)}</text>` : "").join("")}
   </svg></div>`;
 }
-const tile = (label, val, change, help) => `<div class="tile"><span class="tl">${label}</span><b>${val}</b>${change || ""}${help ? `<span class="th">${help}</span>` : ""}</div>`;
+const stCard = (label, val, note, extra) => `<div class="tile"><span class="tl">${label}</span><b>${val}</b>${extra || ""}<span class="th">${note}</span></div>`;
 function viewStats(all){
   const byH = Object.fromEntries(all.map(p => [p.handle, p]));
-  const name = h => byH[h] ? byH[h].title : h, brandN = h => byH[h] ? BRANDS[brandOf(byH[h])] : "—", catN = h => byH[h] ? (SECTIONS[secOf(byH[h])] || {}).en || CATS[catOf(byH[h])] : "—";
-  const ranges = [["today","Today"],["7","Last 7 days"],["30","Last 30 days"],["90","Last 90 days"],["custom","Custom"]];
-  const head = `<div class="list-head"><div><h2>Analytics</h2><p>Private to you. Counts come only from real visits since tracking started; your own visits, bots and the store checks are not counted.</p></div><div class="owner-tools"><a class="btn quiet" href="#admin">Back to admin</a></div></div>`;
-  if (!adminKey()) return head + `<section class="panel"><div><h3>Admin key</h3><p class="why">Enter the private admin key once; it stays on this device only.</p></div>
-    <div class="fields"><label class="f">Admin key<input id="stKey" type="password" autocomplete="off" placeholder="ro-…"></label><div class="row"><button class="btn solid" id="stKeySave">Open dashboard</button></div></div></section>`;
-  const filt = `<div class="st-filters" role="group" aria-label="Date range">${ranges.map(([k, l]) => `<button class="chip" data-range="${k}" aria-pressed="${ST.range === k}">${l}</button>`).join("")}
-    ${ST.range === "custom" ? `<label>From <input type="date" id="stFrom" value="${esc(ST.from)}"></label><label>To <input type="date" id="stTo" value="${esc(ST.to)}"></label><button class="btn" id="stApply">Apply</button>` : ""}
-    <button class="linkish" id="stForget">Forget key on this device</button></div>`;
-  const nav = ["Overview","Traffic & Visitors","Visit Duration & Engagement","Popular Products","Product Ranking","Favorites Analytics","Brands & Categories","Customer Browsing Behavior","Recommendation Performance","Traffic Sources & Devices"];
-  const navHtml = `<nav class="st-nav">${nav.map((n, i) => `<a href="#stats" data-jump="st${i + 1}">${i + 1}. ${n}</a>`).join("")}</nav>`;
-  if (ST.err) return head + filt + `<p class="warnline" style="margin:16px 0">${esc(ST.err)}</p>`;
+  const head = `<div class="st-head"><div><h2>الإحصاءات</h2><p>زوار حقيقيون فقط. زياراتك كمسؤولة، والروبوتات، وفحوصات المتاجر لا تُحسب.</p></div><a class="btn quiet" href="#admin">العودة إلى الإدارة</a></div>`;
+  if (!adminKey()) return `<div class="stats" dir="rtl" lang="ar">${head}<section class="panel"><div><h3>رمز الدخول</h3><p class="why">أدخلي رمز دخول الإدارة مرة واحدة على هذا الجهاز لفتح الإحصاءات.</p></div>
+    <div class="fields"><label class="f">رمز الدخول<input id="stPass" type="password" autocomplete="current-password" dir="ltr"></label><div class="row"><button class="btn solid" id="stOpen">فتح الإحصاءات</button></div><p class="ferr" id="stErr"></p></div></section></div>`;
+  const ranges = [["today","اليوم"],["7","آخر ٧ أيام"],["30","آخر ٣٠ يوماً"],["90","آخر ٩٠ يوماً"],["custom","فترة مخصصة"]];
+  const brandsAll = Object.keys(BRANDS).filter(b => all.some(p => brandOf(p) === b));
+  const filt = `<div class="st-filters">${ranges.map(([k, l]) => `<button class="chip" data-range="${k}" aria-pressed="${ST.range === k}">${l}</button>`).join("")}
+    ${ST.range === "custom" ? `<label>من <input type="date" id="stFrom" value="${esc(ST.from)}"></label><label>إلى <input type="date" id="stTo" value="${esc(ST.to)}"></label><button class="btn" id="stApply">تطبيق</button>` : ""}
+    <span class="sp"></span><label>الماركة <select id="stBrand"><option value="">كل الماركات</option>${brandsAll.map(b => `<option value="${b}" ${ST.f.brand === b ? "selected" : ""}>${esc(BRANDS[b])}</option>`).join("")}</select></label>
+    <label>القسم <select id="stCat"><option value="">كل الأقسام</option>${Object.entries(SECTIONS).map(([k, S0]) => `<option value="${k}" ${ST.f.cat === k ? "selected" : ""}>${S0.ar}</option>`).join("")}</select></label></div>`;
+  const wrap = inner => `<div class="stats" dir="rtl" lang="ar">${head}${filt}${inner}</div>`;
+  if (ST.err) return wrap(`<p class="warnline" style="margin:16px 0">${esc(ST.err)}</p>`);
   const D = ST.data;
-  if (!D) return head + filt + `<p class="small" style="margin:20px 0">${ST.loading ? "Loading statistics…" : "No statistics loaded yet."}</p>`;
-  const P0 = D.prev || {}, E = D.engagement || {}, days = Math.max(1, (D.daily || []).length);
-  const prods = (D.products || []).map(r => Object.assign({}, r, { p: byH[r.h] })).filter(r => (!ST.f.brand || (r.p && brandOf(r.p) === ST.f.brand)) && (!ST.f.cat || (r.p && secOf(r.p) === ST.f.cat)) && (!ST.f.q || name(r.h).toLowerCase().includes(ST.f.q.toLowerCase())));
-  const prodRow = (r, i, cols) => `<tr><td>${i + 1}</td><td class="pc">${r.p && r.p.image ? `<img src="${esc(img(r.p.image, 80))}" alt="">` : ""}<a href="#item-${esc(r.h)}">${esc(name(r.h))}</a></td><td>${esc(brandN(r.h))}</td><td>${esc(catN(r.h))}</td>${cols(r)}</tr>`;
-  const empty = '<p class="nodata">Not enough data yet</p>';
-  // engagement score (same signals as the public ranking): unique views, average time (smoothed), total time, favorites
-  const eng = r => Math.log1p(r.uniq) * 2 + Math.log1p(((r.totalMs || 0) + 45000) / ((r.views || 0) + 3) / 1000) * 2 + Math.log1p((r.totalMs || 0) / 60000) + Math.log1p(r.favs) * 2;
-  const agg = (keyFn) => { const m = {}; for (const r of D.products || []){ const k = keyFn(r.h); if (!k) continue; const o = m[k] || (m[k] = { v:0, t:0, f:0, top:null }); o.v += r.views; o.t += r.totalMs; o.f += r.favs; if (!o.top || r.views > o.top.views) o.top = r; } return m; };
-  const byBrand = agg(h => byH[h] && BRANDS[brandOf(byH[h])]), byCat = agg(h => byH[h] && (SECTIONS[secOf(byH[h])] || {}).en);
-  const favAll = (D.favTotals || []).map(r => ({ h: r.h, n: r.n }));
-  const favBrand = {}, favCat = {}; for (const r of favAll){ const p = byH[r.h]; if (!p) continue; const b = BRANDS[brandOf(p)], c = (SECTIONS[secOf(p)] || {}).en; favBrand[b] = (favBrand[b] || 0) + r.n; if (c) favCat[c] = (favCat[c] || 0) + r.n; }
-  const routeLabel = r => r === "home" ? "Home" : r === "item" ? "Product page" : parseSec(r) ? secTitle(parseSec(r)) : r === "favorites" ? "Favorites" : r === "popular" ? "Most favorited" : r === "recent" ? "Newly added" : r === "discounts" ? "Biggest discounts" : r === "all" ? "All products" : r;
-  const F = D.funnel || {}, R0 = D.recos || {}, ctr = o => o && o.impressions ? (100 * o.clicks / o.impressions).toFixed(1) + "%" : "—";
-  const brandOpts = Object.keys(BRANDS).filter(b => all.some(p => brandOf(p) === b));
-  return head + filt + navHtml + `
-  <section class="st" id="st1"><h3>1. Overview</h3><div class="tiles">
-    ${tile("Visitors", nfmt(D.visitors), chg(D.visitors, P0.visitors))}${tile("Visits (sessions)", nfmt(D.sessions), chg(D.sessions, P0.sessions))}
-    ${tile("Page views", nfmt(D.pageviews), chg(D.pageviews, P0.pageviews))}${tile("Product views", nfmt(D.productViews), chg(D.productViews, P0.productViews))}
-    ${tile("Favorites added", nfmt(D.favAdds), chg(D.favAdds, P0.favAdds))}${tile("Avg. engaged time", msFmt(E.avgEngagedMs), "", "per visit")}</div>
-    <p class="small">Changes compare with the period of the same length just before. Tracking started ${D.firstEventAt ? when(D.firstEventAt) : "— no visits recorded yet"}; nothing before that is shown.</p></section>
-  <section class="st" id="st2"><h3>2. Traffic & Visitors</h3><div class="tiles">
-    ${tile("Unique visitors", nfmt(D.visitors), chg(D.visitors, P0.visitors), "browsers, not people")}${tile("New visitors", nfmt(D.newVisitors), chg(D.newVisitors, P0.newVisitors))}
-    ${tile("Returning visitors", nfmt(Math.max(0, D.visitors - D.newVisitors)))}${tile("Average daily visitors", nfmt(Math.round(D.visitors / days)))}</div>
-    <h4>Visitors per day</h4>${lineChart(D.daily || [], "visitors", "Visitors")}
-    <details><summary>Table</summary><table class="compare"><thead><tr><th>Day</th><th>Visitors</th><th>Visits</th><th>Page views</th><th>Product views</th></tr></thead><tbody>${(D.daily || []).map(d => `<tr><td>${d.d}</td><td>${d.visitors}</td><td>${d.sessions}</td><td>${d.pageviews}</td><td>${d.productViews}</td></tr>`).join("")}</tbody></table></details></section>
-  <section class="st" id="st3"><h3>3. Visit Duration & Engagement</h3><div class="tiles">
-    ${tile("Avg. visit duration", msFmt(E.avgSessionMs), "", "first to last activity, or engaged time if longer")}${tile("Avg. engaged time", msFmt(E.avgEngagedMs), "", "time a product page was visible")}
-    ${tile("Pages per visit", E.avgPages || 0)}${tile("Avg. time on a product", msFmt(D.productAvgMs))}
-    ${tile("Engagement rate", (E.engagementRate || 0) + "%", "", "visits with 2+ pages, a product action, or 10s+ engaged")}${tile("Bounce rate", (E.bounceRate || 0) + "%", "", "visits with 1 page, no action and under 10s engaged")}
-    ${tile("Returning visits", (E.returningPct || 0) + "%")}</div></section>
-  <section class="st" id="st4"><h3>4. Popular Products</h3>
-    <div class="st-filters"><label>Brand <select id="stBrand"><option value="">All brands</option>${brandOpts.map(b => `<option value="${b}" ${ST.f.brand === b ? "selected" : ""}>${esc(BRANDS[b])}</option>`).join("")}</select></label>
-      <label>Category <select id="stCat"><option value="">All categories</option>${Object.entries(SECTIONS).map(([k, S0]) => `<option value="${k}" ${ST.f.cat === k ? "selected" : ""}>${S0.en}</option>`).join("")}</select></label>
-      <label>Product <input id="stQ" type="search" value="${esc(ST.f.q)}" placeholder="Name"></label></div>
-    ${prods.length ? `<div class="table-wrap"><table class="compare st-t"><thead><tr><th>#</th><th>Product</th><th>Brand</th><th>Category</th><th>Views</th><th>Unique</th><th>Avg. time</th><th>Total time</th><th>vs before</th></tr></thead><tbody>
-      ${prods.slice(0, 30).map((r, i) => prodRow(r, i, r => `<td>${r.views}</td><td>${r.uniq}</td><td>${msFmt(r.avgMs)}</td><td>${msFmt(r.totalMs)}</td><td>${chg(r.views, r.prevViews)}</td>`)).join("")}</tbody></table></div>` : empty}</section>
-  <section class="st" id="st5"><h3>5. Product Ranking — most engaging</h3><p class="small">Balanced score: unique views, average and total time spent, and favorites. A piece with fewer but longer visits can rank above one with many quick visits.</p>
-    ${prods.length ? `<div class="table-wrap"><table class="compare st-t"><thead><tr><th>#</th><th>Product</th><th>Brand</th><th>Category</th><th>Views</th><th>Avg. time</th><th>Total time</th><th>Favorites</th><th>Trend</th></tr></thead><tbody>
-      ${[...prods].sort((a, b) => eng(b) - eng(a)).slice(0, 30).map((r, i) => prodRow(r, i, r => `<td>${r.views}</td><td>${msFmt(r.avgMs)}</td><td>${msFmt(r.totalMs)}</td><td>${r.favs}</td><td>${chg(r.totalMs, r.prevTotalMs)}</td>`)).join("")}</tbody></table></div>` : empty}</section>
-  <section class="st" id="st6"><h3>6. Favorites Analytics</h3><p class="small">Private: customers never see these numbers.</p>
-    <h4>Added in this period</h4>${barList((D.products || []).filter(r => r.favs > 0).sort((a, b) => b.favs - a.favs).slice(0, 12).map(r => ({ label: name(r.h), v: r.favs, img: byH[r.h] && byH[r.h].image, tip: brandN(r.h) + " · " + catN(r.h) + " · before: " + r.prevFavs })))}
-    <h4>All-time favorites</h4>${barList(favAll.slice(0, 15).map(r => ({ label: name(r.h), v: r.n, img: byH[r.h] && byH[r.h].image, tip: brandN(r.h) + " · " + catN(r.h) })))}</section>
-  <section class="st" id="st7"><h3>7. Brands & Categories</h3><div class="two">
-    <div><h4>Most viewed brands</h4>${barList(Object.entries(byBrand).sort((a, b) => b[1].v - a[1].v).map(([k, o]) => ({ label: k, v: o.v, tip: "top: " + name(o.top.h) })))}</div>
-    <div><h4>Most viewed categories</h4>${barList(Object.entries(byCat).sort((a, b) => b[1].v - a[1].v).map(([k, o]) => ({ label: k, v: o.v, tip: "top: " + name(o.top.h) })))}</div>
-    <div><h4>Engaged time by brand</h4>${barList(Object.entries(byBrand).sort((a, b) => b[1].t - a[1].t).map(([k, o]) => ({ label: k, v: o.t })), { fmt: msFmt })}</div>
-    <div><h4>Engaged time by category</h4>${barList(Object.entries(byCat).sort((a, b) => b[1].t - a[1].t).map(([k, o]) => ({ label: k, v: o.t })), { fmt: msFmt })}</div>
-    <div><h4>Most favorited brands (all time)</h4>${barList(Object.entries(favBrand).sort((a, b) => b[1] - a[1]).map(([k, v]) => ({ label: k, v })))}</div>
-    <div><h4>Most favorited categories (all time)</h4>${barList(Object.entries(favCat).sort((a, b) => b[1] - a[1]).map(([k, v]) => ({ label: k, v })))}</div></div>
-    <h4>Most popular product in each brand</h4>${Object.keys(byBrand).length ? `<table class="compare"><tbody>${Object.entries(byBrand).sort((a, b) => b[1].v - a[1].v).map(([k, o]) => `<tr><td>${esc(k)}</td><td><a href="#item-${esc(o.top.h)}">${esc(name(o.top.h))}</a></td><td>${o.top.views} views</td></tr>`).join("")}</tbody></table>` : empty}</section>
-  <section class="st" id="st8"><h3>8. Customer Browsing Behavior</h3>
-    <h4>Journey: Home → Category → Brand → Product → Favorite / engaged</h4>${barList([["Visits", F.sessions], ["Saw the home page", F.home], ["Opened a category", F.category], ["Opened a brand", F.brand], ["Opened a product", F.product], ["Saved, clicked a recommendation or stayed 10s+", F.engaged]].map(([label, v]) => ({ label, v: v || 0, tip: F.sessions ? Math.round(100 * (v || 0) / F.sessions) + "% of visits" : "" })))}
-    <div class="two"><div><h4>Most visited pages</h4>${barList((D.routes || []).slice(0, 12).map(r => ({ label: routeLabel(r.r), v: r.n, tip: r.s + " visits" })))}</div>
-    <div><h4>Moves between pages</h4>${barList((D.transitions || []).slice(0, 12).map(r => ({ label: routeLabel(r.from) + " → " + routeLabel(r.to), v: r.n })))}</div>
-    <div><h4>Products opened from a category</h4>${barList((D.categoryToProduct || []).slice(0, 12).map(r => ({ label: routeLabel(r.from) + " → " + name(r.h), v: r.n })))}</div>
-    <div><h4>Most common searches</h4>${barList((D.searches || []).slice(0, 12).map(r => ({ label: r.q, v: r.n })))}</div>
-    <div><h4>Most used filters</h4>${barList((D.filters || []).slice(0, 12).map(r => ({ label: r.f, v: r.n })))}</div></div></section>
-  <section class="st" id="st9"><h3>9. Recommendation Performance</h3><div class="tiles">
-    ${tile("Complete the Look shown", nfmt(R0.look && R0.look.impressions))}${tile("Complete the Look clicks", nfmt(R0.look && R0.look.clicks), `<span class="chg">CTR ${ctr(R0.look)}</span>`)}
-    ${tile("You May Also Like shown", nfmt(R0.alike && R0.alike.impressions))}${tile("You May Also Like clicks", nfmt(R0.alike && R0.alike.clicks), `<span class="chg">CTR ${ctr(R0.alike)}</span>`)}</div>
-    <div class="two"><div><h4>Complete the Look clicks by item type</h4>${barList((D.recoSlots || []).filter(r => r.section === "look").map(r => ({ label: (SLOT_NAMES[r.slot] || r.slot).split(" · ")[0], v: r.n })))}</div>
-    <div><h4>You May Also Like clicks by position</h4>${barList((D.recoSlots || []).filter(r => r.section === "alike").sort((a, b) => Number(a.slot) - Number(b.slot)).map(r => ({ label: "Position " + r.slot, v: r.n })))}</div>
-    <div><h4>Best outfit combinations (viewed → clicked)</h4>${barList((D.recoTop || []).filter(r => r.section === "look").slice(0, 10).map(r => ({ label: name(r.from) + " → " + name(r.h), v: r.n })))}</div>
-    <div><h4>Most clicked similar products</h4>${barList((D.recoTop || []).filter(r => r.section === "alike").slice(0, 10).map(r => ({ label: name(r.h), v: r.n, tip: "from " + name(r.from) })))}</div></div></section>
-  <section class="st" id="st10"><h3>10. Traffic Sources & Devices</h3><div class="two">
-    <div><h4>Devices (visits)</h4>${barList(["mobile","tablet","desktop"].map(k => ({ label: k[0].toUpperCase() + k.slice(1), v: (D.devices || {})[k] || 0 })))}</div>
-    <div><h4>Where visits came from</h4>${barList([["google","Google search"],["direct","Direct / typed / app"],["social","Social media & WhatsApp"],["search","Other search engines"],["other","Other websites"]].map(([k, l]) => ({ label: l, v: (D.sources || {})[k] || 0 })))}</div>
-    <div><h4>Landing pages</h4>${barList((D.landing || []).slice(0, 10).map(r => ({ label: routeLabel(r.r), v: r.n })))}</div></div></section>`;
+  if (!D) return wrap(`<p class="small" style="margin:24px 0">${ST.loading ? "جارٍ تحميل الإحصاءات…" : "لم تُحمَّل الإحصاءات بعد."}</p>`);
+  if (!D.visitors) return wrap(`<p class="nodata" style="margin:24px 0">لا توجد بيانات كافية حتى الآن. ${D.firstEventAt ? "بدأ القياس في " + when(D.firstEventAt) + "." : "يبدأ العدّ مع أول زيارة حقيقية."}</p>`);
+  const P0 = D.prev || {}, F = D.fixed || {};
+  const prodOf = r => byH[r.h], bOf = r => byH[r.h] ? brandOf(byH[r.h]) : r.b, cOf = r => byH[r.h] ? secOf(byH[r.h]) : r.c;
+  const prods = (D.products || []).filter(r => (!ST.f.brand || bOf(r) === ST.f.brand) && (!ST.f.cat || cOf(r) === ST.f.cat));
+  const pname = r => byH[r.h] ? byH[r.h].title : r.h;
+  const thumb = r => prodOf(r) && prodOf(r).image ? `<img src="${esc(img(prodOf(r).image, 80))}" alt="">` : '<span class="noimg"></span>';
+  const rank = (rows, val, sub) => rows.length ? `<ol class="rank">${rows.map(r => `<li><a href="#item-${esc(r.h)}">${thumb(r)}<span class="rn" dir="auto">${esc(pname(r))}<small>${esc(brandAr(bOf(r)))}</small></span><span class="rv">${val(r)}${sub ? `<small>${sub(r)}</small>` : ""}</span></a></li>`).join("")}</ol>` : NODATA;
+  const groups = D.groups || [], gb = groups.filter(g => g.dim === "b"), gc = groups.filter(g => g.dim === "c");
+  const topP = [...(D.products || [])].sort((a, b) => b.uv - a.uv || b.totalMs - a.totalMs)[0];
+  const topB = [...gb].sort((a, b) => b.uv - a.uv)[0], topC = [...gc].sort((a, b) => b.uv - a.uv)[0];
+  const retPct = D.visitors ? Math.round(100 * D.returningVisitors / D.visitors) : 0;
+  const series = (D.series || {})[ST.trend] || [];
+  const routeAr = r => { const q = parseSec(r); return r === "home" ? "الرئيسية" : q ? [SECTIONS[q.sec].ar, q.brand && BRANDS[q.brand], q.sub && (SUB_AR[q.sub] || q.sub)].filter(Boolean).join(" · ")
+    : ({ favorites:"المفضلة", popular:"الأكثر تفضيلاً", recent:"وصل حديثاً", discounts:"أعلى الخصومات", all:"جميع المنتجات", vs:"Victoria's Secret" })[r] || r; };
+  const Fn = D.funnel || {}, steps = [["زاروا الموقع", Fn.visitors], ["فتحوا الرئيسية", Fn.home], ["دخلوا قسماً", Fn.category], ["اختاروا ماركة", Fn.brand], ["فتحوا منتجاً", Fn.product], ["أضافوا للمفضلة", Fn.favorite]];
+  const RT = D.recoTotals || {};
+  const growth = prods.map(r => Object.assign({ d: r.uv - r.prevUv }, r));
+  const minUv = 2;
+  const cols = [["name","المنتج"],["brand","الماركة"],["uv","زوار فريدون"],["avgMs","متوسط وقت التفاعل"],["favUv","مفضلة فريدة"]];
+  const sv = (r, k) => k === "name" ? pname(r).toLowerCase() : k === "brand" ? brandAr(bOf(r)) : r[k] || 0;
+  const tbl = [...prods].sort((a, b) => { const x = sv(a, ST.sort.k), y = sv(b, ST.sort.k); return (x > y ? 1 : x < y ? -1 : 0) * ST.sort.dir; }).slice(0, 60);
+  return wrap(`
+  <section class="st" aria-label="نظرة عامة"><div class="tiles">
+    ${stCard("الزوار الفريدون", arN(D.visitors), "أشخاص مختلفون زاروا الموقع — تقدير: كل جهاز أو متصفح يُحسب شخصاً واحداً", chgAr(D.visitors, P0.visitors))}
+    ${stCard("زوار جدد", arN(D.newVisitors), "أول زيارة لهم كانت خلال هذه الفترة", chgAr(D.newVisitors, P0.newVisitors))}
+    ${stCard("زوار عائدون", arN(D.returningVisitors), "زاروا الموقع من قبل ثم عادوا", chgAr(D.returningVisitors, P0.returningVisitors))}
+    ${stCard("متوسط وقت التفاعل", msAr(D.avgEngagePerVisitorMs), "متوسط ما يقضيه كل زائر في تصفح صفحات المنتجات")}
+    ${stCard("المنتج الأكثر شعبية", topP ? `<a href="#item-${esc(topP.h)}" class="tp">${thumb(topP)}<span dir="auto">${esc(pname(topP))}</span></a>` : "—", topP ? arN(topP.uv) + " زائر فريد شاهدوه" : "لا توجد بيانات كافية حتى الآن")}
+    ${stCard("الماركة الأكثر شعبية", topB ? `<span dir="auto" class="tn">${esc(brandAr(topB.k))}</span>` : "—", topB ? arN(topB.uv) + " زائر فريد" : "لا توجد بيانات كافية حتى الآن")}
+    ${stCard("القسم الأكثر شعبية", topC ? `<span class="tn">${esc(catAr(topC.k))}</span>` : "—", topC ? arN(topC.uv) + " زائر فريد" : "لا توجد بيانات كافية حتى الآن")}</div></section>
+
+  <section class="st"><h3>١. الزوار</h3>
+    <div class="seg" role="group" aria-label="الفترة">${[["day","يومي"],["week","أسبوعي"],["month","شهري"]].map(([k, l]) => `<button class="chip" data-trend="${k}" aria-pressed="${ST.trend === k}">${l}</button>`).join("")}</div>
+    <p class="cap">الزوار الفريدون ${ST.trend === "day" ? "في كل يوم" : ST.trend === "week" ? "في كل أسبوع" : "في كل شهر"}</p>
+    ${lineChart(series)}
+    <div class="minis">
+      <div><b>${arN(F.today)}</b><span>زوار اليوم</span></div><div><b>${arN(F.d7)}</b><span>آخر ٧ أيام</span></div><div><b>${arN(F.d30)}</b><span>آخر ٣٠ يوماً</span></div>
+      <div><b>${retPct}%</b><span>نسبة العائدين</span></div><div><b>${D.visitors ? (D.sessions / D.visitors).toFixed(1) : "0"}</b><span>زيارات لكل زائر</span></div>
+      <div><b>${arN(D.return7)}</b><span>عادوا خلال ٧ أيام</span></div><div><b>${arN(D.return30)}</b><span>عادوا خلال ٣٠ يوماً</span></div></div>
+    <p class="small">للمقارنة فقط: ${arN(D.sessions)} زيارة (جلسة) و${arN(D.pageviews)} مشاهدة صفحة. الجلسة تنتهي بعد ٣٠ دقيقة بلا نشاط، ولا تُحسب إعادة تحميل الصفحة زائراً جديداً.</p></section>
+
+  <section class="st"><h3>٢. اهتمام العملاء</h3><div class="three">
+    <div><h4>الأكثر مشاهدة</h4><p class="cap">عدد الأشخاص المختلفين</p>${rank(prods.filter(r => r.uv > 0).sort((a, b) => b.uv - a.uv).slice(0, 5), r => arN(r.uv), () => "زائر")}</div>
+    <div><h4>أطول وقت تفاعل</h4><p class="cap">متوسط الوقت لكل زائر</p>${rank(prods.filter(r => r.avgMs > 0).sort((a, b) => b.avgMs - a.avgMs).slice(0, 5), r => msAr(r.avgMs), r => arN(r.engagedUv) + " تصفحوه ١٠ ث+")}</div>
+    <div><h4>الأكثر تفضيلاً</h4><p class="cap">أشخاص أضافوه للمفضلة</p>${rank(prods.filter(r => r.favUv > 0).sort((a, b) => b.favUv - a.favUv).slice(0, 5), r => arN(r.favUv), r => r.uv ? Math.round(100 * r.favUv / r.uv) + "% من مشاهديه" : "")}</div></div>
+    <div class="two"><div><h4>الماركات</h4><p class="cap">زوار فريدون شاهدوا منتجاتها</p>${barList(gb.filter(g => !ST.f.brand || g.k === ST.f.brand).sort((a, b) => b.uv - a.uv).map(g => ({ label: brandAr(g.k), v: g.uv, tip: "متوسط التفاعل " + msAr(g.avgMs) + " · مفضلة " + g.favUv })))}</div>
+    <div><h4>الأقسام</h4><p class="cap">زوار فريدون شاهدوا منتجاتها</p>${barList(gc.filter(g => !ST.f.cat || g.k === ST.f.cat).sort((a, b) => b.uv - a.uv).map(g => ({ label: catAr(g.k), v: g.uv, tip: "متوسط التفاعل " + msAr(g.avgMs) + " · مفضلة " + g.favUv })))}</div></div></section>
+
+  <section class="st"><h3>٣. سلوك العملاء</h3>
+    <h4>رحلة العميل</h4><p class="cap">كم شخصاً وصل إلى كل خطوة، وكم غادر قبلها</p>
+    ${Fn.visitors ? `<div class="funnel">${steps.map(([l, v], i) => { const prev = i ? steps[i - 1][1] : v; const pct = Math.round(100 * (v || 0) / Fn.visitors);
+        return `<div class="fs"><span class="fl">${l}</span><span class="bt"><i style="width:${Math.max(2, pct)}%"></i></span><span class="fv">${arN(v)} <small>(${pct}%)</small></span><span class="fd">${i && prev > (v || 0) ? "غادر " + arN(prev - (v || 0)) : ""}</span></div>`; }).join("")}</div>` : NODATA}
+    <div class="two"><div><h4>الأقسام والماركات الأكثر زيارة</h4><p class="cap">أشخاص مختلفون فتحوا كل صفحة</p>${barList((D.routes || []).filter(r => r.r !== "item").slice(0, 8).map(r => ({ label: routeAr(r.r), v: r.uv })))}</div>
+    <div><h4>التوصيات الأكثر نقراً</h4><p class="cap">أكملي الإطلالة: نقر ${arN(RT.lookClicked)} من ${arN(RT.lookSeen)} شخص · قد يعجبك: ${arN(RT.alikeClicked)} من ${arN(RT.alikeSeen)}</p>
+      ${rank((D.recos || []).slice(0, 5), r => arN(r.uv), r => r.section === "look" ? "أكملي الإطلالة" : "قد يعجبك")}</div></div></section>
+
+  <section class="st"><h3>٤. أداء المنتجات</h3><div class="four">
+    <div><h4>يزداد الاهتمام بها</h4>${rank(growth.filter(r => r.d > 0).sort((a, b) => b.d - a.d).slice(0, 4), r => "+" + arN(r.d), () => "زائر عن الفترة السابقة")}</div>
+    <div><h4>يتراجع الاهتمام بها</h4>${rank(growth.filter(r => r.d < 0).sort((a, b) => a.d - b.d).slice(0, 4), r => arN(r.d), () => "زائر عن الفترة السابقة")}</div>
+    <div><h4>تفاعل عالٍ</h4>${rank(prods.filter(r => r.uv >= minUv && r.engagedUv > 0).sort((a, b) => b.engagedUv / b.uv - a.engagedUv / a.uv || b.uv - a.uv).slice(0, 4), r => Math.round(100 * r.engagedUv / r.uv) + "%", () => "تصفحوه ١٠ ث أو أكثر")}</div>
+    <div><h4>نسبة تفضيل عالية</h4>${rank(prods.filter(r => r.uv >= minUv && r.favUv > 0).sort((a, b) => b.favUv / b.uv - a.favUv / a.uv || b.uv - a.uv).slice(0, 4), r => Math.round(100 * r.favUv / r.uv) + "%", () => "من مشاهديه أضافوه")}</div></div>
+    <h4>جدول المنتجات</h4><p class="cap">اضغطي على عنوان أي عمود للترتيب، وعلى اسم المنتج لفتحه.</p>
+    ${tbl.length ? `<div class="table-wrap"><table class="compare st-t"><thead><tr>${cols.map(([k, l]) => `<th><button class="sortb" data-sort="${k}" aria-sort="${ST.sort.k === k ? (ST.sort.dir > 0 ? "ascending" : "descending") : "none"}">${l}${ST.sort.k === k ? (ST.sort.dir > 0 ? " ▲" : " ▼") : ""}</button></th>`).join("")}</tr></thead><tbody>
+      ${tbl.map(r => `<tr><td class="pc">${thumb(r)}<a href="#item-${esc(r.h)}" dir="auto">${esc(pname(r))}</a></td><td dir="auto">${esc(brandAr(bOf(r)))}</td><td>${arN(r.uv)}</td><td>${msAr(r.avgMs)}</td><td>${arN(r.favUv)}</td></tr>`).join("")}</tbody></table></div>` : NODATA}</section>
+
+  <section class="st"><h3>٥. مصادر الزيارات</h3><div class="two">
+    <div><h4>من أين جاء الزوار</h4><p class="cap">أشخاص مختلفون حسب أول صفحة دخلوها</p>${barList([["google","Google"],["direct","زيارة مباشرة / رابط محفوظ"],["social","التواصل الاجتماعي وواتساب"],["search","محركات بحث أخرى"],["other","مواقع أخرى"]].map(([k, l]) => ({ label: l, v: (D.sources || {})[k] || 0 })))}</div>
+    <div><h4>الأجهزة</h4><p class="cap">أشخاص مختلفون حسب نوع الجهاز</p>${barList([["mobile","جوال"],["tablet","جهاز لوحي"],["desktop","كمبيوتر"]].map(([k, l]) => ({ label: l, v: (D.devices || {})[k] || 0 })))}</div></div></section>`);
 }
 function wireStats(){
-  if ($("#stKeySave")) $("#stKeySave").onclick = () => { const k = $("#stKey").value.trim(); if (!k) return toast("Enter the admin key."); store.set("ro-admin-key", k); loadStats(); };
-  if ($("#stForget")) $("#stForget").onclick = () => { store.set("ro-admin-key", ""); ST.data = null; render(); };
+  if ($("#stOpen")) $("#stOpen").onclick = async () => {
+    const v = $("#stPass").value.trim().toLowerCase();
+    if (await sha(v) !== PASS_HASH) return $("#stErr").textContent = "رمز الدخول غير صحيح.";
+    store.set("ro-admin-k", await sha("ro-analytics:" + v)); store.set("ro-admin-key", ""); loadStats(); render();
+  };
   document.querySelectorAll("[data-range]").forEach(b => b.onclick = () => { ST.range = b.dataset.range; if (ST.range !== "custom") loadStats(); else render(); });
-  if ($("#stApply")) $("#stApply").onclick = () => { ST.from = $("#stFrom").value; ST.to = $("#stTo").value; if (!ST.from || !ST.to || ST.from > ST.to) return toast("Choose a start date before the end date."); loadStats(); };
-  document.querySelectorAll("[data-jump]").forEach(a => a.onclick = e => { e.preventDefault(); const t = document.getElementById(a.dataset.jump); if (t) scrollTo(0, t.getBoundingClientRect().top + scrollY - 90); });
+  if ($("#stApply")) $("#stApply").onclick = () => { ST.from = $("#stFrom").value; ST.to = $("#stTo").value; if (!ST.from || !ST.to || ST.from > ST.to) return toast("اختاري تاريخ بداية قبل تاريخ النهاية."); loadStats(); };
+  document.querySelectorAll("[data-trend]").forEach(b => b.onclick = () => { ST.trend = b.dataset.trend; render(); });
+  document.querySelectorAll("[data-sort]").forEach(b => b.onclick = () => { const k = b.dataset.sort; ST.sort = ST.sort.k === k ? { k, dir: -ST.sort.dir } : { k, dir: k === "name" || k === "brand" ? 1 : -1 }; render(); });
   if ($("#stBrand")) $("#stBrand").onchange = e => { ST.f.brand = e.target.value; render(); };
   if ($("#stCat")) $("#stCat").onchange = e => { ST.f.cat = e.target.value; render(); };
-  if ($("#stQ")) $("#stQ").oninput = e => { ST.f.q = e.target.value; const pos = e.target.selectionStart; render(); const n = $("#stQ"); n.focus(); n.setSelectionRange(pos, pos); };
   if (adminKey() && !ST.data && !ST.loading && !ST.err) loadStats();
 }
 
@@ -1486,7 +1513,7 @@ function viewAdmin(all){
   const hidden = Object.keys(S.del).length;
   const withGuide = all.filter(p => p.guide && p.guide.length).length;
   return `<div class="list-head"><div><h2>Admin & settings</h2><p>Changes save instantly on this device${GH.token && GH.sync ? " and are published to customers" : ". Customers see your edits once sync is on (Sync & publish below)"}.</p></div>
-    <div class="owner-tools"><button class="btn quiet" id="aCosts">${SHOWCOSTS ? "Hide my costs" : "Show my costs"}</button><button class="btn quiet" id="aLeave">View as a customer</button><a class="btn solid" href="#stats">Analytics dashboard</a></div></div>
+    <div class="owner-tools"><button class="btn quiet" id="aCosts">${SHOWCOSTS ? "Hide my costs" : "Show my costs"}</button><button class="btn quiet" id="aLeave">View as a customer</button><a class="btn solid" href="#stats">الإحصاءات</a></div></div>
 
   <section class="panel"><div><h3>Brand health checks</h3><p class="why">Four times a day every brand is compared with its official site: missing or wrongly removed pieces, prices, extra discounts and stock. Problems are fixed and listed here.</p></div>
     <div class="fields" id="auditBox"><p class="small">Loading…</p></div></section>
@@ -1611,7 +1638,7 @@ function textDialog(title, value, onOk, okLabel){
 /* ---------- favorites with size ---------- */
 function setFav(h, val){
   const was = S.fav[h] != null;
-  if (was !== (val != null)) track(val ? "fav" : "unfav", { handle: h });
+  if (was !== (val != null)) track(val ? "fav" : "unfav", { handle: h, meta: prodMeta(h) });
   if (val) S.fav[h] = val; else delete S.fav[h];
   if (was !== (val != null)){
     shareFav(h, !!val).then(ok => { if (!ok) return; let done = []; try { done = JSON.parse(store.get("sp-fav-shared") || "[]"); } catch {}
@@ -1776,7 +1803,7 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden && lo
 
 /* ---------- gate + start ---------- */
 async function sha(t){ const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(t)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2,"0")).join(""); }
-$("#gateForm").onsubmit = async e => { e.preventDefault(); const h = await sha($("#pass").value.trim().toLowerCase()); /* phones often capitalise the first letter or add a space */ if (h === PASS_HASH){ store.set("sp-unlock", h); OWNER = true; $("#pass").value = ""; await loadData(false); } else { $("#gateErr").textContent = "That passcode doesn't match. Try again."; } };
+$("#gateForm").onsubmit = async e => { e.preventDefault(); const pv = $("#pass").value.trim().toLowerCase(), h = await sha(pv); /* phones often capitalise the first letter or add a space */ if (h === PASS_HASH){ store.set("sp-unlock", h); store.set("ro-admin-k", await sha("ro-analytics:" + pv)); store.set("ro-admin-key", ""); document.querySelectorAll(".consent").forEach(x => x.remove()); OWNER = true; $("#pass").value = ""; await loadData(false); } else { $("#gateErr").textContent = "That passcode doesn't match. Try again."; } };
 render(); loadData(false).then(shareExistingFavs); schedulePoll(); window._lastLoad = Date.now(); consentBar();
 fetch(BASE + "version.txt?t=" + Date.now(), { cache:"no-store" }).then(r => r.ok ? r.text() : "").then(v => {
   v = v.trim();

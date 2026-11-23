@@ -83,14 +83,16 @@ revoke select on public.fav_totals from anon, authenticated;
 create table if not exists public.admin_keys (key_hash text primary key, note text, created_at timestamptz default now());
 alter table public.admin_keys enable row level security;
 revoke all on public.admin_keys from anon, authenticated;
-insert into public.admin_keys (key_hash, note) values ('ADMIN_KEY_HASH', 'owner') on conflict do nothing;
+-- the statistics open with the site's Admin passcode (a key derived from it); any older separate key is removed
+delete from public.admin_keys where note is distinct from 'passcode';
+insert into public.admin_keys (key_hash, note) values ('ca4a199e1782c9e60ebcd3739fb15d12bf287f5d138ed12f3a727c80ce346909', 'passcode') on conflict (key_hash) do nothing;
 
 create or replace function public.admin_ok(p_key text) returns boolean language sql security definer set search_path = public stable as $$
   select exists (select 1 from public.admin_keys where key_hash = encode(sha256(convert_to(coalesce(p_key, ''), 'UTF8')), 'hex'));
 $$;
 revoke all on function public.admin_ok(text) from public, anon, authenticated;
 
--- everything the dashboard shows, aggregated, for one period and the period before it
+-- everything the dashboard shows — people first (unique anonymous visitors), sessions and page views second
 create or replace function public.admin_stats(p_key text, p_from timestamptz, p_to timestamptz)
 returns jsonb language plpgsql security definer set search_path = public stable as $$
 declare res jsonb; len interval := p_to - p_from;
@@ -98,95 +100,96 @@ begin
   if not public.admin_ok(p_key) then raise exception 'not authorized' using errcode = '42501'; end if;
   if len <= interval '0' or len > interval '400 days' then raise exception 'bad period'; end if;
 
-  with ev as (select * from public.events where at >= p_from and at < p_to),
-  pv as (select * from public.events where at >= p_from - len and at < p_from),
-  sess as (
-    select session, min(at) as t0, max(at) as t1,
-           count(*) filter (where kind = 'pageview') as pages,
-           coalesce(sum(ms) filter (where kind = 'engage'), 0) as eng_ms,
-           count(*) filter (where kind in ('product_view','fav','rec_click','search','filter')) as acts,
-           bool_or(is_new) as is_new
-    from ev group by session),
-  psess as (select session, count(*) filter (where kind = 'pageview') as pages from pv group by session),
+  with ev0 as (
+    select e.*,
+           coalesce(e.meta->>'b', case when e.handle like 'md-%' then 'md' when e.handle like 'ef-%' then 'ef'
+                                       when e.handle like 'rl-%' then 'rl' when e.handle like 'mc-%' then 'mc'
+                                       when e.handle is not null then 'sp' end) as brand,
+           e.meta->>'c' as cat
+    from public.events e),
+  ev as (select * from ev0 where at >= p_from and at < p_to),
+  pv as (select * from ev0 where at >= p_from - len and at < p_from),
+  -- every visitor's sessions (all time) to tell new from returning and measure return gaps
+  vs as (select visitor, session, min(at) as t0 from ev0 group by visitor, session),
+  vfirst as (select visitor, min(t0) as first_at,
+                    (array_agg(t0 order by t0))[2] as second_at, count(*) as sessions_all from vs group by visitor),
+  active as (select distinct visitor from ev),
+  pactive as (select distinct visitor from pv),
+  act as (select a.visitor, f.first_at, f.second_at, f.first_at >= p_from as is_new from active a join vfirst f using (visitor)),
+  pact as (select a.visitor, f.first_at >= p_from - len as is_new from pactive a join vfirst f using (visitor)),
+  eng as (select visitor, handle, brand, cat, sum(ms) as ms from ev where kind = 'engage' and handle is not null group by 1, 2, 3, 4),
   prod as (
-    select handle,
-           count(*) filter (where kind = 'product_view') as views,
-           count(distinct session) filter (where kind = 'product_view') as uniq,
-           coalesce(sum(ms) filter (where kind = 'engage'), 0) as total_ms,
-           count(*) filter (where kind = 'engage') as engs,
-           count(*) filter (where kind = 'fav') as favs,
-           count(*) filter (where kind = 'rec_click') as rec_clicks
-    from ev where handle is not null group by handle),
-  pprod as (select handle, count(*) filter (where kind = 'product_view') as views, count(*) filter (where kind = 'fav') as favs,
-                   coalesce(sum(ms) filter (where kind = 'engage'), 0) as total_ms
-            from pv where handle is not null group by handle)
+    select h.handle,
+           (select count(distinct visitor) from ev x where x.kind = 'product_view' and x.handle = h.handle) as uv,
+           (select count(distinct visitor) from eng x where x.handle = h.handle and x.ms >= 10000) as engaged_uv,
+           (select coalesce(sum(ms), 0) from eng x where x.handle = h.handle) as total_ms,
+           (select count(distinct visitor) from eng x where x.handle = h.handle) as eng_uv,
+           (select count(distinct visitor) from ev x where x.kind = 'fav' and x.handle = h.handle) as fav_uv,
+           (select count(distinct x.visitor) from ev x join act a using (visitor) where x.kind = 'product_view' and x.handle = h.handle and not a.is_new) as ret_uv,
+           (select count(distinct visitor) from pv x where x.kind = 'product_view' and x.handle = h.handle) as prev_uv,
+           (select max(brand) from ev x where x.handle = h.handle) as brand,
+           (select max(cat) from ev x where x.handle = h.handle) as cat
+    from (select distinct handle from ev where handle is not null and kind in ('product_view','engage','fav')) h),
+  grp as (select 'b' as dim, brand as k, visitor, kind, ms from ev where brand is not null and kind in ('product_view','engage','fav')
+          union all
+          select 'c', cat, visitor, kind, ms from ev where cat is not null and kind in ('product_view','engage','fav'))
   select jsonb_build_object(
-    'from', p_from, 'to', p_to,
-    'visitors', (select count(distinct visitor) from ev),
-    'sessions', (select count(*) from sess),
+    'from', p_from, 'to', p_to, 'firstEventAt', (select min(at) from public.events),
+    'visitors', (select count(*) from act),
+    'newVisitors', (select count(*) from act where is_new),
+    'returningVisitors', (select count(*) from act where not is_new),
+    'sessions', (select count(distinct session) from ev),
     'pageviews', (select count(*) from ev where kind = 'pageview'),
-    'newVisitors', (select count(distinct visitor) from ev where is_new),
-    'productViews', (select count(*) from ev where kind = 'product_view'),
-    'favAdds', (select count(*) from ev where kind = 'fav'),
-    'prev', jsonb_build_object(
-      'visitors', (select count(distinct visitor) from pv),
-      'sessions', (select count(*) from psess),
-      'pageviews', (select count(*) from pv where kind = 'pageview'),
-      'newVisitors', (select count(distinct visitor) from pv where is_new),
-      'productViews', (select count(*) from pv where kind = 'product_view'),
-      'favAdds', (select count(*) from pv where kind = 'fav')),
-    'daily', coalesce((select jsonb_agg(jsonb_build_object('d', d, 'visitors', v, 'sessions', s, 'pageviews', p, 'productViews', pr) order by d)
-       from (select (at at time zone 'Asia/Riyadh')::date as d, count(distinct visitor) as v, count(distinct session) as s,
-                    count(*) filter (where kind = 'pageview') as p, count(*) filter (where kind = 'product_view') as pr
-             from ev group by 1) x), '[]'::jsonb),
-    'engagement', (select jsonb_build_object(
-        'avgSessionMs', coalesce(round(avg(greatest(extract(epoch from (t1 - t0)) * 1000, eng_ms))), 0),
-        'avgEngagedMs', coalesce(round(avg(eng_ms)), 0),
-        'avgPages', coalesce(round(avg(pages)::numeric, 2), 0),
-        'bounceRate', coalesce(round(100.0 * count(*) filter (where pages <= 1 and acts = 0 and eng_ms < 10000) / nullif(count(*), 0), 1), 0),
-        'engagementRate', coalesce(round(100.0 * count(*) filter (where pages >= 2 or acts > 0 or eng_ms >= 10000) / nullif(count(*), 0), 1), 0),
-        'returningPct', coalesce(round(100.0 * count(*) filter (where not is_new) / nullif(count(*), 0), 1), 0))
-      from sess),
-    'productAvgMs', coalesce((select round(avg(ms)) from ev where kind = 'engage'), 0),
-    'products', coalesce((select jsonb_agg(jsonb_build_object('h', p.handle, 'views', p.views, 'uniq', p.uniq, 'totalMs', p.total_ms,
-          'avgMs', case when p.engs > 0 then round(p.total_ms::numeric / p.engs) else 0 end, 'favs', p.favs, 'recClicks', p.rec_clicks,
-          'prevViews', coalesce(q.views, 0), 'prevFavs', coalesce(q.favs, 0), 'prevTotalMs', coalesce(q.total_ms, 0)) order by p.views desc)
-       from (select * from prod order by views desc, total_ms desc limit 400) p left join pprod q using (handle)), '[]'::jsonb),
-    'favTotals', coalesce((select jsonb_agg(jsonb_build_object('h', handle, 'n', total) order by total desc)
-       from (select handle, total from public.fav_totals where total > 0 order by total desc limit 300) x), '[]'::jsonb),
-    'searches', coalesce((select jsonb_agg(jsonb_build_object('q', q, 'n', n) order by n desc)
-       from (select lower(trim(meta->>'q')) as q, count(*) as n from ev where kind = 'search' and coalesce(meta->>'q','') <> '' group by 1 order by 2 desc limit 30) x), '[]'::jsonb),
-    'filters', coalesce((select jsonb_agg(jsonb_build_object('f', f, 'n', n) order by n desc)
-       from (select (meta->>'type') || ': ' || coalesce(meta->>'value', '') as f, count(*) as n from ev where kind = 'filter' group by 1 order by 2 desc limit 20) x), '[]'::jsonb),
-    'routes', coalesce((select jsonb_agg(jsonb_build_object('r', route, 'n', n, 's', s) order by n desc)
-       from (select route, count(*) as n, count(distinct session) as s from ev where kind = 'pageview' group by route order by 2 desc limit 60) x), '[]'::jsonb),
-    'transitions', coalesce((select jsonb_agg(jsonb_build_object('from', fr, 'to', t, 'n', n) order by n desc)
-       from (select meta->>'from' as fr, route as t, count(*) as n from ev where kind = 'pageview' and coalesce(meta->>'from','') <> ''
-             and meta->>'from' <> route group by 1, 2 order by 3 desc limit 25) x), '[]'::jsonb),
-    'categoryToProduct', coalesce((select jsonb_agg(jsonb_build_object('from', fr, 'h', handle, 'n', n) order by n desc)
-       from (select meta->>'from' as fr, handle, count(*) as n from ev where kind = 'product_view' and coalesce(meta->>'from','') not in ('', 'item')
-             group by 1, 2 order by 3 desc limit 40) x), '[]'::jsonb),
+    'engagedVisitors', (select count(distinct visitor) from eng where ms >= 10000),
+    'avgEngagePerVisitorMs', coalesce((select round(sum(ms)::numeric / nullif((select count(*) from act), 0)) from eng), 0),
+    'return7', (select count(*) from act where second_at is not null and second_at - first_at <= interval '7 days'),
+    'return30', (select count(*) from act where second_at is not null and second_at - first_at <= interval '30 days'),
+    'prev', jsonb_build_object('visitors', (select count(*) from pact), 'newVisitors', (select count(*) from pact where is_new),
+                               'returningVisitors', (select count(*) from pact where not is_new), 'sessions', (select count(distinct session) from pv)),
+    'fixed', jsonb_build_object(
+       'today', (select count(distinct visitor) from ev0 where at >= date_trunc('day', now() at time zone 'Asia/Riyadh') at time zone 'Asia/Riyadh'),
+       'd7', (select count(distinct visitor) from ev0 where at >= now() - interval '7 days'),
+       'd30', (select count(distinct visitor) from ev0 where at >= now() - interval '30 days'),
+       'all', (select count(distinct visitor) from ev0)),
+    'series', jsonb_build_object(
+       'day', coalesce((select jsonb_agg(jsonb_build_object('d', d, 'v', v, 'n', n) order by d) from (
+          select (at at time zone 'Asia/Riyadh')::date as d, count(distinct e.visitor) as v,
+                 count(distinct e.visitor) filter (where (f.first_at at time zone 'Asia/Riyadh')::date = (e.at at time zone 'Asia/Riyadh')::date) as n
+          from ev e join vfirst f using (visitor) group by 1) x), '[]'::jsonb),
+       'week', coalesce((select jsonb_agg(jsonb_build_object('d', d, 'v', v) order by d) from (
+          select date_trunc('week', at at time zone 'Asia/Riyadh')::date as d, count(distinct visitor) as v from ev group by 1) x), '[]'::jsonb),
+       'month', coalesce((select jsonb_agg(jsonb_build_object('d', d, 'v', v) order by d) from (
+          select date_trunc('month', at at time zone 'Asia/Riyadh')::date as d, count(distinct visitor) as v from ev group by 1) x), '[]'::jsonb)),
+    'products', coalesce((select jsonb_agg(jsonb_build_object('h', handle, 'uv', uv, 'engagedUv', engaged_uv, 'totalMs', total_ms,
+          'avgMs', case when eng_uv > 0 then round(total_ms::numeric / eng_uv) else 0 end, 'favUv', fav_uv,
+          'retUv', ret_uv, 'prevUv', prev_uv, 'b', brand, 'c', cat) order by uv desc, total_ms desc)
+       from (select * from prod order by uv desc, total_ms desc limit 500) p), '[]'::jsonb),
+    'groups', coalesce((select jsonb_agg(jsonb_build_object('dim', dim, 'k', k, 'uv', uv, 'engagedUv', euv, 'avgMs', avgms, 'favUv', fuv)) from (
+          select dim, k, count(distinct visitor) filter (where kind = 'product_view') as uv,
+                 count(distinct visitor) filter (where kind = 'engage' and ms >= 10000) as euv,
+                 coalesce(round(sum(ms) filter (where kind = 'engage')::numeric / nullif(count(distinct visitor) filter (where kind = 'engage'), 0)), 0) as avgms,
+                 count(distinct visitor) filter (where kind = 'fav') as fuv
+          from grp group by dim, k) x), '[]'::jsonb),
     'funnel', (select jsonb_build_object(
-        'sessions', count(distinct session),
-        'home', count(distinct session) filter (where kind = 'pageview' and route = 'home'),
-        'category', count(distinct session) filter (where kind = 'pageview' and route ~ '^(dresses|bags|shoes|winter|all|discounts|recent|popular)'),
-        'brand', count(distinct session) filter (where kind = 'pageview' and route ~ '^(dresses|bags|shoes|winter)-'),
-        'product', count(distinct session) filter (where kind = 'product_view'),
-        'engaged', count(distinct session) filter (where kind in ('fav','rec_click') or (kind = 'engage' and ms >= 10000))) from ev),
-    'recos', (select jsonb_build_object(
-        'look', jsonb_build_object('impressions', count(*) filter (where kind = 'rec_view' and meta->>'section' = 'look'),
-                                   'clicks', count(*) filter (where kind = 'rec_click' and meta->>'section' = 'look')),
-        'alike', jsonb_build_object('impressions', count(*) filter (where kind = 'rec_view' and meta->>'section' = 'alike'),
-                                    'clicks', count(*) filter (where kind = 'rec_click' and meta->>'section' = 'alike'))) from ev),
-    'recoSlots', coalesce((select jsonb_agg(jsonb_build_object('section', sec, 'slot', slot, 'n', n) order by n desc)
-       from (select meta->>'section' as sec, coalesce(meta->>'slot', meta->>'pos', '') as slot, count(*) as n from ev where kind = 'rec_click' group by 1, 2) x), '[]'::jsonb),
-    'recoTop', coalesce((select jsonb_agg(jsonb_build_object('section', sec, 'from', fr, 'h', handle, 'n', n) order by n desc)
-       from (select meta->>'section' as sec, meta->>'from' as fr, handle, count(*) as n from ev where kind = 'rec_click' group by 1, 2, 3 order by 4 desc limit 40) x), '[]'::jsonb),
-    'devices', coalesce((select jsonb_object_agg(coalesce(device, 'unknown'), n) from (select device, count(distinct session) as n from ev where kind = 'pageview' and meta->>'landing' = '1' group by device) x), '{}'::jsonb),
-    'sources', coalesce((select jsonb_object_agg(coalesce(source, 'direct'), n) from (select source, count(distinct session) as n from ev where kind = 'pageview' and meta->>'landing' = '1' group by source) x), '{}'::jsonb),
-    'landing', coalesce((select jsonb_agg(jsonb_build_object('r', route, 'n', n) order by n desc)
-       from (select route, count(*) as n from ev where kind = 'pageview' and meta->>'landing' = '1' group by route order by 2 desc limit 15) x), '[]'::jsonb),
-    'firstEventAt', (select min(at) from public.events)
+        'visitors', count(distinct visitor),
+        'home', count(distinct visitor) filter (where kind = 'pageview' and route = 'home'),
+        'category', count(distinct visitor) filter (where kind = 'pageview' and route ~ '^(dresses|bags|shoes|winter|all|discounts|recent|popular)'),
+        'brand', count(distinct visitor) filter (where kind = 'pageview' and route ~ '^(dresses|bags|shoes|winter)-'),
+        'product', count(distinct visitor) filter (where kind = 'product_view'),
+        'favorite', count(distinct visitor) filter (where kind = 'fav')) from ev),
+    'routes', coalesce((select jsonb_agg(jsonb_build_object('r', route, 'uv', uv) order by uv desc) from (
+          select route, count(distinct visitor) as uv from ev where kind = 'pageview' and route is not null group by route order by 2 desc limit 40) x), '[]'::jsonb),
+    'recos', coalesce((select jsonb_agg(jsonb_build_object('section', sec, 'h', handle, 'uv', uv) order by uv desc) from (
+          select meta->>'section' as sec, handle, count(distinct visitor) as uv from ev where kind = 'rec_click' group by 1, 2 order by 3 desc limit 30) x), '[]'::jsonb),
+    'recoTotals', (select jsonb_build_object(
+          'lookSeen', count(distinct visitor) filter (where kind = 'rec_view' and meta->>'section' = 'look'),
+          'lookClicked', count(distinct visitor) filter (where kind = 'rec_click' and meta->>'section' = 'look'),
+          'alikeSeen', count(distinct visitor) filter (where kind = 'rec_view' and meta->>'section' = 'alike'),
+          'alikeClicked', count(distinct visitor) filter (where kind = 'rec_click' and meta->>'section' = 'alike')) from ev),
+    'sources', coalesce((select jsonb_object_agg(coalesce(source, 'direct'), n) from (
+          select source, count(distinct visitor) as n from ev where kind = 'pageview' and meta->>'landing' = '1' group by source) x), '{}'::jsonb),
+    'devices', coalesce((select jsonb_object_agg(coalesce(device, 'unknown'), n) from (
+          select device, count(distinct visitor) as n from ev where kind = 'pageview' and meta->>'landing' = '1' group by device) x), '{}'::jsonb)
   ) into res;
   return res;
 end $$;
