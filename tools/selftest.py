@@ -127,6 +127,17 @@ def main():
             continue
         except Exception:  # noqa: BLE001
             continue
+    if not oos:   # look in the store's own feed for a dress that exists but is sold out in every size
+        try:
+            feed = U.fetch_md_collection(U.MD_MAXI)
+            raw6 = next((x for x in feed if x.get("variants") and not any(v.get("available") for v in x["variants"])), None)
+            if raw6:
+                n6 = U.refresh_product({"handle": "md-" + raw6["handle"], "brand": "md", "title": raw6["title"]}, set())
+                oos = ({"title": raw6["title"]}, n6)
+        except U.Gone:
+            oos = ({"title": "?"}, None)
+        except Exception as e:  # noqa: BLE001
+            print("feed read failed", e)
     if oos:
         p, n6 = oos
         rec(6, "Out of stock but still on the official site", bool(n6) and not any(s["a"] for s in n6["sizes"]),
