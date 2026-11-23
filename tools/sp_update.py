@@ -137,24 +137,38 @@ def fetch_md_collection(handle):
 
 
 MD_PROMO = {"tag": MD_PROMO_TAG, "pct": 25, "label": "+25% Off In Cart"}
+MD_PROMOS = [MD_PROMO]   # every extra-%-off label the store shows right now (a product gets the first one whose tag it carries)
 
 
-def fetch_md_promo():
+def fetch_md_promos():
     """Mac Duggal's own product-label promotions (window.cardHighlights): which tag gets which extra % off.
-    Returns the promo, None when the store shows none, or raises when the page can't be read."""
+    Returns every extra-discount label for the main (core) market — [] when the store shows none —
+    or raises when the page can't be read. Labels that say "Price as marked" are not an extra discount."""
     h = fetch(MD_STORE + "/", accept="text/html")
     m = re.search(r"cardHighlights\s*=\s*(\[.*?\])\s*;", h, re.S)
     if not m:
-        return None
+        return []
+    out = []
     for obj in re.findall(r"\{[^{}]*\}", m.group(1)):
         val = lambda k: (re.search(k + r'\s*:\s*"([^"]*)"', obj) or [None, ""])[1]
         label, tag, market = val("label"), val("tag"), val("market")
-        if not label or not tag:
+        if not label or not tag or re.search(r"price\s+as\s+marked", label, re.I):
             continue
         pct = re.search(r"(\d{1,2})\s*%", label)
-        if pct and (not market or market == "core"):
-            return {"tag": tag, "pct": int(pct.group(1)), "label": label}
-    return None
+        if pct and (not market or market == "core") and tag not in {p["tag"] for p in out}:
+            out.append({"tag": tag, "pct": int(pct.group(1)), "label": label})
+    return out
+
+
+def fetch_md_promo():
+    """First extra-discount label (kept for diagnostics)."""
+    found = fetch_md_promos()
+    return found[0] if found else None
+
+
+def md_promo_for(p):
+    tags = set(tag_list(p))
+    return next((x for x in MD_PROMOS if x.get("tag") in tags), None)
 
 
 def tag_list(p):
@@ -179,7 +193,8 @@ def normalize_md(p, bf_handles, retain=False):
     price = float(cheapest["price"])
     compare = float(cheapest.get("compare_at_price") or 0)
     markdown = compare > price
-    promo = bool(MD_PROMO) and MD_PROMO["tag"] in tag_list(p)
+    hit = md_promo_for(p)
+    promo = bool(hit)
     if not markdown and not promo and not retain:
         return None  # full price and not eligible for the cart promotion
     sizes, colors = {}, []
@@ -206,16 +221,21 @@ def normalize_md(p, bf_handles, retain=False):
         "compare": round(compare if markdown else price, 2),
         "bf": markdown and p["handle"] in bf_handles,
         "markdown": markdown,
-        "extra25": promo and MD_PROMO["pct"] == 25,
-        "extraPct": MD_PROMO["pct"] if promo else 0,
+        "extra25": promo and hit["pct"] == 25,
+        "extraPct": hit["pct"] if promo else 0,
         "colors": colors[:8],
         "sizes": [{"s": k, "a": a} for k, a in sizes.items()],
         "publishedAt": (p.get("published_at") or "")[:10],
     }
 
 
+MD_RAW = {}   # this run's official feed, by our handle (used to re-read dresses that left the sale list)
+
+
 def fetch_md():
     maxi = fetch_md_collection(MD_MAXI)
+    MD_RAW.clear()
+    MD_RAW.update({"md-" + p["handle"]: p for p in maxi if p.get("handle")})
     time.sleep(1.5)
     bf = {p["handle"] for p in fetch_md_collection(MD_BF)}
     out = {}
@@ -707,21 +727,30 @@ def main():
     try:
         if os.environ.get("MD_ENABLE", "1") != "1":
             raise RuntimeError("Mac Duggal disabled")
-        global MD_PROMO
+        global MD_PROMO, MD_PROMOS
+        known = [dict(x) for x in (meta.get("mdPromos") or ([meta["mdPromo"]] if meta.get("mdPromo") else []))]
+        for x in known:
+            x.setdefault("pct", int((re.search(r"(\d{1,2})\s*%", x.get("label", "")) or [0, 25])[1]))
+            x.pop("source", None)
         try:
-            found = fetch_md_promo()
-            if found or not meta.get("mdPromo") or meta.get("mdPromoMiss", 0) >= 2:
-                MD_PROMO = found
-                meta["mdPromoMiss"] = 0
-            else:   # promo not seen: confirm on 3 checks in a row before removing it everywhere
-                meta["mdPromoMiss"] = meta.get("mdPromoMiss", 0) + 1
-                MD_PROMO = dict(meta["mdPromo"])
-                MD_PROMO.setdefault("pct", int((re.search(r"(\d{1,2})\s*%", MD_PROMO.get("label", "")) or [0, 25])[1]))
-            print("md promo:", MD_PROMO, "| misses", meta.get("mdPromoMiss"))
+            found = fetch_md_promos()
+            tags = {x["tag"] for x in found}
+            promos = [dict(x, miss=0) for x in found]
+            for x in known:   # a label no longer shown: confirm on 3 checks in a row before removing it everywhere
+                if x.get("tag") and x["tag"] not in tags:
+                    miss = x.get("miss", 0) + 1
+                    if miss < 3:
+                        promos.append(dict(x, miss=miss))
+                    else:
+                        print("Mac Duggal promotion no longer shown — removed:", x)
+            meta["mdPromoMiss"] = 0
         except Exception as e:  # noqa: BLE001
-            MD_PROMO = dict(meta.get("mdPromo") or MD_PROMO)
-            MD_PROMO.setdefault("pct", 25)
+            promos = known or [dict(MD_PROMO, miss=0)]
             print("md promo page failed (keeping last known):", e)
+        meta["mdPromos"] = promos
+        MD_PROMOS = [{k: v for k, v in x.items() if k != "miss"} for x in promos]
+        MD_PROMO = MD_PROMOS[0] if MD_PROMOS else None
+        print("md promos:", promos)
         md_items, raw_counts["md"] = fetch_md()
         for n in md_items:
             fresh[n["handle"]] = n
@@ -767,6 +796,17 @@ def main():
     budget, refreshed, retired = int(os.environ.get("REFRESH_LIMIT", "60")), 0, 0
     for p in missing:
         h = p["handle"]
+        if h in old and p.get("brand") == "md" and h in MD_RAW and "md:maxi" in ok_cats:
+            # still in the official feed but no longer on sale / no longer labelled: use today's official data
+            n = normalize_md(MD_RAW[h], bf_set, retain=True)
+            if n:
+                for k in ("firstSeen", "guide", "guideImg", "guideAt", "dims"):
+                    if k in p and k not in n:
+                        n[k] = p[k]
+                n.update(listed=False, status="ok", pageCheckedAt=ts)
+                fresh[h] = n
+                refreshed += 1
+                continue
         due = age_s(p.get("pageCheckedAt", "")) > 3 * 3600
         if due and budget > 0 and grp(dict(p, cat=p.get("cat", "midi"))) in ok_cats:
             budget -= 1
@@ -812,7 +852,7 @@ def main():
                 added.append(h)
             continue
         n["firstSeen"] = o.get("firstSeen", ts)
-        if n.get("brand") == "md" and MD_PROMO and (o.get("extraPct") or o.get("extra25")) and not n.get("extraPct"):
+        if n.get("brand") == "md" and MD_PROMOS and (o.get("extraPct") or o.get("extra25")) and not n.get("extraPct"):
             miss = o.get("extraMiss", 0) + 1
             if miss < 3:
                 n.update(extraPct=o.get("extraPct") or 25, extra25=o.get("extra25", True), extraMiss=miss)
