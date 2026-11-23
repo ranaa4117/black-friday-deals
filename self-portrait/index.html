@@ -333,7 +333,24 @@ nav.tabs .dot{display:inline-block;width:6px;height:6px;border-radius:50%;backgr
 .pick button{border:1px solid var(--ink);min-width:64px;padding:10px 12px;font-size:14px}
 .pick button[aria-pressed="true"]{background:var(--ink);color:#fff}
 .pick button:disabled{border-color:var(--rule);color:#bdb6ae;text-decoration:line-through;cursor:not-allowed}
-.popcount{position:absolute;right:8px;bottom:12px;background:#fff;font-size:12px;padding:3px 8px}
+.st-filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0 14px;font-size:13px}
+.st-filters .chip{border:1px solid var(--rule);background:#fff;padding:6px 12px;font:inherit;cursor:pointer}.st-filters .chip[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.st-filters label{display:flex;gap:6px;align-items:center}.st-filters input,.st-filters select{border:1px solid var(--rule);padding:5px 8px;font:inherit}
+.st-nav{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;margin:4px 0 10px}.st-nav a{color:var(--stone)}
+.st{border-top:1px solid var(--rule);padding:22px 0 10px}.st h3{font:400 22px/1.2 var(--serif);margin:0 0 14px}.st h4{font:500 13px var(--sans);letter-spacing:.04em;margin:18px 0 8px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.tile{border:1px solid var(--rule);padding:12px 14px;display:flex;flex-direction:column;gap:3px}.tile .tl{font-size:12px;color:var(--stone)}.tile b{font:400 26px/1.1 var(--serif)}.tile .th{font-size:11px;color:var(--stone)}
+.chg{font-size:12px;color:var(--stone)}.chg.up{color:#1e7a46}.chg.down{color:var(--red)}
+.bars{display:flex;flex-direction:column;gap:6px;max-width:720px}.bar{display:grid;grid-template-columns:minmax(120px,38%) 1fr auto;gap:10px;align-items:center;font-size:13px}
+.bl{display:flex;gap:8px;align-items:center;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.bl img{width:26px;height:34px;object-fit:cover;flex:none}
+.bt{background:var(--ivory);height:12px;display:block}.bt i{display:block;height:100%;background:#1f3a5f;border-radius:0 4px 4px 0}.bv{font-variant-numeric:tabular-nums;min-width:44px;text-align:right}
+.lc svg{width:100%;max-width:720px;height:auto;display:block}.lc .grid{stroke:var(--rule);stroke-width:1}.lc .ax{font:11px var(--sans);fill:var(--stone)}.lc .ln{fill:none;stroke:#1f3a5f;stroke-width:2}
+.lc circle{fill:#1f3a5f;stroke:#fff;stroke-width:2}.lc .pt:hover circle{r:6}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:4px 32px}@media (max-width:760px){ .two{grid-template-columns:1fr} .bar{grid-template-columns:minmax(90px,42%) 1fr auto} }
+.st-t td.pc{display:flex;gap:8px;align-items:center;min-width:220px}.st-t td.pc img{width:30px;height:40px;object-fit:cover}
+.nodata{color:var(--stone);font-size:13px;margin:6px 0}
+.consent{position:fixed;left:12px;right:12px;bottom:12px;z-index:60;background:#fff;border:1px solid var(--rule);box-shadow:0 6px 24px rgba(0,0,0,.08);padding:10px 14px;display:flex;gap:10px;align-items:center;font:400 13px/1.5 "Tajawal",var(--sans);max-width:620px;margin:0 auto}
+.consent span{flex:1}.consent button{border:1px solid var(--ink);background:var(--ink);color:#fff;padding:6px 14px;font:inherit;cursor:pointer}.consent button.q{background:#fff;color:var(--ink)}
 /* ---- size guide illustration ---- */
 .sg-ill{margin:18px 0 6px;background:#fff;text-align:center}
 .sg-ill img{max-width:100%;max-height:520px;margin:0 auto;object-fit:contain}
@@ -499,7 +516,7 @@ const PASS_HASH = "3c29f0bb09f7f11433b993fb3a8d945503758c57eacb6ecfe88c49e1ef74e
 const REPO = "ranaa4117/black-friday-deals";
 const WORKFLOW = "self-portrait-update.yml";
 const LS = "sp-edit-v1";
-const APP_VERSION = "21";
+const APP_VERSION = "22";
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
@@ -602,7 +619,15 @@ async function shareExistingFavs(){   // favorites saved before counting started
   for (const h of todo) if (await shareFav(h, true)) done.push(h);
   store.set("sp-fav-shared", JSON.stringify(done.filter(h => S.fav[h] != null)));
 }
+/* ranking: 0–100 scores from product_scores (views, engaged time, favorites, recommendation clicks); counts stay private */
+let SCORES = null;
+async function loadScores(){
+  try { const rows = await sb("product_scores?select=handle,score,fav_score&limit=10000"); const t = {}; for (const r of rows || []) t[r.handle] = { s: Number(r.score) || 0, f: r.fav_score == null ? null : Number(r.fav_score) }; SCORES = t; }
+  catch { /* analytics not set up yet: favorites only */ }
+}
+const interest = h => SCORES ? (SCORES[h] ? SCORES[h].s : 0) : favCount(h) * 10;
 function favCount(h){
+  if (SCORES) return SCORES[h] && SCORES[h].f != null ? 1 + SCORES[h].f : 0;   // order only, never shown
   if (TOTALS) return TOTALS[h] ? TOTALS[h].n : 0;
   return S.fav[h] != null ? 1 : 0;
 }
@@ -610,7 +635,7 @@ function favTime(h){ if (TOTALS && TOTALS[h]) return TOTALS[h].t; const b = favO
 const popular = list => list.filter(p => favCount(p.handle) > 0).sort((a,b) => favCount(b.handle) - favCount(a.handle) || favTime(b.handle) - favTime(a.handle));
 let GH = JSON.parse(store.get("sp-gh") || '{"token":"","sync":false}');
 const UI = {};
-const ui = r => UI[r] || (UI[r] = { q:"", sort: r === "discounts" ? "disc" : r === "popular" ? "pop" : "new", pmin:"", pmax:"", color:"", limit:48 });
+const ui = r => UI[r] || (UI[r] = { q:"", sort: r === "discounts" ? "disc" : r === "popular" ? "pop" : r === "recent" ? "new" : "rank", pmin:"", pmax:"", color:"", limit:48 });
 
 /* ---------- helpers ---------- */
 const rate = () => Number(C().settings && C().settings.rate) || Number(DATA.meta.rate && DATA.meta.rate.value) || 0;
@@ -628,8 +653,9 @@ const extraFor = p => isEF(p) ? extraEF() : isMC(p) ? extraShoes() : isRL(p) ? e
    it is read from the store's own banner by the updater and disappears when the store stops showing it */
 const spExtra = p => { const x = DATA.meta && DATA.meta.spPromo; return isSP(p) && x && x.pct > 0 && p.compare > p.price ? x.pct : 0; };
 const mcExtra = p => isMacys(p) && p.promo && p.promo.pct > 0 && p.promo.pct < 80 ? p.promo.pct : 0;   // a Macy's public code shown on that product's page
-const extraPct = p => isMD(p) && p.extra25 ? 25 : spExtra(p) || mcExtra(p);
-const netPrice = p => isMD(p) && p.extra25 ? p.price * 0.75 : extraPct(p) ? p.price * (1 - extraPct(p) / 100) : p.price;
+const mdExtra = p => isMD(p) ? (p.extraPct || (p.extra25 ? 25 : 0)) : 0;
+const extraPct = p => mdExtra(p) || spExtra(p) || mcExtra(p);
+const netPrice = p => extraPct(p) ? p.price * (1 - extraPct(p) / 100) : p.price;
 const finalSAR = p => Math.round(netPrice(p) * rateFor(p) + extraFor(p));
 const saleSAR = p => Math.round(p.price * rateFor(p) + extraFor(p));
 const wasSAR = p => Math.round(p.compare * rateFor(p) + extraFor(p));
@@ -680,7 +706,7 @@ async function loadData(manual){
     const side = f => fetch(BASE + f + "?t=" + Date.now(), { cache:"no-store" }).then(x => x.ok ? x.json() : {}).catch(() => ({}));
     const w = side("winter.json"), sh = side("shoes.json");
     DATA = await r.json(); WINTER = (await w).products || WINTER; SHOES = (await sh).products || SHOES; loaded = true;
-    await Promise.all([pullSync(), loadTotals(), loadViews()]);
+    await Promise.all([pullSync(), loadScores().then(() => SCORES ? null : loadTotals())]);
     if (manual) toast("Up to date.");
   } catch (e) {
     if (manual || !loaded) toast("Couldn't load the latest data (" + e.message + "). Check your connection and try again.");
@@ -770,8 +796,7 @@ function card(p, showCat){
       ${p.image ? `<img loading="lazy" decoding="async" src="${esc(img(p.image, W.card))}" alt="${esc(BRANDS[brandOf(p)] + " " + p.title)}">` : '<span class="empty" style="display:grid;place-items:center;height:100%">No image</span>'}
       ${alt2 && !TOUCH ? `<img class="alt" loading="lazy" decoding="async" src="${esc(img(alt2, W.card))}" alt="">` : ""}
       ${off ? `<span class="badge">−${off}%</span>` : ""}
-      ${out ? `<span class="flag">${p.status === "unavailable" ? "Unavailable" : p.status === "verify" ? "Needs verification" : "Sold out"}</span>` : isNew ? '<span class="flag">New to sale</span>' : nPics > 1 ? `<span class="flag light">${nPics} photos</span>` : ""}
-      ${showPop && favCount(p.handle) ? `<span class="popcount">♥ ${favCount(p.handle)}</span>` : ""}
+      ${out ? `<span class="flag">${p.status === "unavailable" || p.status === "discontinued" ? "Unavailable" : p.status === "verify" ? "Needs verification" : "Sold out"}</span>` : isNew ? '<span class="flag">New to sale</span>' : nPics > 1 ? `<span class="flag light">${nPics} photos</span>` : ""}
     </a>
     <button class="heart" data-fav="${esc(p.handle)}" aria-pressed="${fav}" aria-label="${fav ? "Remove from" : "Save to"} favorites">${heartSVG}</button>
     ${showCat ? `<p class="cat-tag">${esc(kindOf(p))}</p>` : ""}
@@ -781,10 +806,10 @@ function card(p, showCat){
     <p class="sar${pct(p) ? " hot" : ""}">${fmt(finalSAR(p))}<small>SAR</small></p>
     ${pct(p) ? `<p class="eur"><s>${fmt(wasSAR(p))} SAR</s></p>` : ""}
     ${COSTS() ? `<p class="calc">${money(p, p.price)} (was ${money(p, p.compare)}) × ${usdRate().toFixed(3)} + ${fmt(extraFor(p))} SAR</p>` : ""}` : isMD(p) ? `
-    ${p.extra25 ? '<p class="ptags"><span class="ptag ptag-x">25% OFF</span></p>' : ""}
+    ${mdExtra(p) ? `<p class="ptags"><span class="ptag ptag-x">${mdExtra(p)}% OFF</span></p>` : ""}
     <p class="sar${off ? " hot" : ""}">${fmt(finalSAR(p))}<small>SAR</small></p>
     ${off ? `<p class="eur"><s>${fmt(wasSAR(p))} SAR</s></p>` : ""}
-    ${COSTS() ? `<p class="calc">${money(p, p.price)}${p.markdown ? " (was " + money(p, p.compare) + ")" : ""}${p.extra25 ? " × 0.75" : ""} × ${usdRate().toFixed(3)} + ${fmt(extraFor(p))} SAR</p>` : ""}` : `
+    ${COSTS() ? `<p class="calc">${money(p, p.price)}${p.markdown ? " (was " + money(p, p.compare) + ")" : ""}${mdExtra(p) ? " × " + (1 - mdExtra(p) / 100).toFixed(2) : ""} × ${usdRate().toFixed(3)} + ${fmt(extraFor(p))} SAR</p>` : ""}` : `
     ${spExtra(p) ? `<p class="ptags"><span class="ptag ptag-x">EXTRA ${spExtra(p)}% OFF</span></p>` : ""}
     ${COSTS() ? `<p class="eur"><s>${eur(p.compare)}</s><span class="now">${eur(p.price)}</span><span class="pct">−${pct(p)}%</span></p>` : ""}
     <p class="sar${off ? " hot" : ""}">${fmt(finalSAR(p))}<small>SAR</small></p>
@@ -830,9 +855,13 @@ function applyFilters(list, u){
     disc: (a,b) => offShown(b) - offShown(a) || finalSAR(a) - finalSAR(b),
     new: (a,b) => (b.firstSeen||"").localeCompare(a.firstSeen||"") || (b.publishedAt||"").localeCompare(a.publishedAt||""),
     pop: (a,b) => favCount(b.handle) - favCount(a.handle) || favTime(b.handle) - favTime(a.handle),
+    /* default: real customer interest (views, engaged time, favorites, recommendation clicks); with no data yet,
+       pieces on sale with the deepest discount first */
+    rank: (a,b) => interest(b.handle) - interest(a.handle) || (b.listed === false ? 0 : 1) - (a.listed === false ? 0 : 1) || offShown(b) - offShown(a) || (b.firstSeen||"").localeCompare(a.firstSeen||""),
     fav: (a,b) => (S.fav[b.handle] ? 1 : 0) - (S.fav[a.handle] ? 1 : 0) || (b.firstSeen||"").localeCompare(a.firstSeen||""),
   }[u.sort] || (() => 0);
-  return out.sort(by);
+  const down = p => p.status === "discontinued" ? 2 : isAvail(p) ? 0 : 1;
+  return out.sort((a, b) => down(a) - down(b) || by(a, b));
 }
 
 const opt = (v, label, cur) => `<option value="${esc(v)}" ${String(cur) === String(v) ? "selected" : ""}>${esc(label)}</option>`;
@@ -906,7 +935,7 @@ function viewList(route, all){
       <div class="fhead"><h3>الفلاتر</h3>${filtered ? '<button class="linkish" id="clearAll">مسح الكل</button>' : ""}</div>
       <label class="search"><input id="q" type="search" placeholder="ابحث باسم المنتج" value="${esc(u.q)}" aria-label="ابحث باسم المنتج" dir="auto"></label>
       <div class="frow">
-        <label class="fld"><span>الترتيب</span><select id="f-sort">${opt("new","الأحدث",u.sort)}${opt("asc","السعر: من الأقل إلى الأعلى",u.sort)}${opt("desc","السعر: من الأعلى إلى الأقل",u.sort)}${opt("disc","أعلى خصم",u.sort)}${opt("fav","المفضلة أولاً",u.sort)}${opt("pop","الأكثر تفضيلاً",u.sort)}</select></label>
+        <label class="fld"><span>الترتيب</span><select id="f-sort">${opt("rank","الأكثر رواجاً",u.sort)}${opt("new","الأحدث",u.sort)}${opt("asc","السعر: من الأقل إلى الأعلى",u.sort)}${opt("desc","السعر: من الأعلى إلى الأقل",u.sort)}${opt("disc","أعلى خصم",u.sort)}${opt("fav","المفضلة أولاً",u.sort)}${opt("pop","الأكثر تفضيلاً",u.sort)}</select></label>
         <fieldset class="fld fprice"><legend>السعر</legend>
           <label><span>أقل سعر</span><input id="pmin" type="number" inputmode="numeric" min="0" step="1" value="${esc(u.pmin ?? "")}" placeholder="0"><i>ر.س</i></label>
           <label><span>أعلى سعر</span><input id="pmax" type="number" inputmode="numeric" min="0" step="1" value="${esc(u.pmax ?? "")}" placeholder="—"><i>ر.س</i></label>
@@ -932,10 +961,10 @@ function viewHome(all){
   const defaults3 = byDisc(sp).filter(p => p.image && isDress(p)).slice(0, 3);
   const pop = popular(all);
   /* the three home pictures follow real customer activity: favorites (×3) + product views, one per category where possible */
-  const ranked = avail.filter(p => p.image && engage(p.handle) > 0).sort((a,b) => engage(b.handle) - engage(a.handle));
-  const top = [], secs = new Set();
-  for (const p of ranked){ if (top.length >= 3) break; if (!secs.has(secOf(p))){ top.push(p); secs.add(secOf(p)); } }
-  for (const p of ranked){ if (top.length >= 3) break; if (!top.includes(p)) top.push(p); }
+  /* the three home pictures: the three most engaging DRESSES (views, engaged time, favorites), all brands */
+  const ranked = avail.filter(p => p.image && (catOf(p) === "midi" || catOf(p) === "maxi") && engage(p.handle) > 0).sort((a,b) => engage(b.handle) - engage(a.handle));
+  const top = [];
+  for (const p of ranked){ if (top.length >= 3) break; if (!top.some(x => x.handle === p.handle)) top.push(p); }
   for (const p of defaults3){ if (top.length >= 3) break; if (!top.includes(p)) top.push(p); }
   const picks = top.length >= 3 ? [top[1], top[0], top[2]] : defaults3;
   const maxOff = Math.max(0, ...avail.map(pct));
@@ -1082,7 +1111,7 @@ function pickLook(p, all){
 function completeLook(p, all){
   const look = pickLook(p, all); if (!look.length) return "";
   return `<section class="looks" aria-label="Complete the look"><h2>COMPLETE THE LOOK <span lang="ar" dir="rtl">— أكملي الإطلالة</span></h2>
-    <div class="look-row n${look.length}">${look.map(([slot, c]) => `<a class="look" href="${plink(c)}"><span class="slot">${SLOT_NAMES[slot]}</span><span class="lph"><img loading="lazy" decoding="async" src="${esc(img(c.image, 400))}" alt="${esc(BRANDS[brandOf(c)] + " " + c.title)}"></span>
+    <div class="look-row n${look.length}">${look.map(([slot, c]) => `<a class="look" href="${plink(c)}" data-rec="look" data-slot="${slot}" data-from="${esc(p.handle)}" data-h="${esc(c.handle)}"><span class="slot">${SLOT_NAMES[slot]}</span><span class="lph"><img loading="lazy" decoding="async" src="${esc(img(c.image, 400))}" alt="${esc(BRANDS[brandOf(c)] + " " + c.title)}"></span>
       <span class="lk">${esc(BRANDS[brandOf(c)])}</span><span class="ln">${esc(c.title)}</span><span class="lp${offShown(c) ? " hot" : ""}">${fmt(finalSAR(c))} SAR</span></a>`).join("")}</div></section>`;
 }
 const SIMILAR_CATS = { midi:["midi"], maxi:["maxi"], bags:["bags"], shoes:["shoes"], jackets:["jackets","coats"], coats:["coats","jackets"], scarves:["scarves"] };
@@ -1103,24 +1132,79 @@ function alsoLike(p, all, skip){
     .map(c => [sim(c), c]).sort((a, b) => b[0] - a[0]).slice(0, 8).map(x => x[1]);
   if (!list.length) return "";
   return `<section class="alike" aria-label="You may also like"><h2>YOU MAY ALSO LIKE <span lang="ar" dir="rtl">— منتجات قد تعجبك</span></h2>
-    <div class="grid">${list.map(c => card(c, true)).join("")}</div></section>`;
+    <div class="grid" data-rec-grid="alike" data-from="${esc(p.handle)}">${list.map(c => card(c, true)).join("")}</div></section>`;
 }
 function recos(p, all){
   const look = pickLook(p, all);
+  setTimeout(() => trackRecView(p, [look.length ? "look" : null, "alike"].filter(Boolean)), 0);
   return completeLook(p, all) + alsoLike(p, all, new Set(look.map(x => x[1].handle)));
 }
 
-/* ---------- product views (aggregate counts only; no customer identity) ---------- */
-let VIEWS = null; const VIEWED = new Set();
-async function loadViews(){ try { const rows = await sb("view_totals?select=handle,total&limit=5000"); const t = {}; for (const r of rows || []) t[r.handle] = r.total; VIEWS = t; } catch { /* views table not set up yet: favorites only */ } }
-function viewCount(h){ return VIEWS && VIEWS[h] || 0; }
-function trackView(h){
-  if (OWNER || VIEWED.has(h)) return; VIEWED.add(h);
-  let seen = []; try { seen = JSON.parse(sessionStorage.getItem("ro-viewed") || "[]"); } catch {}
-  if (seen.includes(h)) return;
-  sb("rpc/add_view", { method:"POST", body: JSON.stringify({ p_handle: h }) }).then(() => { try { sessionStorage.setItem("ro-viewed", JSON.stringify(seen.concat(h).slice(-200))); } catch {} }).catch(() => {});
+/* ---------- anonymous analytics: aggregate events only, no personal data ---------- */
+const BOT_RE = /bot|crawl|spider|slurp|preview|headless|lighthouse|pagespeed|facebookexternalhit|whatsapp|telegram|discord|curl|python|wget|monitor/i;
+const AN = { q: [], timer: null, route: null, eng: null };
+function anOn(){
+  if (OWNER || navigator.webdriver || BOT_RE.test(navigator.userAgent) || /^(localhost|127\.)/.test(location.hostname) || document.prerendering) return false;
+  return store.get("ro-consent") !== "no";
 }
-const engage = h => favCount(h) * 3 + viewCount(h);
+const visitor = (() => { let v = store.get("ro-visitor"), fresh = false; if (!v){ v = (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2)); store.set("ro-visitor", v); fresh = true; } return { id: v, fresh }; })();
+function session(){
+  let s = null; try { s = JSON.parse(sessionStorage.getItem("ro-session") || "null"); } catch {}
+  const now = Date.now();
+  if (!s || now - s.last > 30 * 60e3){ s = { id: (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2)), last: now, n: 0, isNew: !!(visitor.fresh && !store.get("ro-seen")) }; store.set("ro-seen", "1"); }
+  s.last = now; try { sessionStorage.setItem("ro-session", JSON.stringify(s)); } catch {}
+  return s;
+}
+const DEVICE = (() => { const ua = navigator.userAgent; const m = Math.min(screen.width, screen.height), M = Math.max(screen.width, screen.height);
+  return /iPad|Tablet/i.test(ua) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(ua)) || (/Android/i.test(ua) && !/Mobile/i.test(ua)) || (TOUCH && m >= 600 && M <= 1400) ? "tablet" : /Mobi|iPhone|Android/i.test(ua) ? "mobile" : "desktop"; })();
+const SOURCE = (() => { const q = new URLSearchParams(location.search).get("utm_source"); if (q) return /insta|face|fb|tiktok|snap|twitter|x$|whats/i.test(q) ? "social" : /google/i.test(q) ? "google" : "other";
+  let h = ""; try { h = new URL(document.referrer).hostname; } catch {}
+  if (!h || h === location.hostname) return "direct";
+  return /google\./.test(h) ? "google" : /bing|yahoo|duckduckgo|yandex|ecosia/.test(h) ? "search" : /instagram|facebook|fb\.|t\.co$|twitter|x\.com|tiktok|snapchat|whatsapp|wa\.me|pinterest|youtube|linkedin|telegram/.test(h) ? "social" : "other"; })();
+function track(kind, data = {}){
+  if (!anOn()) return;
+  const s = session();
+  AN.q.push(Object.assign({ kind, visitor: visitor.id, session: s.id, device: DEVICE, source: SOURCE, isNew: s.isNew }, data));
+  clearTimeout(AN.timer); AN.timer = setTimeout(flush, AN.q.length >= 20 ? 0 : 3000);
+}
+function flush(){
+  if (!AN.q.length) return;
+  const batch = AN.q.splice(0, 40);
+  fetch(SB_URL + "/rest/v1/rpc/track", { method:"POST", keepalive:true, headers:{ apikey: SB_KEY, "Content-Type":"application/json" }, body: JSON.stringify({ p_events: batch }) }).catch(() => {});
+}
+const once = (key) => { let seen = []; try { seen = JSON.parse(sessionStorage.getItem("ro-once") || "[]"); } catch {} if (seen.includes(key)) return false; seen.push(key); try { sessionStorage.setItem("ro-once", JSON.stringify(seen.slice(-400))); } catch {} return true; };
+const routeName = r => r.startsWith("item-") ? "item" : r;
+function trackRoute(route){
+  const name = routeName(route), prev = AN.route;
+  endEngage();
+  if (name === "item"){ const h = route.slice(5); if (once("pv:" + h)) track("product_view", { handle:h, route:"item", meta: prev ? { from: prev } : undefined }); startEngage(h); }
+  if (prev !== name || name === "item"){
+    const s = session(), landing = s.n === 0; s.n++; try { sessionStorage.setItem("ro-session", JSON.stringify(s)); } catch {}
+    track("pageview", { route: name, meta: Object.assign({}, prev ? { from: prev } : {}, landing ? { landing: "1" } : {}) });
+  }
+  AN.route = name;
+}
+/* engaged time on a product page: counted only while the page is visible */
+function startEngage(h){ AN.eng = { h, ms: 0, at: document.visibilityState === "visible" ? Date.now() : null }; }
+function pauseEngage(){ if (AN.eng && AN.eng.at){ AN.eng.ms += Date.now() - AN.eng.at; AN.eng.at = null; } }
+function endEngage(){ pauseEngage(); if (AN.eng && AN.eng.ms >= 1000) track("engage", { handle: AN.eng.h, ms: Math.min(Math.round(AN.eng.ms), 600000) }); AN.eng = null; }
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden"){ if (AN.eng){ const h = AN.eng.h; endEngage(); startEngage(h); AN.eng.at = null; } flush(); }
+  else if (AN.eng && !AN.eng.at) AN.eng.at = Date.now();
+});
+addEventListener("pagehide", () => { endEngage(); flush(); });
+function trackRecView(p, sections){ for (const sec of sections) if (once("rv:" + sec + ":" + p.handle)) track("rec_view", { handle: p.handle, meta: { section: sec } }); }
+let lastSearch = "", searchTimer = null;
+function trackSearch(q){ clearTimeout(searchTimer); searchTimer = setTimeout(() => { q = q.trim(); if (q.length >= 2 && q !== lastSearch){ lastSearch = q; track("search", { meta: { q: q.slice(0, 60) } }); } }, 1500); }
+const trackFilter = (type, value) => track("filter", { meta: { type, value: String(value).slice(0, 40) } });
+function consentBar(){
+  if (OWNER || store.get("ro-consent")) return;
+  const b = document.createElement("div"); b.className = "consent"; b.dir = "rtl"; b.lang = "ar";
+  b.innerHTML = '<span>نستخدم إحصاءات مجهولة الهوية لتحسين الموقع، بدون أي بيانات شخصية.</span><button data-c="yes">حسناً</button><button data-c="no" class="q">إيقاف</button>';
+  b.onclick = e => { const c = e.target.dataset && e.target.dataset.c; if (!c) return; store.set("ro-consent", c); b.remove(); if (c === "no") AN.q.length = 0; };
+  document.body.appendChild(b);
+}
+const engage = h => interest(h);
 
 /* ---------- search engines: unique titles, descriptions, structured data ---------- */
 const SITE = "https://raghad-outlet.pages.dev/";
@@ -1160,7 +1244,6 @@ function viewItem(all, handle){
   const fav = !!S.fav[p.handle], off = offShown(p), out = !isAvail(p), dims = dimsOf(p);
   const avail = (p.sizes || []).filter(s => s.a).map(s => s.s);
   const sib = all.filter(x => catOf(x) === catOf(p) && brandOf(x) === brandOf(p)), i = sib.indexOf(p), prev = sib[i - 1], next = sib[i + 1];
-  trackView(p.handle);
   const cr = parseSec(crumbHref(p));
   return `<nav class="crumbs"><a href="#${cr.sec}">${SECTIONS[cr.sec].en}</a> · <a href="#${crumbHref(p)}" id="backLink">${esc(secTitle(cr).split(" · ").slice(1).join(" · "))}</a></nav>
   <section class="pdp">
@@ -1178,11 +1261,11 @@ function viewItem(all, handle){
       ${(p.colors || []).length ? `<p class="small" style="margin-top:10px">Colours: ${esc(p.colors.join(", "))}</p>` : ""}
       ${p.note && OWNER ? `<p class="warnline">${esc(p.note)}</p>` : ""}
       ${COSTS() ? `<p class="calc">${money(p, p.price)} (was ${money(p, p.compare)}, −${pct(p)}%) × ${usdRate().toFixed(3)} + ${fmt(extraFor(p))} SAR</p>` : ""}`
-      : isMD(p) ? `${p.extra25 ? '<p class="ptags"><span class="ptag ptag-x">25% OFF</span></p>' : ""}<p class="sar big${off ? " hot" : ""}">${fmt(finalSAR(p))}<small>SAR</small></p>
+      : isMD(p) ? `${mdExtra(p) ? `<p class="ptags"><span class="ptag ptag-x">${mdExtra(p)}% OFF</span></p>` : ""}<p class="sar big${off ? " hot" : ""}">${fmt(finalSAR(p))}<small>SAR</small></p>
       ${off ? `<p class="eur"><s>${fmt(wasSAR(p))} SAR</s><span class="pct">−${off}%</span></p>` : ""}
       ${priceBreak(p)}
       ${(p.colors || []).length ? `<p class="small" style="margin-top:10px">Colours: ${esc(p.colors.join(", "))}</p>` : ""}
-      ${COSTS() ? `<p class="calc">${money(p, p.price)}${p.markdown ? " (was " + money(p, p.compare) + ")" : ""}${p.extra25 ? " × 0.75" : ""} × ${usdRate().toFixed(3)} + ${fmt(extraFor(p))} SAR</p>` : ""}`
+      ${COSTS() ? `<p class="calc">${money(p, p.price)}${p.markdown ? " (was " + money(p, p.compare) + ")" : ""}${mdExtra(p) ? " × " + (1 - mdExtra(p) / 100).toFixed(2) : ""} × ${usdRate().toFixed(3)} + ${fmt(extraFor(p))} SAR</p>` : ""}`
       : `${spExtra(p) ? `<p class="ptags"><span class="ptag ptag-x">EXTRA ${spExtra(p)}% OFF</span></p>` : ""}<p class="sar big${off ? " hot" : ""}">${fmt(finalSAR(p))}<small>SAR</small></p>
       ${off ? `<p class="eur"><s>${fmt(wasSAR(p))} SAR</s><span class="pct">−${off}%</span></p>` : ""}
       ${priceBreak(p)}
@@ -1259,6 +1342,142 @@ function openMDChart(p){
 $("#guide").addEventListener("click", e => { if (e.target === $("#guide")) $("#guide").close(); });
 
 /* ---------- admin ---------- */
+/* ======================= private analytics dashboard (#stats) ======================= */
+const ST = { range: "7", from: "", to: "", data: null, err: "", loading: false, f: { brand:"", cat:"", q:"" } };
+const adminKey = () => store.get("ro-admin-key") || "";
+const msFmt = ms => { ms = Math.round(Number(ms) || 0); if (ms < 1000) return ms ? "<1s" : "0s"; const s0 = Math.round(ms / 1000), m = Math.floor(s0 / 60), h = Math.floor(m / 60); return h ? h + "h " + (m % 60) + "m" : m ? m + "m " + String(s0 % 60).padStart(2, "0") + "s" : s0 + "s"; };
+const nfmt = n => Number(n || 0).toLocaleString("en-US");
+const chg = (cur, prev) => { cur = Number(cur) || 0; prev = Number(prev) || 0; if (!prev) return cur ? '<span class="chg up">new</span>' : '<span class="chg">—</span>'; const d = Math.round((cur - prev) / prev * 100); return `<span class="chg ${d > 0 ? "up" : d < 0 ? "down" : ""}">${d > 0 ? "▲" : d < 0 ? "▼" : ""}${Math.abs(d)}%</span>`; };
+function stRange(){
+  const now = new Date(), end = new Date(now.getTime() + 60e3);
+  const riyadhMidnight = d => { const k = new Date(d.toLocaleString("en-US", { timeZone:"Asia/Riyadh" })); const off = d - k; k.setHours(0,0,0,0); return new Date(k.getTime() + off); };
+  if (ST.range === "custom" && ST.from && ST.to) return [new Date(ST.from + "T00:00:00+03:00"), new Date(new Date(ST.to + "T00:00:00+03:00").getTime() + 864e5)];
+  if (ST.range === "today") return [riyadhMidnight(now), end];
+  return [new Date(now - Number(ST.range) * 864e5), end];
+}
+async function loadStats(){
+  if (!adminKey()) return;
+  ST.loading = true; ST.err = ""; if (routeOf() === "stats") render();
+  const [a, b] = stRange();
+  try { ST.data = await sb("rpc/admin_stats", { method:"POST", body: JSON.stringify({ p_key: adminKey(), p_from: a.toISOString(), p_to: b.toISOString() }) }); }
+  catch (e) { ST.data = null; ST.err = /401|403|42501/.test(String(e.message)) ? "That admin key isn't accepted. Check it and try again." : /404/.test(String(e.message)) ? "The analytics database isn't set up yet — run the analytics SQL in Supabase first." : "Couldn't load the statistics (" + e.message + "). Try again."; }
+  ST.loading = false; if (routeOf() === "stats") render();
+}
+function barList(rows, opts = {}){   // horizontal bars: one hue, value labels in text ink, tooltip on hover
+  rows = rows.filter(r => r.v > 0); if (!rows.length) return '<p class="nodata">Not enough data yet</p>';
+  const max = Math.max(...rows.map(r => r.v)), f = opts.fmt || nfmt;
+  return `<div class="bars">${rows.map(r => `<div class="bar" title="${esc(r.label)}: ${esc(f(r.v))}${r.tip ? " · " + esc(r.tip) : ""}"><span class="bl">${r.img ? `<img src="${esc(img(r.img, 80))}" alt="">` : ""}${esc(r.label)}</span><span class="bt"><i style="width:${Math.max(2, r.v / max * 100)}%"></i></span><span class="bv">${esc(f(r.v))}</span></div>`).join("")}</div>`;
+}
+function lineChart(points, key, label){   // single series line with hover crosshair + tooltip
+  if (!points.length) return '<p class="nodata">Not enough data yet</p>';
+  const W = 640, H = 180, P = { l: 34, r: 12, t: 12, b: 26 }, n = points.length, max = Math.max(1, ...points.map(p => p[key]));
+  const x = i => P.l + (n === 1 ? (W - P.l - P.r) / 2 : i * (W - P.l - P.r) / (n - 1)), y = v => P.t + (H - P.t - P.b) * (1 - v / max);
+  const path = points.map((p, i) => (i ? "L" : "M") + x(i).toFixed(1) + " " + y(p[key]).toFixed(1)).join(" ");
+  const ticks = [0, Math.round(max / 2), max];
+  const every = Math.max(1, Math.ceil(n / 7));
+  return `<div class="lc" data-key="${key}"><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(label)} per day">
+    ${ticks.map(t => `<line x1="${P.l}" x2="${W - P.r}" y1="${y(t)}" y2="${y(t)}" class="grid"/><text x="${P.l - 6}" y="${y(t) + 4}" class="ax" text-anchor="end">${t}</text>`).join("")}
+    <path d="${path}" class="ln"/>
+    ${points.map((p, i) => `<g class="pt"><rect x="${x(i) - (W / n) / 2}" y="0" width="${W / n}" height="${H}" fill="transparent"><title>${p.d}: ${p[key]} ${label.toLowerCase()}</title></rect><circle cx="${x(i)}" cy="${y(p[key])}" r="4"/></g>`).join("")}
+    ${points.map((p, i) => i % every === 0 || i === n - 1 ? `<text x="${x(i)}" y="${H - 6}" class="ax" text-anchor="middle">${p.d.slice(5)}</text>` : "").join("")}
+  </svg></div>`;
+}
+const tile = (label, val, change, help) => `<div class="tile"><span class="tl">${label}</span><b>${val}</b>${change || ""}${help ? `<span class="th">${help}</span>` : ""}</div>`;
+function viewStats(all){
+  const byH = Object.fromEntries(all.map(p => [p.handle, p]));
+  const name = h => byH[h] ? byH[h].title : h, brandN = h => byH[h] ? BRANDS[brandOf(byH[h])] : "—", catN = h => byH[h] ? (SECTIONS[secOf(byH[h])] || {}).en || CATS[catOf(byH[h])] : "—";
+  const ranges = [["today","Today"],["7","Last 7 days"],["30","Last 30 days"],["90","Last 90 days"],["custom","Custom"]];
+  const head = `<div class="list-head"><div><h2>Analytics</h2><p>Private to you. Counts come only from real visits since tracking started; your own visits, bots and the store checks are not counted.</p></div><div class="owner-tools"><a class="btn quiet" href="#admin">Back to admin</a></div></div>`;
+  if (!adminKey()) return head + `<section class="panel"><div><h3>Admin key</h3><p class="why">Enter the private admin key once; it stays on this device only.</p></div>
+    <div class="fields"><label class="f">Admin key<input id="stKey" type="password" autocomplete="off" placeholder="ro-…"></label><div class="row"><button class="btn solid" id="stKeySave">Open dashboard</button></div></div></section>`;
+  const filt = `<div class="st-filters" role="group" aria-label="Date range">${ranges.map(([k, l]) => `<button class="chip" data-range="${k}" aria-pressed="${ST.range === k}">${l}</button>`).join("")}
+    ${ST.range === "custom" ? `<label>From <input type="date" id="stFrom" value="${esc(ST.from)}"></label><label>To <input type="date" id="stTo" value="${esc(ST.to)}"></label><button class="btn" id="stApply">Apply</button>` : ""}
+    <button class="linkish" id="stForget">Forget key on this device</button></div>`;
+  const nav = ["Overview","Traffic & Visitors","Visit Duration & Engagement","Popular Products","Product Ranking","Favorites Analytics","Brands & Categories","Customer Browsing Behavior","Recommendation Performance","Traffic Sources & Devices"];
+  const navHtml = `<nav class="st-nav">${nav.map((n, i) => `<a href="#stats" data-jump="st${i + 1}">${i + 1}. ${n}</a>`).join("")}</nav>`;
+  if (ST.err) return head + filt + `<p class="warnline" style="margin:16px 0">${esc(ST.err)}</p>`;
+  const D = ST.data;
+  if (!D) return head + filt + `<p class="small" style="margin:20px 0">${ST.loading ? "Loading statistics…" : "No statistics loaded yet."}</p>`;
+  const P0 = D.prev || {}, E = D.engagement || {}, days = Math.max(1, (D.daily || []).length);
+  const prods = (D.products || []).map(r => Object.assign({}, r, { p: byH[r.h] })).filter(r => (!ST.f.brand || (r.p && brandOf(r.p) === ST.f.brand)) && (!ST.f.cat || (r.p && secOf(r.p) === ST.f.cat)) && (!ST.f.q || name(r.h).toLowerCase().includes(ST.f.q.toLowerCase())));
+  const prodRow = (r, i, cols) => `<tr><td>${i + 1}</td><td class="pc">${r.p && r.p.image ? `<img src="${esc(img(r.p.image, 80))}" alt="">` : ""}<a href="#item-${esc(r.h)}">${esc(name(r.h))}</a></td><td>${esc(brandN(r.h))}</td><td>${esc(catN(r.h))}</td>${cols(r)}</tr>`;
+  const empty = '<p class="nodata">Not enough data yet</p>';
+  // engagement score (same signals as the public ranking): unique views, average time (smoothed), total time, favorites
+  const eng = r => Math.log1p(r.uniq) * 2 + Math.log1p(((r.totalMs || 0) + 45000) / ((r.views || 0) + 3) / 1000) * 2 + Math.log1p((r.totalMs || 0) / 60000) + Math.log1p(r.favs) * 2;
+  const agg = (keyFn) => { const m = {}; for (const r of D.products || []){ const k = keyFn(r.h); if (!k) continue; const o = m[k] || (m[k] = { v:0, t:0, f:0, top:null }); o.v += r.views; o.t += r.totalMs; o.f += r.favs; if (!o.top || r.views > o.top.views) o.top = r; } return m; };
+  const byBrand = agg(h => byH[h] && BRANDS[brandOf(byH[h])]), byCat = agg(h => byH[h] && (SECTIONS[secOf(byH[h])] || {}).en);
+  const favAll = (D.favTotals || []).map(r => ({ h: r.h, n: r.n }));
+  const favBrand = {}, favCat = {}; for (const r of favAll){ const p = byH[r.h]; if (!p) continue; const b = BRANDS[brandOf(p)], c = (SECTIONS[secOf(p)] || {}).en; favBrand[b] = (favBrand[b] || 0) + r.n; if (c) favCat[c] = (favCat[c] || 0) + r.n; }
+  const routeLabel = r => r === "home" ? "Home" : r === "item" ? "Product page" : parseSec(r) ? secTitle(parseSec(r)) : r === "favorites" ? "Favorites" : r === "popular" ? "Most favorited" : r === "recent" ? "Newly added" : r === "discounts" ? "Biggest discounts" : r === "all" ? "All products" : r;
+  const F = D.funnel || {}, R0 = D.recos || {}, ctr = o => o && o.impressions ? (100 * o.clicks / o.impressions).toFixed(1) + "%" : "—";
+  const brandOpts = Object.keys(BRANDS).filter(b => all.some(p => brandOf(p) === b));
+  return head + filt + navHtml + `
+  <section class="st" id="st1"><h3>1. Overview</h3><div class="tiles">
+    ${tile("Visitors", nfmt(D.visitors), chg(D.visitors, P0.visitors))}${tile("Visits (sessions)", nfmt(D.sessions), chg(D.sessions, P0.sessions))}
+    ${tile("Page views", nfmt(D.pageviews), chg(D.pageviews, P0.pageviews))}${tile("Product views", nfmt(D.productViews), chg(D.productViews, P0.productViews))}
+    ${tile("Favorites added", nfmt(D.favAdds), chg(D.favAdds, P0.favAdds))}${tile("Avg. engaged time", msFmt(E.avgEngagedMs), "", "per visit")}</div>
+    <p class="small">Changes compare with the period of the same length just before. Tracking started ${D.firstEventAt ? when(D.firstEventAt) : "— no visits recorded yet"}; nothing before that is shown.</p></section>
+  <section class="st" id="st2"><h3>2. Traffic & Visitors</h3><div class="tiles">
+    ${tile("Unique visitors", nfmt(D.visitors), chg(D.visitors, P0.visitors), "browsers, not people")}${tile("New visitors", nfmt(D.newVisitors), chg(D.newVisitors, P0.newVisitors))}
+    ${tile("Returning visitors", nfmt(Math.max(0, D.visitors - D.newVisitors)))}${tile("Average daily visitors", nfmt(Math.round(D.visitors / days)))}</div>
+    <h4>Visitors per day</h4>${lineChart(D.daily || [], "visitors", "Visitors")}
+    <details><summary>Table</summary><table class="compare"><thead><tr><th>Day</th><th>Visitors</th><th>Visits</th><th>Page views</th><th>Product views</th></tr></thead><tbody>${(D.daily || []).map(d => `<tr><td>${d.d}</td><td>${d.visitors}</td><td>${d.sessions}</td><td>${d.pageviews}</td><td>${d.productViews}</td></tr>`).join("")}</tbody></table></details></section>
+  <section class="st" id="st3"><h3>3. Visit Duration & Engagement</h3><div class="tiles">
+    ${tile("Avg. visit duration", msFmt(E.avgSessionMs), "", "first to last activity, or engaged time if longer")}${tile("Avg. engaged time", msFmt(E.avgEngagedMs), "", "time a product page was visible")}
+    ${tile("Pages per visit", E.avgPages || 0)}${tile("Avg. time on a product", msFmt(D.productAvgMs))}
+    ${tile("Engagement rate", (E.engagementRate || 0) + "%", "", "visits with 2+ pages, a product action, or 10s+ engaged")}${tile("Bounce rate", (E.bounceRate || 0) + "%", "", "visits with 1 page, no action and under 10s engaged")}
+    ${tile("Returning visits", (E.returningPct || 0) + "%")}</div></section>
+  <section class="st" id="st4"><h3>4. Popular Products</h3>
+    <div class="st-filters"><label>Brand <select id="stBrand"><option value="">All brands</option>${brandOpts.map(b => `<option value="${b}" ${ST.f.brand === b ? "selected" : ""}>${esc(BRANDS[b])}</option>`).join("")}</select></label>
+      <label>Category <select id="stCat"><option value="">All categories</option>${Object.entries(SECTIONS).map(([k, S0]) => `<option value="${k}" ${ST.f.cat === k ? "selected" : ""}>${S0.en}</option>`).join("")}</select></label>
+      <label>Product <input id="stQ" type="search" value="${esc(ST.f.q)}" placeholder="Name"></label></div>
+    ${prods.length ? `<div class="table-wrap"><table class="compare st-t"><thead><tr><th>#</th><th>Product</th><th>Brand</th><th>Category</th><th>Views</th><th>Unique</th><th>Avg. time</th><th>Total time</th><th>vs before</th></tr></thead><tbody>
+      ${prods.slice(0, 30).map((r, i) => prodRow(r, i, r => `<td>${r.views}</td><td>${r.uniq}</td><td>${msFmt(r.avgMs)}</td><td>${msFmt(r.totalMs)}</td><td>${chg(r.views, r.prevViews)}</td>`)).join("")}</tbody></table></div>` : empty}</section>
+  <section class="st" id="st5"><h3>5. Product Ranking — most engaging</h3><p class="small">Balanced score: unique views, average and total time spent, and favorites. A piece with fewer but longer visits can rank above one with many quick visits.</p>
+    ${prods.length ? `<div class="table-wrap"><table class="compare st-t"><thead><tr><th>#</th><th>Product</th><th>Brand</th><th>Category</th><th>Views</th><th>Avg. time</th><th>Total time</th><th>Favorites</th><th>Trend</th></tr></thead><tbody>
+      ${[...prods].sort((a, b) => eng(b) - eng(a)).slice(0, 30).map((r, i) => prodRow(r, i, r => `<td>${r.views}</td><td>${msFmt(r.avgMs)}</td><td>${msFmt(r.totalMs)}</td><td>${r.favs}</td><td>${chg(r.totalMs, r.prevTotalMs)}</td>`)).join("")}</tbody></table></div>` : empty}</section>
+  <section class="st" id="st6"><h3>6. Favorites Analytics</h3><p class="small">Private: customers never see these numbers.</p>
+    <h4>Added in this period</h4>${barList((D.products || []).filter(r => r.favs > 0).sort((a, b) => b.favs - a.favs).slice(0, 12).map(r => ({ label: name(r.h), v: r.favs, img: byH[r.h] && byH[r.h].image, tip: brandN(r.h) + " · " + catN(r.h) + " · before: " + r.prevFavs })))}
+    <h4>All-time favorites</h4>${barList(favAll.slice(0, 15).map(r => ({ label: name(r.h), v: r.n, img: byH[r.h] && byH[r.h].image, tip: brandN(r.h) + " · " + catN(r.h) })))}</section>
+  <section class="st" id="st7"><h3>7. Brands & Categories</h3><div class="two">
+    <div><h4>Most viewed brands</h4>${barList(Object.entries(byBrand).sort((a, b) => b[1].v - a[1].v).map(([k, o]) => ({ label: k, v: o.v, tip: "top: " + name(o.top.h) })))}</div>
+    <div><h4>Most viewed categories</h4>${barList(Object.entries(byCat).sort((a, b) => b[1].v - a[1].v).map(([k, o]) => ({ label: k, v: o.v, tip: "top: " + name(o.top.h) })))}</div>
+    <div><h4>Engaged time by brand</h4>${barList(Object.entries(byBrand).sort((a, b) => b[1].t - a[1].t).map(([k, o]) => ({ label: k, v: o.t })), { fmt: msFmt })}</div>
+    <div><h4>Engaged time by category</h4>${barList(Object.entries(byCat).sort((a, b) => b[1].t - a[1].t).map(([k, o]) => ({ label: k, v: o.t })), { fmt: msFmt })}</div>
+    <div><h4>Most favorited brands (all time)</h4>${barList(Object.entries(favBrand).sort((a, b) => b[1] - a[1]).map(([k, v]) => ({ label: k, v })))}</div>
+    <div><h4>Most favorited categories (all time)</h4>${barList(Object.entries(favCat).sort((a, b) => b[1] - a[1]).map(([k, v]) => ({ label: k, v })))}</div></div>
+    <h4>Most popular product in each brand</h4>${Object.keys(byBrand).length ? `<table class="compare"><tbody>${Object.entries(byBrand).sort((a, b) => b[1].v - a[1].v).map(([k, o]) => `<tr><td>${esc(k)}</td><td><a href="#item-${esc(o.top.h)}">${esc(name(o.top.h))}</a></td><td>${o.top.views} views</td></tr>`).join("")}</tbody></table>` : empty}</section>
+  <section class="st" id="st8"><h3>8. Customer Browsing Behavior</h3>
+    <h4>Journey: Home → Category → Brand → Product → Favorite / engaged</h4>${barList([["Visits", F.sessions], ["Saw the home page", F.home], ["Opened a category", F.category], ["Opened a brand", F.brand], ["Opened a product", F.product], ["Saved, clicked a recommendation or stayed 10s+", F.engaged]].map(([label, v]) => ({ label, v: v || 0, tip: F.sessions ? Math.round(100 * (v || 0) / F.sessions) + "% of visits" : "" })))}
+    <div class="two"><div><h4>Most visited pages</h4>${barList((D.routes || []).slice(0, 12).map(r => ({ label: routeLabel(r.r), v: r.n, tip: r.s + " visits" })))}</div>
+    <div><h4>Moves between pages</h4>${barList((D.transitions || []).slice(0, 12).map(r => ({ label: routeLabel(r.from) + " → " + routeLabel(r.to), v: r.n })))}</div>
+    <div><h4>Products opened from a category</h4>${barList((D.categoryToProduct || []).slice(0, 12).map(r => ({ label: routeLabel(r.from) + " → " + name(r.h), v: r.n })))}</div>
+    <div><h4>Most common searches</h4>${barList((D.searches || []).slice(0, 12).map(r => ({ label: r.q, v: r.n })))}</div>
+    <div><h4>Most used filters</h4>${barList((D.filters || []).slice(0, 12).map(r => ({ label: r.f, v: r.n })))}</div></div></section>
+  <section class="st" id="st9"><h3>9. Recommendation Performance</h3><div class="tiles">
+    ${tile("Complete the Look shown", nfmt(R0.look && R0.look.impressions))}${tile("Complete the Look clicks", nfmt(R0.look && R0.look.clicks), `<span class="chg">CTR ${ctr(R0.look)}</span>`)}
+    ${tile("You May Also Like shown", nfmt(R0.alike && R0.alike.impressions))}${tile("You May Also Like clicks", nfmt(R0.alike && R0.alike.clicks), `<span class="chg">CTR ${ctr(R0.alike)}</span>`)}</div>
+    <div class="two"><div><h4>Complete the Look clicks by item type</h4>${barList((D.recoSlots || []).filter(r => r.section === "look").map(r => ({ label: (SLOT_NAMES[r.slot] || r.slot).split(" · ")[0], v: r.n })))}</div>
+    <div><h4>You May Also Like clicks by position</h4>${barList((D.recoSlots || []).filter(r => r.section === "alike").sort((a, b) => Number(a.slot) - Number(b.slot)).map(r => ({ label: "Position " + r.slot, v: r.n })))}</div>
+    <div><h4>Best outfit combinations (viewed → clicked)</h4>${barList((D.recoTop || []).filter(r => r.section === "look").slice(0, 10).map(r => ({ label: name(r.from) + " → " + name(r.h), v: r.n })))}</div>
+    <div><h4>Most clicked similar products</h4>${barList((D.recoTop || []).filter(r => r.section === "alike").slice(0, 10).map(r => ({ label: name(r.h), v: r.n, tip: "from " + name(r.from) })))}</div></div></section>
+  <section class="st" id="st10"><h3>10. Traffic Sources & Devices</h3><div class="two">
+    <div><h4>Devices (visits)</h4>${barList(["mobile","tablet","desktop"].map(k => ({ label: k[0].toUpperCase() + k.slice(1), v: (D.devices || {})[k] || 0 })))}</div>
+    <div><h4>Where visits came from</h4>${barList([["google","Google search"],["direct","Direct / typed / app"],["social","Social media & WhatsApp"],["search","Other search engines"],["other","Other websites"]].map(([k, l]) => ({ label: l, v: (D.sources || {})[k] || 0 })))}</div>
+    <div><h4>Landing pages</h4>${barList((D.landing || []).slice(0, 10).map(r => ({ label: routeLabel(r.r), v: r.n })))}</div></div></section>`;
+}
+function wireStats(){
+  if ($("#stKeySave")) $("#stKeySave").onclick = () => { const k = $("#stKey").value.trim(); if (!k) return toast("Enter the admin key."); store.set("ro-admin-key", k); loadStats(); };
+  if ($("#stForget")) $("#stForget").onclick = () => { store.set("ro-admin-key", ""); ST.data = null; render(); };
+  document.querySelectorAll("[data-range]").forEach(b => b.onclick = () => { ST.range = b.dataset.range; if (ST.range !== "custom") loadStats(); else render(); });
+  if ($("#stApply")) $("#stApply").onclick = () => { ST.from = $("#stFrom").value; ST.to = $("#stTo").value; if (!ST.from || !ST.to || ST.from > ST.to) return toast("Choose a start date before the end date."); loadStats(); };
+  document.querySelectorAll("[data-jump]").forEach(a => a.onclick = e => { e.preventDefault(); const t = document.getElementById(a.dataset.jump); if (t) scrollTo(0, t.getBoundingClientRect().top + scrollY - 90); });
+  if ($("#stBrand")) $("#stBrand").onchange = e => { ST.f.brand = e.target.value; render(); };
+  if ($("#stCat")) $("#stCat").onchange = e => { ST.f.cat = e.target.value; render(); };
+  if ($("#stQ")) $("#stQ").oninput = e => { ST.f.q = e.target.value; const pos = e.target.selectionStart; render(); const n = $("#stQ"); n.focus(); n.setSelectionRange(pos, pos); };
+  if (adminKey() && !ST.data && !ST.loading && !ST.err) loadStats();
+}
+
 function viewAdmin(all){
   const m = DATA.meta, sizes = new Set(S.settings.sizes), cnt = m.counts || {}, sc = m.storeCounts || {};
   const log = (m.log || []).slice(0, 14).map(l => `<div><span>${when(l.at)}</span><span>+${l.added} new · −${l.removed} left · ${l.changed} changed${l.guides != null ? " · " + l.guides + " guides" : ""}</span></div>`).join("");
@@ -1266,7 +1485,7 @@ function viewAdmin(all){
   const hidden = Object.keys(S.del).length;
   const withGuide = all.filter(p => p.guide && p.guide.length).length;
   return `<div class="list-head"><div><h2>Admin & settings</h2><p>Changes save instantly on this device${GH.token && GH.sync ? " and are published to customers" : ". Customers see your edits once sync is on (Sync & publish below)"}.</p></div>
-    <div class="owner-tools"><button class="btn quiet" id="aCosts">${SHOWCOSTS ? "Hide my costs" : "Show my costs"}</button><button class="btn quiet" id="aLeave">View as a customer</button></div></div>
+    <div class="owner-tools"><button class="btn quiet" id="aCosts">${SHOWCOSTS ? "Hide my costs" : "Show my costs"}</button><button class="btn quiet" id="aLeave">View as a customer</button><a class="btn solid" href="#stats">Analytics dashboard</a></div></div>
 
   <section class="panel"><div><h3>Updates</h3><p class="why">GitHub checks the Spain store every 15 minutes: new sale items, prices, discounts, sizes, stock, photos and the exchange rate.</p></div>
     <div class="fields">
@@ -1388,11 +1607,12 @@ function textDialog(title, value, onOk, okLabel){
 /* ---------- favorites with size ---------- */
 function setFav(h, val){
   const was = S.fav[h] != null;
+  if (was !== (val != null)) track(val ? "fav" : "unfav", { handle: h });
   if (val) S.fav[h] = val; else delete S.fav[h];
   if (was !== (val != null)){
     shareFav(h, !!val).then(ok => { if (!ok) return; let done = []; try { done = JSON.parse(store.get("sp-fav-shared") || "[]"); } catch {}
       done = val ? [...new Set([...done, h])] : done.filter(x => x !== h); store.set("sp-fav-shared", JSON.stringify(done));
-      return loadTotals(); }).then(() => { const r = routeOf(); if (r === "popular" || r === "home") render(); else counts(products()); });
+      return SCORES ? loadScores() : loadTotals(); }).then(() => { const r = routeOf(); if (r === "popular" || r === "home") render(); else counts(products()); });
   }
   save(); const on = S.fav[h] != null;
   document.querySelectorAll(`.heart[data-fav="${CSS.escape(h)}"]`).forEach(b => { b.setAttribute("aria-pressed", on); b.setAttribute("aria-label", (on ? "Change size or remove from" : "Save to") + " favorites"); });
@@ -1448,8 +1668,10 @@ function routeOf(){
   if (r.startsWith("dress-")) r = "item-" + r.slice(6);
   return LEGACY[r] || r;
 }
+let lastTracked = null;
 function render(){
   const route = routeOf();
+  if (loaded && route !== lastTracked && route !== "admin" && route !== "stats"){ lastTracked = route; trackRoute(route); }
   let navRoute = parseSec(route) ? parseSec(route).sec : route;
   if (route.startsWith("item-")){ const it = products().find(x => x.handle === route.slice(5)); if (it) navRoute = secOf(it); }
   document.querySelectorAll("nav.tabs a").forEach(a => { if (a.getAttribute("href") === "#" + navRoute) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
@@ -1459,28 +1681,29 @@ function render(){
   const list = products(); counts(list);
   const v = $("#view");
   if (!loaded){ v.innerHTML = '<div class="empty"><h3>Loading the collection</h3><p>One moment.</p></div>'; return; }
-  if (route === "admin" && !OWNER){ $("#gate").classList.remove("hidden"); setTimeout(() => $("#pass").focus(), 50); v.innerHTML = ""; return; }
+  if ((route === "admin" || route === "stats") && !OWNER){ $("#gate").classList.remove("hidden"); setTimeout(() => $("#pass").focus(), 50); v.innerHTML = ""; return; }
   $("#gate").classList.add("hidden");
   if (route.startsWith("item-") && $("#slides")) window._galleryAt = Math.round($("#slides").scrollLeft / $("#slides").clientWidth);
   v.innerHTML = route.startsWith("item-") ? viewItem(list, route.slice(5)) : LISTS.includes(route) || parseSec(route) ? viewList(route, list)
-    : route === "favorites" ? viewFav(list) : route === "admin" ? viewAdmin(list) : route === "vs" ? viewVS() : viewHome(list);
+    : route === "favorites" ? viewFav(list) : route === "admin" ? viewAdmin(list) : route === "stats" ? viewStats(list) : route === "vs" ? viewVS() : viewHome(list);
   document.documentElement.style.setProperty("--hh", $("#top").offsetHeight + "px");
   if (LISTS.includes(route) || parseSec(route)) wireList(route);
   seo(route, list);
   if (route.startsWith("item-")) wireItem();
   if (route === "admin") wireAdmin(list);
+  if (route === "stats") wireStats(list);
   warnSizes();
 }
 function wireList(route){
   const u = ui(route);
-  const q = $("#q"); q.oninput = () => { u.q = q.value; u.limit = 48; const pos = q.selectionStart; render(); const n = $("#q"); n.focus(); n.setSelectionRange(pos, pos); };
-  $("#f-sort").onchange = e => { u.sort = e.target.value; u.limit = 48; render(); };
-  $("#f-color").onchange = e => { u.color = e.target.value; u.limit = 48; render(); };
+  const q = $("#q"); q.oninput = () => { u.q = q.value; trackSearch(q.value); u.limit = 48; const pos = q.selectionStart; render(); const n = $("#q"); n.focus(); n.setSelectionRange(pos, pos); };
+  $("#f-sort").onchange = e => { u.sort = e.target.value; trackFilter("sort", e.target.value); u.limit = 48; render(); };
+  $("#f-color").onchange = e => { u.color = e.target.value; trackFilter("color", e.target.value || "all"); u.limit = 48; render(); };
   const applyPrice = () => {
     const a = $("#pmin").value.trim(), b = $("#pmax").value.trim();
     if ((a !== "" && !(Number(a) >= 0)) || (b !== "" && !(Number(b) >= 0))) return $("#fErr").textContent = "أدخلي أرقاماً صحيحة بالريال.";
     if (a !== "" && b !== "" && Number(a) > Number(b)) return $("#fErr").textContent = "أقل سعر يجب أن يكون أقل من أعلى سعر.";
-    u.pmin = a; u.pmax = b; u.limit = 48; render();
+    u.pmin = a; u.pmax = b; u.limit = 48; trackFilter("price", (a || "0") + "–" + (b || "∞")); render();
   };
   $("#pApply").onclick = applyPrice;
   ["#pmin","#pmax"].forEach(id => $(id).onkeydown = e => { if (e.key === "Enter") applyPrice(); });
@@ -1514,6 +1737,11 @@ function wireAdmin(list){
 }
 
 document.addEventListener("click", e => {
+  const rl = e.target.closest("a[data-rec]");
+  if (rl) track("rec_click", { handle: rl.dataset.h, meta: { section: "look", slot: rl.dataset.slot, from: rl.dataset.from } });
+  const rg = e.target.closest("[data-rec-grid] article.card a");
+  if (rg){ const g = rg.closest("[data-rec-grid]"), cardEl = rg.closest("article.card"), pos = [...g.children].indexOf(cardEl) + 1, hh = (rg.getAttribute("href") || "").replace("#item-", "");
+    if (hh) track("rec_click", { handle: hh, meta: { section: "alike", pos: String(pos), from: g.dataset.from } }); }
   const uf = e.target.closest("[data-unfav]"); if (uf){ setFav(uf.dataset.unfav, null); return; }
   const f = e.target.closest("[data-fav]");
   if (f){ const h = f.dataset.fav, p = products().find(x => x.handle === h); if (!p) return;
@@ -1539,7 +1767,7 @@ document.addEventListener("visibilitychange", () => { if (!document.hidden && lo
 /* ---------- gate + start ---------- */
 async function sha(t){ const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(t)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2,"0")).join(""); }
 $("#gateForm").onsubmit = async e => { e.preventDefault(); const h = await sha($("#pass").value); if (h === PASS_HASH){ store.set("sp-unlock", h); OWNER = true; $("#pass").value = ""; await loadData(false); } else { $("#gateErr").textContent = "That passcode doesn't match. Try again."; } };
-render(); loadData(false).then(shareExistingFavs); schedulePoll(); window._lastLoad = Date.now();
+render(); loadData(false).then(shareExistingFavs); schedulePoll(); window._lastLoad = Date.now(); consentBar();
 fetch(BASE + "version.txt?t=" + Date.now(), { cache:"no-store" }).then(r => r.ok ? r.text() : "").then(v => {
   v = v.trim();
   if (v && v !== APP_VERSION && new URLSearchParams(location.search).get("v") !== v) location.replace(location.pathname + "?v=" + v + location.hash);
