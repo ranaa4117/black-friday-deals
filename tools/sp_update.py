@@ -630,6 +630,40 @@ def refresh_product(p, bf_handles):
     return n
 
 
+def _state(p):
+    return {"price": p.get("price"), "compare": p.get("compare"), "extraPct": p.get("extraPct") or 0,
+            "listed": p.get("listed", True), "status": p.get("status", "ok")}
+
+
+def change_item(n, msgs, o=None):
+    item = {"h": n["handle"], "t": n.get("title", ""), "b": n.get("brand", "sp"), "m": msgs, "n": _state(n)}
+    if o:
+        item["o"] = _state(o)
+    return item
+
+
+CHANGES = os.path.join(os.path.dirname(__file__), "..", "self-portrait", "changes.json")
+
+
+def save_changes(ts, items, keep_items=800):
+    """Admin page history: each update that changed something, with every product that changed in it."""
+    if not items:
+        return
+    try:
+        with open(CHANGES, encoding="utf-8") as f:
+            runs = json.load(f).get("runs", [])
+    except Exception:  # noqa: BLE001
+        runs = []
+    runs.insert(0, {"at": ts, "src": "auto", "items": items[:200]})
+    out, total = [], 0
+    for r in runs:
+        if total >= keep_items:
+            break
+        out.append(r)
+        total += len(r.get("items", []))
+    _dump(CHANGES, {"runs": out})
+
+
 def size_msgs(old, new):
     o = {x["s"]: x["a"] for x in old}
     return [f"{x['s']} {'back in stock' if x['a'] else 'sold out'}" for x in new if x["s"] in o and o[x["s"]] != x["a"]]
@@ -854,6 +888,7 @@ def main():
     baseline = {g for g in groups if not any(grp(p) == g for p in old.values())}
     added, changed = [], []
     known_before = {r.get("handle") for r in prev.get("removed", [])} | set(meta.get("everSeen", []))
+    run_items = []   # what changed in this update, product by product (shown on the Admin page)
     for h, n in fresh.items():
         o = old.get(h)
         if grp(n) in ok_cats:
@@ -868,6 +903,7 @@ def main():
             else:
                 n.update(firstSeen=ts, lastChanged=ts, changes=["Newly discovered on sale"])
                 added.append(h)
+                run_items.append(change_item(n, ["Newly discovered on sale"]))
             continue
         n["firstSeen"] = o.get("firstSeen", ts)
         if n.get("brand") == "md" and MD_PROMOS and (o.get("extraPct") or o.get("extra25")) and not n.get("extraPct"):
@@ -894,6 +930,7 @@ def main():
         if msgs:
             n.update(lastChanged=ts, changes=msgs)
             changed.append(h)
+            run_items.append(change_item(n, msgs, o))
         else:
             n.update(lastChanged=o.get("lastChanged", ts), changes=o.get("changes", []))
 
@@ -915,6 +952,10 @@ def main():
     log = meta.get("log", [])
     log.insert(0, {"at": ts, "added": len(added), "removed": len(gone), "changed": len(changed), "guides": guides})
     meta["log"] = log[:40]
+    try:
+        save_changes(ts, run_items)
+    except Exception as e:  # noqa: BLE001
+        print("changes log failed:", e)
     write({"meta": meta, "products": products, "removed": removed})
     try:
         write_sitemap(products)

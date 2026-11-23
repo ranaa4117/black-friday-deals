@@ -368,6 +368,7 @@ nav.tabs .dot{display:inline-block;width:6px;height:6px;border-radius:50%;backgr
 .two{display:grid;grid-template-columns:1fr 1fr;gap:4px 32px}@media (max-width:760px){ .two{grid-template-columns:1fr} .bar{grid-template-columns:minmax(90px,42%) 1fr auto} }
 .st-t td.pc{display:flex;gap:8px;align-items:center;min-width:220px}.st-t td.pc img{width:30px;height:40px;object-fit:cover}
 .nodata{color:var(--stone);font-size:13px;margin:6px 0}
+.cgchips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}.cgchip{border:1px solid #ccc;background:#fff;border-radius:16px;padding:4px 10px;font:inherit;font-size:12px;cursor:pointer}.cgchip.on{background:#111;color:#fff;border-color:#111}.chgrun{border-top:1px solid #eee;padding:8px 0}.chgrun summary{cursor:pointer;font-size:13px}.chg{margin:8px 0 0;font-size:13px}.chg a{color:inherit;font-weight:600}.chg ul{margin:2px 0 0 18px;padding:0}.fixtag{white-space:nowrap;font-size:11px;padding:1px 7px;border-radius:10px;background:#e3f1e8;color:#1e7a46}.fixtag.bad{background:#fbe5e5;color:var(--red)}.audit p{margin:4px 0 0}
 .audit{border-left:3px solid #1e7a46;padding:6px 10px;margin:0 0 10px;font-size:13px}.audit.bad{border-color:var(--red)}.audit ul{margin:4px 0 0 18px;padding:0}
 .adm{font-family:"Tajawal",var(--sans)}.adm .panel h3{font-family:"Tajawal",var(--sans);font-weight:500;font-size:19px}.adm h4{font:500 14px "Tajawal",var(--sans);margin:14px 0 4px}
 .kvs{display:flex;flex-direction:column;border-top:1px solid var(--rule);margin:6px 0 12px}.kv{display:grid;grid-template-columns:1fr auto auto;gap:12px;align-items:center;padding:9px 0;border-bottom:1px solid var(--rule);font-size:14px}.kv b{font:400 20px var(--serif);min-width:48px;text-align:left}.muted{color:var(--stone);font-size:12.5px}
@@ -541,7 +542,7 @@ const PASS_HASH = "d6f7961e955b42afb04e910ef174ce7b82af4efe180a05605bc68aee28cad
 const REPO = "ranaa4117/black-friday-deals";
 const WORKFLOW = "self-portrait-update.yml";
 const LS = "sp-edit-v1";
-const APP_VERSION = "28";
+const APP_VERSION = "29";
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
@@ -1540,6 +1541,12 @@ function viewAdmin(all){
   <section class="panel"><div><h3>فحص الماركات</h3><p class="why">أربع مرات يومياً تتم مقارنة كل ماركة بموقعها الرسمي: منتجات ناقصة، أسعار، خصومات إضافية، ومخزون. أي مشكلة تُصلَّح وتظهر هنا.</p></div>
     <div class="fields" id="auditBox"><p class="small">جارٍ التحميل…</p></div></section>
 
+  <section class="panel"><div><h3>المشاكل وكيف حُلّت</h3><p class="why">كل مشكلة واجهت الموقع بكلام بسيط: ماذا حدث، وكيف تم حلّها.</p></div>
+    <div class="fields" id="fixBox"><p class="small">جارٍ التحميل…</p></div></section>
+
+  <section class="panel"><div><h3>ماذا تغيّر في كل تحديث</h3><p class="why">المنتجات التي تغيّر سعرها، أو انتهى خصمها، أو خرجت من التخفيضات أو رجعت لها. لا يُحذف أي منتج: إذا انتهى خصمه يبقى في الموقع بسعره الأصلي + المبلغ الذي تضيفينه.</p></div>
+    <div class="fields" id="chgBox"><p class="small">جارٍ التحميل…</p></div></section>
+
   <section class="panel"><div><h3>الأسعار</h3><p class="why">السعر النهائي للعميلة = سعر المتجر بعد الخصم × سعر الصرف + المبلغ الذي تضيفينه. غيّري المبلغ المضاف لأي ماركة وسيتحدث كل شيء فوراً.</p></div>
     <div class="fields prices">
       ${priceRow("sExtra", "Self-Portrait — فساتين", "اليورو × سعر الصرف، بعد أي خصم إضافي من المتجر", extra())}
@@ -1762,7 +1769,66 @@ function wireList(route){
   if ($("#more")) $("#more").onclick = () => { u.limit += 48; const y = scrollY; render(); scrollTo(0, y); };
 }
 
+const CHG_KIND = { ended:"انتهى الخصم", extraEnd:"انتهى الخصم الإضافي", left:"خرج من التخفيضات", price:"تغيّر السعر", fresh:"جديد", back:"رجع للتخفيض", gone:"لم يعد يُباع", stock:"المقاسات" };
+function chgText(it, p){
+  const out = [], kinds = new Set(), o = it.o, n = it.n || {}, m = it.m || [];
+  const add = (k, t) => { kinds.add(k); out.push(t); };
+  if (m.some(x => /Newly discovered/.test(x))) add("fresh", "دخل التخفيضات لأول مرة");
+  if (m.some(x => /^Restored/.test(x))) add("back", "أُعيد للموقع (لا يُحذف أي منتج)");
+  if (o){
+    if (o.compare > o.price && !(n.compare > n.price)) add("ended", "انتهى خصم المتجر — يظهر الآن بسعره الأصلي + إضافتك");
+    if (!(o.compare > o.price) && n.compare > n.price) add("back", "رجع عليه خصم في المتجر");
+    if (o.extraPct && !n.extraPct) add("extraEnd", "انتهى الخصم الإضافي " + o.extraPct + "%");
+    if (!o.extraPct && n.extraPct) add("back", "صار عليه خصم إضافي " + n.extraPct + "%");
+    if (o.listed !== false && n.listed === false) add("left", "خرج من قائمة تخفيضات المتجر — لم يُحذف، باقٍ في موقعك بسعره الحالي من المتجر + إضافتك");
+    if (o.listed === false && n.listed !== false) add("back", "رجع لقائمة تخفيضات المتجر");
+    if (o.status !== "discontinued" && n.status === "discontinued") add("gone", "لم يعد المتجر يبيعه — يظهر «غير متوفر» ولم يُحذف");
+    if (o.status === "discontinued" && n.status !== "discontinued") add("back", "صار متوفراً من جديد");
+    if (o.status !== "unavailable" && n.status === "unavailable") add("gone", "غير متوفر في المتجر حالياً — لم يُحذف");
+    if (p){
+      const sx = s => finalSAR(Object.assign({}, p, s, { extra25: s.extraPct === 25, promo: s.extraPct ? p.promo : null }));
+      const a = sx(o), b = sx(n);
+      if (a !== b) add("price", "السعر للعميلة: من " + arN(a) + " إلى " + arN(b) + " ر.س" + (b < a ? " (أرخص)" : " (أغلى)"));
+    }
+  } else {
+    m.forEach(x => {
+      let r;
+      if ((r = x.match(/^Sale price (\S+) → (\S+)/))) add("price", "سعر المتجر بعد الخصم: من " + r[1] + " إلى " + r[2]);
+      else if ((r = x.match(/^Original price (\S+) → (\S+)/))) add("price", "السعر الأصلي في المتجر: من " + r[1] + " إلى " + r[2]);
+      else if (/Left the store/.test(x)) add("left", "خرج من قائمة تخفيضات المتجر — لم يُحذف");
+      else if (/Back in the sale/.test(x)) add("back", "رجع لقائمة التخفيضات");
+      else if (/No longer sold/.test(x)) add("gone", "لم يعد المتجر يبيعه — يظهر «غير متوفر» ولم يُحذف");
+      else if (/Available again/.test(x)) add("back", "صار متوفراً من جديد");
+      else if (/Extra 25% in cart no longer/.test(x)) add("extraEnd", "انتهى الخصم الإضافي 25%");
+      else if (/Extra 25% in cart now/.test(x)) add("back", "صار عليه خصم إضافي 25%");
+    });
+  }
+  const soldOut = m.filter(x => / sold out$/.test(x)).map(x => x.replace(/ sold out$/, "")), backIn = m.filter(x => / back in stock$/.test(x)).map(x => x.replace(/ back in stock$/, ""));
+  if (soldOut.length) add("stock", "مقاسات نفدت: " + soldOut.join("، "));
+  if (backIn.length) add("stock", "مقاسات رجعت: " + backIn.join("، "));
+  if (m.includes("Image updated")) out.push("تحدّثت صورة المنتج");
+  return { lines: out, kinds };
+}
+const CHG = { runs: null, f: "all", open: 0 };
+function drawChanges(){
+  const box = $("#chgBox"); if (!box) return;
+  if (!CHG.runs) { box.innerHTML = '<p class="small">جارٍ التحميل…</p>'; return; }
+  const byH = new Map(products().map(p => [p.handle, p]));
+  const runs = CHG.runs.map(r => ({ at: r.at, src: r.src, items: (r.items || []).map(it => Object.assign({ x: chgText(it, byH.get(it.h)) }, it)) }));
+  const tally = {}; runs.forEach(r => r.items.forEach(it => it.x.kinds.forEach(k => tally[k] = (tally[k] || 0) + 1)));
+  const chips = `<div class="cgchips">${[["all", "الكل"]].concat(Object.keys(CHG_KIND).filter(k => tally[k]).map(k => [k, CHG_KIND[k] + " (" + arN(tally[k]) + ")"])).map(([k, l]) => `<button class="cgchip${CHG.f === k ? " on" : ""}" data-chg="${k}">${l}</button>`).join("")}</div>`;
+  const shown = runs.map(r => Object.assign({}, r, { items: r.items.filter(it => it.x.lines.length && (CHG.f === "all" || it.x.kinds.has(CHG.f))) })).filter(r => r.items.length).slice(0, 20);
+  box.innerHTML = chips + (shown.length ? shown.map((r, i) => `<details class="chgrun"${i === 0 ? " open" : ""}><summary><b><bdi dir="ltr">${when(r.at)}</bdi></b> · ${r.src === "macys" ? "Macy's · " : ""}${arN(r.items.length)} منتج تغيّر</summary>${r.items.slice(0, 60).map(it => `<div class="chg"><a href="#item-${encodeURIComponent(it.h)}" dir="auto">${esc(it.t || it.h)}</a> <span class="muted" dir="auto">${esc(BRANDS[it.b] || it.b || "")}</span><ul>${it.x.lines.map(t => `<li>${esc(t)}</li>`).join("")}</ul></div>`).join("")}${r.items.length > 60 ? `<p class="small">و${arN(r.items.length - 60)} منتجات أخرى.</p>` : ""}</details>`).join("") : '<p class="small">لا توجد تغييرات من هذا النوع بعد.</p>');
+  box.querySelectorAll("[data-chg]").forEach(b => b.onclick = () => { CHG.f = b.dataset.chg; drawChanges(); });
+}
+function drawFixes(list){
+  const box = $("#fixBox"); if (!box) return;
+  const st = { solved:["تم الحل", "ok"], watching:["تم الحل — تحت المراقبة", "ok"], open:["لم يُحل بعد", "bad"] };
+  box.innerHTML = list.length ? list.slice(0, 30).map(x => { const s = st[x.status] || st.solved; return `<div class="audit ${s[1]}"><b>${esc(x.title)}</b> <span class="fixtag ${s[1]}">${s[0]}</span><span class="small muted"> · <bdi dir="ltr">${when(x.at)}</bdi></span><p class="small"><b>ماذا حدث:</b> ${esc(x.what)}</p><p class="small"><b>كيف حُلّت:</b> ${esc(x.fix)}</p></div>`; }).join("") : '<p class="small">لا توجد مشاكل مسجّلة.</p>';
+}
 function wireAdmin(list){
+  fetch(BASE + "fixes.json?t=" + Date.now(), { cache:"no-store" }).then(r => r.ok ? r.json() : { fixes: [] }).catch(() => ({ fixes: [] })).then(a => drawFixes(a.fixes || []));
+  fetch(BASE + "changes.json?t=" + Date.now(), { cache:"no-store" }).then(r => r.ok ? r.json() : { runs: [] }).catch(() => ({ runs: [] })).then(a => { CHG.runs = a.runs || []; drawChanges(); });
   fetch(BASE + "audit.json?t=" + Date.now(), { cache:"no-store" }).then(r => r.ok ? r.json() : { audits: [] }).catch(() => ({ audits: [] })).then(a => {
     const box = $("#auditBox"); if (!box) return;
     const list = (a.audits || []).slice(0, 8);

@@ -106,7 +106,7 @@ jobs:
         run: |
           git config user.name "self-portrait-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add self-portrait/data.json self-portrait/more.json self-portrait/full.json self-portrait/sitemap.xml self-portrait/audit.json
+          touch self-portrait/changes.json; git add self-portrait/data.json self-portrait/more.json self-portrait/full.json self-portrait/sitemap.xml self-portrait/audit.json self-portrait/changes.json
           if git diff --cached --quiet; then echo "No changes"; exit 0; fi
           git commit -m "Self-Portrait sale check $(date -u +%Y-%m-%dT%H:%MZ)"
           for i in 1 2 3; do git pull --rebase -X theirs origin main && git push && exit 0; sleep 5; done
