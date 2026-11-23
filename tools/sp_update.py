@@ -638,18 +638,24 @@ def url_of(p):
     return p.get("url") or (f"{STORE}/products/{p['handle']}" if p.get("brand", "sp") == "sp" else "")
 
 
-def page_gone(p):
-    """Second, independent confirmation: the product's own official web page answers "not found" (404/410)."""
+def page_state(p):
+    """The product's own official web page: "gone" (answers not found 404/410), "exists" (the page is there —
+    e.g. sold out, or hidden from the store's data feed), or "unknown" (could not be read)."""
     u = url_of(p)
     if not u:
-        return False
+        return "unknown"
     try:
-        fetch(u + ("&" if "?" in u else "?") + "_rc=%d" % time.time(), accept="text/html")
-        return False
+        h = fetch(u + ("&" if "?" in u else "?") + "_rc=%d" % time.time(), accept="text/html")
     except urllib.error.HTTPError as e:
-        return e.code in (404, 410)
+        return "gone" if e.code in (404, 410) else "unknown"
     except Exception:  # noqa: BLE001
-        return False
+        return "unknown"
+    words = [w for w in re.findall(r"[a-z]{4,}", (p.get("title") or "").lower())][:4]
+    return "exists" if words and sum(w in h.lower() for w in words) >= max(1, len(words) - 1) else "unknown"
+
+
+def page_gone(p):
+    return page_state(p) == "gone"
 
 
 class Gone(Exception):
@@ -990,9 +996,23 @@ def main():
                     time.sleep(0.6)
                     continue
             except Gone:
+                state = page_state(p)
+                if state == "exists":
+                    # the official page is still there (sold out / hidden from the data feed): never removed, never "gone"
+                    fresh[h] = dict(p, listed=False, status="unavailable", pageCheckedAt=ts,
+                                    sizes=[dict(x, a=False) for x in p.get("sizes", [])])
+                    fresh[h].pop("goneChecks", None)
+                    print("  data feed says not found but the official page exists — kept as unavailable:", h)
+                    continue
+                if state == "unknown":
+                    print("  not found in the data feed; page could not be read — kept, will retry:", h)
+                    vf = meta.setdefault("verifyFail", {})
+                    vf.setdefault(h, {"t": p.get("title", h), "b": p.get("brand", "sp"), "since": ts})["last"] = ts
+                    fresh[h] = dict(old.get(h, p), listed=False)
+                    continue
                 retired += 1
                 checks = [t for t in p.get("goneChecks", []) if t] + [ts]
-                if removal_confirmed(checks) and page_gone(p):
+                if removal_confirmed(checks):
                     # removed from the official store: confirmed on its product page several times over a day
                     deleted.append(dict(p, goneChecks=checks))
                     print("  permanently removed by the store — deleted:", h, url_of(p))

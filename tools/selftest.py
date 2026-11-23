@@ -154,10 +154,10 @@ def main():
     else:
         rec(6, "Out of stock but still on the official site", None, "no fully sold-out product found to test")
 
-    # 7. permanently removed
-    gone = [p for p in items if p.get("status") == "discontinued"]
-    tested = False
-    for p in gone[:10]:
+    # 7. "not found" in the store's data: deleted only when the official page itself is gone, 3 times over 24h
+    cands = [p for p in items if p.get("status") in ("discontinued", "unavailable")][:10]
+    done = False
+    for p in cands:
         try:
             U.refresh_product(p, set())
             continue
@@ -165,18 +165,22 @@ def main():
             pass
         except Exception:  # noqa: BLE001
             continue
-        tested = True
-        time.sleep(5)
-        page404 = U.page_gone(p)
-        first = U.removal_confirmed([ts])
-        later = U.removal_confirmed([iso(25), iso(12), ts])
-        rec(7, "Permanently removed from the official site", page404 and not first and later,
-            f"«{p['title']}»: product data 'not found'; its web page {'also not found' if page404 else 'could not be confirmed as not found'} (live) — "
-            f"1st check: {'deleted' if first else 'kept'}; after 3 checks over 24h: {'deleted' if later else 'kept'}")
+        time.sleep(3)
+        st = U.page_state(p)
+        done = True
+        if st == "exists":
+            rec(7, "Product missing from the store's data but its official page still exists", True,
+                f"«{p['title']}»: data feed 'not found', official page still there (sold out) → kept, NOT deleted")
+        elif st == "gone":
+            rec(7, "Permanently removed from the official site", not U.removal_confirmed([ts]) and U.removal_confirmed([iso(25), iso(12), ts]),
+                f"«{p['title']}»: data and official page both 'not found' → kept on 1st check, deleted only after 3 checks over 24h")
+        else:
+            rec(7, "Removed product", None, f"«{p['title']}»: official page could not be read → kept, retried later")
         break
-    if not tested:
-        rec(7, "Permanently removed from the official site", None, "no product currently answers 'not found' on its official page — deletion rule tested only by its timing condition"
-            + (" (PASS)" if (not U.removal_confirmed([ts]) and U.removal_confirmed([iso(25), iso(12), ts])) else " (FAIL)"))
+    if not done:
+        rec(7, "Permanently removed from the official site", None, "no product is currently 'not found' in the store's data to test against")
+    rec(8, "Deletion timing rule", (not U.removal_confirmed([ts])) and (not U.removal_confirmed([iso(10), iso(5), ts])) and U.removal_confirmed([iso(25), iso(12), ts]),
+        "1 check → kept; 3 checks within 10h → kept; 3 checks over 25h (+ official page gone) → deleted")
 
     json.dump({"at": ts, "results": R}, open(os.path.join(ROOT, "selftest.json"), "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 

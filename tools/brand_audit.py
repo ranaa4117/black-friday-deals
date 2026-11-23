@@ -218,6 +218,9 @@ def main():
             live, err = read_live(p)
         except U.Gone:
             checked += 1
+            if U.page_state(p) == "exists":   # page still there (sold out / hidden from the data feed): not removed
+                F.resolve(key, "صفحة القطعة الأصلية موجودة (نفدت أو مخفية)، فبقيت في الموقع كـ«غير متوفرة». تم التحقق.")
+                continue
             if p.get("status") == "discontinued":
                 F.resolve(key, "المتجر الأصلي لم يعد يبيعها، وتظهر «غير متوفرة» في الموقع ولم تُحذف. تم التحقق.")
             else:
