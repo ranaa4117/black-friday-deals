@@ -774,6 +774,8 @@ def main():
                 n = refresh_product(p, bf_set)
                 if n:
                     n.update(listed=False, status="ok", pageCheckedAt=ts)
+                    if h not in old:   # restored after an older version removed it: not new to the sale
+                        n.update(firstSeen=p.get("firstSeen") or meta.get("initialImport", ts), restored=True)
                     fresh[h] = n
                     refreshed += 1
                     time.sleep(0.6)
@@ -798,6 +800,9 @@ def main():
         if grp(n) in ok_cats:
             n["verifiedAt"] = ts
         if not o:
+            if n.pop("restored", False):
+                n.update(lastChanged=ts, changes=["Restored (kept permanently)"])
+                continue
             if grp(n) in baseline:  # first time this category is tracked: starting stock, not "new"
                 base = meta.get("initialImport", ts)
                 n.update(firstSeen=base, lastChanged=ts, changes=[])
