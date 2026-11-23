@@ -807,7 +807,7 @@ def main():
                 fresh[h] = n
                 refreshed += 1
                 continue
-        due = age_s(p.get("pageCheckedAt", "")) > 3 * 3600
+        due = age_s(p.get("pageCheckedAt", "")) > 3 * 3600 or os.environ.get("RECHECK_ALL") == "1"
         if due and budget > 0 and grp(dict(p, cat=p.get("cat", "midi"))) in ok_cats:
             budget -= 1
             try:
