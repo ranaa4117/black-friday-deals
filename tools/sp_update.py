@@ -49,10 +49,25 @@ def age_s(iso):
         return 1e12
 
 
-def fetch(url, accept="application/json"):
-    req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": accept})
-    with urllib.request.urlopen(req, timeout=45) as r:
-        return r.read().decode("utf-8", "replace")
+def fetch(url, accept="application/json", tries=4):
+    """Read an official page. Busy / rate-limited / temporary server errors are retried with a pause;
+    a real answer such as 404 is returned to the caller at once."""
+    for i in range(tries):
+        req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": accept})
+        try:
+            with urllib.request.urlopen(req, timeout=45) as r:
+                return r.read().decode("utf-8", "replace")
+        except urllib.error.HTTPError as e:
+            if e.code in (429, 500, 502, 503, 504) and i < tries - 1:
+                wait = int(e.headers.get("Retry-After") or 0) if e.headers else 0
+                time.sleep(min(max(wait, 5 * (i + 1) ** 2), 60))
+                continue
+            raise
+        except (urllib.error.URLError, TimeoutError, ConnectionError):
+            if i < tries - 1 and "invalid" not in url:
+                time.sleep(5 * (i + 1))
+                continue
+            raise
 
 
 def get_json(url):

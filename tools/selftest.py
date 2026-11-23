@@ -50,10 +50,16 @@ def main():
         f"official price ${n['price']:g}, label on its page: {'Extra 25% Off' if shows else 'none'}, system status: {n['promoStatus']}, extra {n['extraPct']}%")
 
     # 2. every Mac Duggal dress whose extra % was marked as ended
-    ended = [p for p in items if p.get("brand") == "md" and not p.get("extraPct") and any("no longer applies" in c for c in p.get("changes", []))]
+    log = json.load(open(os.path.join(ROOT, "changes.json"), encoding="utf-8")).get("runs", [])
+    marked = []
+    for r in log:   # every dress the update history shows as "extra ended", newest first
+        for it in r.get("items", []):
+            if any("no longer applies" in m for m in it.get("m", [])) and it["h"] not in marked:
+                marked.append(it["h"])
+    ended = [by[h] for h in marked if h in by]
     act = chk = exp = err = 0
     wrong = []
-    for p in ended[:80]:
+    for p in ended[:40]:
         try:
             _, n2 = live_md(p["handle"])
         except Exception:  # noqa: BLE001
@@ -65,14 +71,15 @@ def main():
             chk += 1; wrong.append(p["title"])
         else:
             exp += 1
-        time.sleep(0.5)
+        time.sleep(1.5)
     rec(2, f"Mac Duggal dresses previously marked 'extra ended' ({len(ended)})", True if ended else None,
-        f"re-read {act + chk + exp}: label still shown on {act} (+{chk} checkout-verify) → these get their 25% back automatically; truly no label on {exp}; unreadable {err}"
+        f"re-read the {act + chk + exp} most recent: label still shown on {act} (+{chk} checkout-verify) → these get their 25% back automatically; truly no label on {exp}; unreadable {err}"
         + (f"; e.g. {', '.join(wrong[:4])}" if wrong else ""))
 
     # 3. a genuinely expired discount: label really gone from the product page
     none_live = None
-    for p in [x for x in items if x.get("brand") == "md"][:200]:
+    for p in [x for x in items if x.get("brand") == "md" and not x.get("extraPct")][:30]:
+        time.sleep(1.5)
         try:
             _, n3 = live_md(p["handle"])
         except Exception:  # noqa: BLE001
