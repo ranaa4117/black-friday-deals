@@ -115,6 +115,13 @@ jobs:
           RECHECK_ALL: ${{ github.event.inputs.recheck || '0' }}
           REFRESH_LIMIT: ${{ github.event.inputs.recheck == '1' && '400' || '60' }}
         run: python3 tools/sp_update.py
+      - name: Elisabetta Franchi prices as shoppers see them (hourly, real browser)
+        continue-on-error: true
+        env:
+          AUDIT_FORCE: ${{ github.event.inputs.audit || '0' }}
+        run: |
+          pip install -q playwright==1.48.0 || true
+          python3 tools/ef_verify.py
       - name: Brand health check (hourly — compares a sample with the official stores)
         continue-on-error: true
         env:
@@ -125,7 +132,7 @@ jobs:
         run: |
           git config user.name "self-portrait-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          touch self-portrait/changes.json self-portrait/selftest.json; git add self-portrait/data.json self-portrait/more.json self-portrait/full.json self-portrait/sitemap.xml self-portrait/audit.json self-portrait/changes.json self-portrait/fixes.json self-portrait/selftest.json
+          touch self-portrait/changes.json self-portrait/selftest.json self-portrait/ef_verify.json; git add self-portrait/data.json self-portrait/more.json self-portrait/full.json self-portrait/sitemap.xml self-portrait/audit.json self-portrait/changes.json self-portrait/fixes.json self-portrait/selftest.json self-portrait/ef_verify.json
           if git diff --cached --quiet; then echo "No changes"; exit 0; fi
           git commit -m "Self-Portrait sale check $(date -u +%Y-%m-%dT%H:%MZ)"
           for i in 1 2 3; do git pull --rebase -X theirs origin main && git push && exit 0; sleep 5; done

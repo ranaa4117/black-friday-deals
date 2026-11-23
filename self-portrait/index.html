@@ -368,7 +368,7 @@ nav.tabs .dot{display:inline-block;width:6px;height:6px;border-radius:50%;backgr
 .two{display:grid;grid-template-columns:1fr 1fr;gap:4px 32px}@media (max-width:760px){ .two{grid-template-columns:1fr} .bar{grid-template-columns:minmax(90px,42%) 1fr auto} }
 .st-t td.pc{display:flex;gap:8px;align-items:center;min-width:220px}.st-t td.pc img{width:30px;height:40px;object-fit:cover}
 .nodata{color:var(--stone);font-size:13px;margin:6px 0}
-.okb{font-size:11px;padding:1px 7px;border-radius:10px;background:#e3f1e8;color:#1e7a46;white-space:nowrap}.okb.bad{background:#fbe5e5;color:var(--red)}.cg{border-top:1px solid #eee;padding:8px 0;font-size:13px}.cg a{color:inherit;font-weight:600}.cg .orig{font-weight:400}.cgsz{margin-top:8px}.cgsz summary{cursor:pointer;font-size:13px}.red{color:var(--red)}.fixes{display:grid;gap:8px}.fx{display:grid;grid-template-columns:1fr auto;gap:4px 10px;border:1px solid var(--rule);border-right:4px solid #1e7a46;padding:8px 10px;font-size:13px}.fx.bad{border-right-color:var(--red)}.fx.mid{border-right-color:#d9a400}.fxs{white-space:nowrap;font-size:12px;align-self:start}.fxf{grid-column:1/-1}.erow{border-bottom:1px solid var(--rule)}.erow button{border-bottom:0!important;width:100%}.orig{display:inline-block;font-size:12px;padding:0 10px 8px;padding-inline-start:62px;color:var(--ink);text-decoration:underline}.orig.bad{color:var(--red);text-decoration:none}.dtag{font-size:11px;color:var(--stone)}.dtag.red{color:var(--red)}.dtag.warn{color:#9a6b00}
+.okb{font-size:11px;padding:1px 7px;border-radius:10px;background:#e3f1e8;color:#1e7a46;white-space:nowrap}.okb.bad{background:#fbe5e5;color:var(--red)}.cg{border-top:1px solid #eee;padding:8px 0;font-size:13px}.cg a{color:inherit;font-weight:600}.cg .orig{font-weight:400}.cgsz{margin-top:8px}.cgsz summary{cursor:pointer;font-size:13px}.red{color:var(--red)}.fixes{display:grid;gap:8px}.fx{display:grid;grid-template-columns:1fr auto;gap:4px 10px;border:1px solid var(--rule);border-right:4px solid #1e7a46;padding:8px 10px;font-size:13px}.fx.bad{border-right-color:var(--red)}.fx.mid{border-right-color:#d9a400}.fxs{white-space:nowrap;font-size:12px;align-self:start}.fxf{grid-column:1/-1}.erow{border-bottom:1px solid var(--rule)}.erow button{border-bottom:0!important;width:100%}.orig{display:inline-block;font-size:12px;padding:0 10px 8px;padding-inline-start:62px;color:var(--ink);text-decoration:underline}.orig.bad{color:var(--red);text-decoration:none}.dtag{font-size:11px;color:var(--stone)}.dtag.red{color:var(--red)}.dtag.warn{color:#9a6b00}.dtag.ok{color:#1e7a46}.efblock{margin:6px 0 14px}.efblock summary{cursor:pointer;margin-bottom:6px}.eftab{overflow-x:auto}.eftab table{border-collapse:collapse;width:100%;font-size:12px}.eftab th,.eftab td{border-bottom:1px solid var(--rule);padding:6px 4px;text-align:start;vertical-align:top}.eftab th{font-weight:600;white-space:nowrap}.eftab td a{color:inherit}
 .cgchips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}.cgchip{border:1px solid #ccc;background:#fff;border-radius:16px;padding:4px 10px;font:inherit;font-size:12px;cursor:pointer}.cgchip.on{background:#111;color:#fff;border-color:#111}.chgrun{border-top:1px solid #eee;padding:8px 0}.chgrun summary{cursor:pointer;font-size:13px}.chg{margin:8px 0 0;font-size:13px}.chg a{color:inherit;font-weight:600}.chg ul{margin:2px 0 0 18px;padding:0}.fixtag{white-space:nowrap;font-size:11px;padding:1px 7px;border-radius:10px;background:#e3f1e8;color:#1e7a46}.fixtag.bad{background:#fbe5e5;color:var(--red)}.audit p{margin:4px 0 0}
 .audit{border-left:3px solid #1e7a46;padding:6px 10px;margin:0 0 10px;font-size:13px}.audit.bad{border-color:var(--red)}.audit ul{margin:4px 0 0 18px;padding:0}
 .adm{font-family:"Tajawal",var(--sans)}.adm .panel h3{font-family:"Tajawal",var(--sans);font-weight:500;font-size:19px}.adm h4{font:500 14px "Tajawal",var(--sans);margin:14px 0 4px}
@@ -543,7 +543,7 @@ const PASS_HASH = "d6f7961e955b42afb04e910ef174ce7b82af4efe180a05605bc68aee28cad
 const REPO = "ranaa4117/black-friday-deals";
 const WORKFLOW = "self-portrait-update.yml";
 const LS = "sp-edit-v1";
-const APP_VERSION = "31";
+const APP_VERSION = "32";
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
@@ -687,7 +687,7 @@ const finalSAR = p => Math.round(netPrice(p) * rateFor(p) + extraFor(p));
 const saleSAR = p => Math.round(p.price * rateFor(p) + extraFor(p));
 const wasSAR = p => Math.round(p.compare * rateFor(p) + extraFor(p));
 const pct = p => p.compare > p.price ? Math.round((1 - p.price / p.compare) * 100) : 0;
-const offShown = p => isMacys(p) || (COSTS() && !isMD(p) && !spExtra(p)) ? pct(p) : (wasSAR(p) > finalSAR(p) ? Math.round((1 - finalSAR(p) / wasSAR(p)) * 100) : 0);
+const offShown = p => isEF(p) ? (p.compare > p.price ? (p.discPct || pct(p)) : 0) : isMacys(p) || (COSTS() && !isMD(p) && !spExtra(p)) ? pct(p) : (wasSAR(p) > finalSAR(p) ? Math.round((1 - finalSAR(p) / wasSAR(p)) * 100) : 0);
 const money = (p, n) => isUS(p) ? "$" + (Math.round(n * 100) / 100).toLocaleString("en-US") : eur(n);
 const sizeLabel = (p, raw) => isUS(p) || isEF(p) ? raw : "UK " + ukLabel(raw);
 const isAvail = p => (p.sizes || []).some(s => s.a);
@@ -1534,6 +1534,7 @@ function viewAdmin(all){
   <section class="panel"><div><h3>إدارة المنتجات</h3><p class="why">السعر الحالي وحالة الخصم ورابط القطعة في المتجر الأصلي لكل منتج. اضغطي على المنتج لتعديله، أو أضيفي منتجاً يدوياً.${hidden ? " لديك " + hidden + " منتج محذوف يدوياً." : ""}</p></div>
     <div class="fields" style="max-width:none">
       <div class="row"><button class="btn solid" id="aAdd">إضافة منتج</button><label class="search" style="flex:1"><input id="aQ" type="search" placeholder="ابحثي عن منتج لتعديله" dir="auto"></label></div>
+      <details class="efblock" open><summary><b>Elisabetta Franchi — الأسعار والتحقق</b></summary><div id="efBox"><p class="small">جارٍ التحميل…</p></div></details>
       <div class="edit-list" id="editList"></div>
       ${hidden ? `<div class="row"><button class="btn quiet" id="aRestore">استرجاع ${hidden} منتج محذوف</button></div>` : ""}
     </div></section>
@@ -1847,7 +1848,23 @@ function drawFixes(){
   box.querySelectorAll("[data-fix]").forEach(b => b.onclick = () => { FIX.f = b.dataset.fix; drawFixes(); });
   if ($("#fixMore")) $("#fixMore").onclick = () => { FIX.more = true; drawFixes(); };
 }
+function drawEF(v){
+  const box = $("#efBox"); if (!box) return;
+  const list = products().filter(isEF), r = rate(), ex = extraEF(), items = (v && v.items) || {}, fresh = v && v.at && (Date.now() - Date.parse(v.at)) < 3 * 3600e3;
+  const e2 = x => "€" + Number(x).toFixed(2).replace(/\.00$/, "");
+  const ver = p => { const x = items[p.handle];
+    if (!fresh || !x) return '<span class="dtag warn">غير مؤكد — يُعاد التحقق</span>';
+    const ok = Math.abs(x.orig - (p.compare || p.price)) < 0.011 && x.pct === (p.discPct || 0) && Math.abs(x.sale - p.price) < 0.011;
+    return ok ? '<span class="dtag ok">✓ مطابق لصفحة المتجر</span>' : `<span class="dtag red">✗ المتجر يعرض: ${esc(x.shown)}</span>`; };
+  const okN = list.filter(p => fresh && items[p.handle] && ver(p).includes("✓")).length, disc = list.filter(p => p.discPct > 0).length, ex2 = (DATA.meta.efExcluded || []);
+  box.innerHTML = `<p class="small">المصدر الوحيد: <a href="${esc(EF_PAGE_URL)}" target="_blank" rel="noopener">صفحة الفساتين الطويلة في المتجر — الصفحة ٢</a>. ${v && v.at ? "آخر تحقق في المتصفح: <bdi dir=\"ltr\">" + when(v.at) + "</bdi>" : "لم يتم التحقق بعد"}.</p>
+  <p class="small">تمت مراجعة <b>${arN(list.length)}</b> فستان · مطابق لصفحة المتجر: <b>${arN(okN)}</b> · عليها خصم: <b>${arN(disc)}</b> · بدون خصم: <b>${arN(list.length - disc)}</b> · غير مؤكد: <b>${arN(list.length - okN)}</b>${ex2.length ? ` · غير مضافة لأنها ليست فساتين طويلة: <b>${arN(ex2.length)}</b>` : ""}</p>
+  <div class="eftab"><table><thead><tr><th>القطعة</th><th>السعر الأصلي</th><th>الخصم</th><th>بعد الخصم</th><th>السعر النهائي</th><th>التحقق</th></tr></thead><tbody>${list.map(p => `<tr><td dir="auto"><a href="${esc(url(p))}" target="_blank" rel="noopener">${esc(p.title)}</a></td><td dir="ltr">${e2(p.compare || p.price)}</td><td dir="ltr">${p.discPct ? "-" + p.discPct + "%" : "—"}</td><td dir="ltr">${e2(p.price)}</td><td><b class="${p.discPct ? "red" : ""}">${fmt(finalSAR(p))} ر.س</b><div class="small muted" dir="ltr">${e2(p.price)} × ${r} + ${ex}</div></td><td>${ver(p)}</td></tr>`).join("")}</tbody></table></div>
+  ${ex2.length ? `<details class="small"><summary>قطع في الصفحة ٢ لم تُضف (ليست فساتين طويلة)</summary>${ex2.map(x => `<div dir="auto"><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.t)}</a></div>`).join("")}</details>` : ""}`;
+}
+const EF_PAGE_URL = "https://outlet.elisabettafranchi.com/it-it/abbigliamento/abiti/abiti-lunghi/?page=2";
 function wireAdmin(list){
+  fetch(BASE + "ef_verify.json?t=" + Date.now(), { cache:"no-store" }).then(r => r.ok ? r.json() : null).catch(() => null).then(drawEF);
   fetch(BASE + "fixes.json?t=" + Date.now(), { cache:"no-store" }).then(r => r.ok ? r.json() : { fixes: [] }).catch(() => ({ fixes: [] })).then(a => { FIX.list = a.fixes || []; drawFixes(); });
   fetch(BASE + "changes.json?t=" + Date.now(), { cache:"no-store" }).then(r => r.ok ? r.json() : { runs: [] }).catch(() => ({ runs: [] })).then(a => { CHG.runs = a.runs || []; drawChanges(); });
   editList(list); $("#aQ").oninput = () => editList(products());

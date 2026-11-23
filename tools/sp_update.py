@@ -368,6 +368,15 @@ def ef_product(href, debug=False):
         if not compare and m and float(m.group(1)) > price:
             compare = float(m.group(1))
             break
+    # the outlet's own promotion on this product (e.g. "promo_outlet_35%"): the store's page shows
+    # "€ 650  -35%  € 422.50" — the listed price is the ORIGINAL price, the promotion gives the real sale price
+    promo_ids = []
+    for blk in re.findall(r'"productPromotions":\[(.*?)\]', h):
+        promo_ids += re.findall(r'"promotionId":"([^"]+)"', blk)
+    promo_ids = list(dict.fromkeys(promo_ids))
+    pcts = sorted({int(m.group(1)) for x in promo_ids for m in [re.search(r"(\d{1,2})\s*%", x)] if m})
+    promo_pct = pcts[0] if len(pcts) == 1 else 0
+    promo_unclear = bool(promo_ids) and not promo_pct
     imgs = ld.get("image") or []
     imgs = list(dict.fromkeys([i for i in (imgs if isinstance(imgs, list) else [imgs]) if i]))
     code = re.search(r"([A-Z0-9]{9})_([A-Z0-9]{3})_0\.jpg", " ".join(imgs))
@@ -377,8 +386,14 @@ def ef_product(href, debug=False):
     if debug:
         print("  EF", name, color, "| length", length, "| prices", prices, "| sizes", sizes, "| compare", compare,
               "| keys:", {k: h.count('"' + k + '"') for k in EF_LIST_KEYS}, "| pricebooks", sorted(set(re.findall(r'"pricebook":"([^"]+)"', h))))
+    if debug:
+        print("  EF promotions:", promo_ids, "->", promo_pct, "%")
     return {"url": url, "name": name, "color": color, "desc": desc, "length": length, "price": price, "compare": compare,
+            "promoIds": promo_ids, "promoPct": promo_pct, "promoUnclear": promo_unclear,
             "sizes": sizes, "images": imgs, "avail": "InStock" in str(offers.get("availability", "")) or any(sizes.values())}
+
+
+EF_EXCLUDED = []   # products on the authorized page that are not maxi dresses (reported in admin, never added)
 
 
 def fetch_ef(debug=False):
@@ -403,19 +418,30 @@ def fetch_ef(debug=False):
             why = why or "no price"
         if why:
             print("  EF excluded:", d["name"], d["color"], "—", why)
+            EF_EXCLUDED.append({"t": d["name"] + (" — " + d["color"] if d["color"] else ""), "why": why, "url": d["url"]})
             continue
         code = href.rsplit("-", 1)[-1].replace(".html", "")
-        out.append({
-            "handle": "ef-" + code.lower(), "brand": "ef", "cat": "maxi", "cur": "EUR", "url": d["url"],
-            "title": d["name"] + (" — " + d["color"] if d["color"] else ""), "image": d["images"][0] if d["images"] else "",
-            "images": d["images"][:6], "details": d["desc"][:500], "price": round(d["price"], 2),
-            "compare": round(d["compare"] if d["compare"] > d["price"] else d["price"], 2),
-            "colors": [d["color"]] if d["color"] else [], "sizes": [{"s": "IT " + k, "a": a} for k, a in d["sizes"].items()],
-            "lengthCm": d["length"], "publishedAt": "",
-        })
+        out.append(ef_record(d, code))
     if not links:
         raise RuntimeError("page listed no products")
     return out, len(links)
+
+
+def ef_record(d, code):
+    """Original price = the outlet's listed price; sale price = original × (1 − promotion %) when the product carries
+    the outlet's own percentage promotion (what its page shows as "€ 650 -35% € 422.50")."""
+    orig = round(max(d["price"], d["compare"] or 0), 2)
+    pct = d.get("promoPct") or 0
+    sale = round(orig * (1 - pct / 100), 2) if pct else round(d["price"], 2)
+    return {
+            "handle": "ef-" + code.lower(), "brand": "ef", "cat": "maxi", "cur": "EUR", "url": d["url"],
+            "title": d["name"] + (" — " + d["color"] if d["color"] else ""), "image": d["images"][0] if d["images"] else "",
+            "images": d["images"][:6], "details": d["desc"][:500], "price": sale,
+            "compare": orig if orig > sale else sale, "discPct": pct, "promoIds": d.get("promoIds", []),
+            "promoStatus": "active" if pct else ("unverified" if d.get("promoUnclear") else "none"),
+            "colors": [d["color"]] if d["color"] else [], "sizes": [{"s": "IT " + k, "a": a} for k, a in d["sizes"].items()],
+            "lengthCm": d["length"], "publishedAt": "",
+    }
 
 
 SP_PROMO_PAGES = ["/collections/sale-last-chance", "/collections/sale", ""]
@@ -691,8 +717,8 @@ def refresh_product(p, bf_handles):
             n = raw and normalize_md(raw, bf_handles, retain=True)
         elif brand == "ef":
             d = ef_product(p["url"].replace(EF_SITE, ""))
-            n = dict(p, price=round(d["price"], 2), compare=round(d["compare"] if d["compare"] > d["price"] else d["price"], 2),
-                     sizes=[{"s": "IT " + k, "a": a} for k, a in d["sizes"].items()]) if d["price"] else None
+            r = ef_record(d, p["handle"][3:]) if d["price"] else None
+            n = dict(p, **{k: r[k] for k in ("price", "compare", "discPct", "promoIds", "promoStatus", "sizes")}) if r else None
         else:
             return None
     except urllib.error.HTTPError as e:
@@ -709,7 +735,7 @@ def refresh_product(p, bf_handles):
 
 
 def _state(p):
-    return {"price": p.get("price"), "compare": p.get("compare"), "extraPct": p.get("extraPct") or 0,
+    return {"price": p.get("price"), "compare": p.get("compare"), "extraPct": p.get("extraPct") or 0, "discPct": p.get("discPct") or 0,
             "listed": p.get("listed", True), "status": p.get("status", "ok"), "ps": p.get("promoStatus") or ""}
 
 
@@ -718,6 +744,36 @@ def change_item(n, msgs, o=None):
     if o:
         item["o"] = _state(o)
     return item
+
+
+def ef_promo_decide(n, o, ts, fresh_read=True):
+    """Elisabetta Franchi outlet promotion (e.g. -35%): applied when the product's own official data carries it;
+    a promotion that disappears is kept (unverified) until 3 fresh reads in a row confirm it ended; an unreadable
+    or unclear promotion never ends a discount. Prices are always re-computed from the current official price."""
+    had = o.get("discPct") or 0
+    orig = n.get("compare") or n.get("price")
+    if n.get("discPct"):
+        n.pop("discMiss", None)
+        n.pop("promoEndedAt", None)
+        n["promoCheckedAt"] = ts
+        return n
+    keep = lambda status, **kw: n.update(price=round(orig * (1 - had / 100), 2), compare=orig, discPct=had, promoStatus=status, **kw)
+    if had and (not fresh_read or n.get("promoStatus") == "unverified"):
+        keep("unverified")
+        return n
+    if had:
+        miss = o.get("discMiss", 0) + 1
+        if miss < 3:
+            keep("unverified", discMiss=miss, promoCheckedAt=ts)
+            return n
+        n.pop("discMiss", None)
+        n.update(promoStatus="expired", promoEndedAt=ts, promoCheckedAt=ts)
+        return n
+    n.pop("discMiss", None)
+    if o.get("promoStatus") == "expired" and n.get("promoStatus") == "none":
+        n["promoStatus"] = "expired"
+    n["promoCheckedAt"] = ts
+    return n
 
 
 def md_promo_decide(n, o, ts, fresh_read=True):
@@ -931,6 +987,7 @@ def main():
     if os.environ.get("EF_ENABLE", "1") == "1":
         try:
             ef_items, raw_counts["ef"] = fetch_ef(DEBUG)
+            meta["efExcluded"] = EF_EXCLUDED
             for n in ef_items:
                 fresh[n["handle"]] = n
             ok_cats.add("ef:maxi")
@@ -1058,6 +1115,8 @@ def main():
                 run_items.append(change_item(n, ["Newly discovered on sale"]))
             continue
         n["firstSeen"] = o.get("firstSeen", ts)
+        if n.get("brand") == "ef":
+            ef_promo_decide(n, o, ts, fresh_read=n.get("pageCheckedAt") == ts or n.get("verifiedAt") == ts)
         if n.get("brand") == "md":
             md_promo_decide(n, o, ts, fresh_read=MD_LABELS_OK and (n.get("pageCheckedAt") == ts or n.get("verifiedAt") == ts))
         msgs = []
@@ -1072,7 +1131,9 @@ def main():
             msgs.append("No longer sold by the store" if n.get("status") == "discontinued" else "Available again")
         if (o.get("extraPct") or 0) != (n.get("extraPct") or 0) and n.get("brand") == "md":
             msgs.append(f"Extra {n.get('extraPct') or o.get('extraPct')}% " + ("now applies" if n.get("extraPct") else "no longer applies"))
-        if (o.get("promoStatus") or "none") != (n.get("promoStatus") or "none") and n.get("brand") == "md":
+        if (o.get("discPct") or 0) != (n.get("discPct") or 0) and n.get("brand") == "ef":
+            msgs.append(f"Outlet discount {o.get('discPct') or 0}% → {n.get('discPct') or 0}%")
+        if (o.get("promoStatus") or "none") != (n.get("promoStatus") or "none") and n.get("brand") in ("md", "ef"):
             msgs.append(f"Promotion status: {o.get('promoStatus') or 'none'} → {n.get('promoStatus') or 'none'}")
         if o.get("image") != n["image"]:
             msgs.append("Image updated")

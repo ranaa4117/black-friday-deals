@@ -92,8 +92,7 @@ def read_live(p):
             d = U.ef_product(p["url"].replace(U.EF_SITE, ""))
             if not d.get("price"):
                 return None, None
-            return {"price": round(d["price"], 2), "compare": round(d["compare"] if d["compare"] > d["price"] else d["price"], 2),
-                    "sizes": [{"s": k, "a": a} for k, a in d["sizes"].items()]}, None
+            return U.ef_record(d, h[3:]), None
     except U.urllib.error.HTTPError as e:
         if e.code in (404, 410):
             raise U.Gone() from e
@@ -255,6 +254,32 @@ def main():
             F.problem("store:" + b, f"{NAMES[b]}: تعذّر فتح المتجر الأصلي", "progress", "آخر الأسعار المؤكدة باقية كما هي. ستُعاد المحاولة كل ساعة.")
         elif b in store_ok:
             F.resolve("store:" + b, "عاد المتجر الأصلي يفتح وتم التحقق من المنتجات.")
+
+    # 1b) Elisabetta Franchi: every product against the prices a shopper sees on the authorized page (real browser)
+    ev = load("ef_verify.json") or {}
+    efs = [p for p in items if p.get("brand") == "ef" and p.get("status") != "discontinued"]
+    if ev.get("items") and U.age_s(ev.get("at", "")) < 3 * 3600:
+        F.resolve("ef-verify", "صار التحقق من أسعار Elisabetta Franchi يعمل، وتم التحقق.")
+        for p in efs:
+            key = "efprice:" + p["handle"]
+            v = ev["items"].get(p["handle"])
+            title = f"«{p.get('title', p['handle'])}» (Elisabetta Franchi)"
+            if not v:
+                found += 1
+                F.problem(key, f"{title}: لم تظهر في صفحة المتجر المعتمدة (الصفحة ٢) عند التحقق", "progress",
+                          "تبقى بآخر سعر مؤكد وتُعلَّم «غير مؤكد»، ويُعاد التحقق كل ساعة.")
+                continue
+            same = abs(v["orig"] - (p.get("compare") or 0)) < 0.011 and v["pct"] == (p.get("discPct") or 0) and abs(v["sale"] - p["price"]) < 0.011
+            if same:
+                F.resolve(key, "السعر الأصلي والخصم والسعر بعد الخصم مطابقة لصفحة المتجر. تم التحقق.")
+            else:
+                found += 1
+                F.problem(key, f"{title}: السعر في الموقع لا يطابق صفحة المتجر ({v['shown']})", "progress",
+                          "سيُصحَّح من بيانات المتجر في التحديث القادم ثم يُعاد التحقق.")
+    elif efs:
+        found += 1
+        F.problem("ef-verify", "تعذّر فتح صفحة Elisabetta Franchi المعتمدة في المتصفح للتحقق من الأسعار", "progress",
+                  "الأسعار باقية من بيانات المتجر الرسمية، ويُعاد التحقق كل ساعة.")
 
     # 2) products the updater could not verify (store page unreachable) — kept at their last verified price
     vf = meta.get("verifyFail") or {}
