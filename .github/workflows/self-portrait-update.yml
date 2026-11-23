@@ -75,6 +75,11 @@ jobs:
       - name: Elisabetta Franchi price diagnostics
         if: ${{ github.event.inputs.ef_probe == '2' }}
         run: python3 tools/ef_price_probe.py
+      - name: Elisabetta Franchi as a shopper sees it (real browser)
+        if: ${{ github.event.inputs.ef_probe == '3' }}
+        run: |
+          pip install -q playwright==1.48.0
+          python3 tools/ef_render_probe.py
       - name: Mac Duggal diagnostics
         if: ${{ github.event.inputs.md_probe == '1' }}
         run: python3 tools/md_probe.py
