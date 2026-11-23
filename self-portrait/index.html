@@ -398,14 +398,19 @@ a.guide-btn.macys{display:inline-block;text-decoration:underline}
 .looks{margin:clamp(34px,5vw,60px) 0 10px;border-top:1px solid var(--rule);padding-top:clamp(20px,3vw,30px)}
 .looks h2{font:400 clamp(17px,2.2vw,22px)/1.2 var(--serif);letter-spacing:.14em;margin:0 0 16px}
 .looks h2 span{font-family:"Tajawal",var(--sans);letter-spacing:0;font-size:.85em;color:var(--stone)}
-.look-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(10px,1.6vw,18px)}
+.look-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(10px,1.6vw,18px);max-width:860px}
+.look-row.n2{grid-template-columns:repeat(2,minmax(0,1fr));max-width:600px}
+.look .slot{font-size:11px;letter-spacing:.06em;color:var(--stone);margin-bottom:6px;font-family:"Tajawal",var(--sans)}
+.alike{margin:clamp(34px,5vw,56px) 0 10px;border-top:1px solid var(--rule);padding-top:clamp(20px,3vw,30px)}
+.alike h2{font:400 clamp(17px,2.2vw,22px)/1.2 var(--serif);letter-spacing:.14em;margin:0 0 16px}
+.alike h2 span{font-family:"Tajawal",var(--sans);letter-spacing:0;font-size:.85em;color:var(--stone)}
 .look{display:flex;flex-direction:column;gap:3px;text-decoration:none;color:var(--ink)}
 .lph{display:block;aspect-ratio:3/4;background:var(--ivory);overflow:hidden;margin-bottom:6px}
 .lph img{width:100%;height:100%;object-fit:cover}
 .lk{font-size:11px;letter-spacing:.05em;color:var(--stone)} .ln{font-size:13.5px;line-height:1.35}
 .lp{font:400 16px var(--serif)} .lp.hot{color:var(--red)}
 .look-tip{color:var(--stone);font-size:14px;max-width:560px}
-@media (max-width:600px){ .look-row{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (max-width:600px){ .look-row,.look-row.n2{grid-template-columns:repeat(2,minmax(0,1fr))} }
 .cats4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(6px,1.2vw,14px)}
 .cat4{position:relative;display:block;aspect-ratio:3/4;overflow:hidden;background:var(--ivory);color:#fff;text-decoration:none}
 .cat4 img{width:100%;height:100%;object-fit:cover}
@@ -424,7 +429,7 @@ ul.breakdown li.tot{font-size:16px}
 .bf-sub{font-size:14px;letter-spacing:.08em;opacity:.85}
 .cta.light{background:#fff;color:var(--ink);margin-top:24px}
 .cta.light:hover{background:var(--ivory)}
-.brands{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.brands{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
 .brandcard{position:relative;display:block;aspect-ratio:4/5;overflow:hidden;background:var(--ivory);color:#fff;text-decoration:none}
 .brandcard img{width:100%;height:100%;object-fit:cover;transition:transform 1.1s cubic-bezier(.2,.6,.2,1)}
 .brandcard:hover img{transform:scale(1.04)}
@@ -494,7 +499,7 @@ const PASS_HASH = "3c29f0bb09f7f11433b993fb3a8d945503758c57eacb6ecfe88c49e1ef74e
 const REPO = "ranaa4117/black-friday-deals";
 const WORKFLOW = "self-portrait-update.yml";
 const LS = "sp-edit-v1";
-const APP_VERSION = "20";
+const APP_VERSION = "21";
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
@@ -504,11 +509,12 @@ const CATS = { midi:"Midi dresses", maxi:"Maxi dresses", bags:"Bags", jackets:"J
 const CAT1 = { midi:"Midi dress", maxi:"Maxi dress", bags:"Bag", jackets:"Jacket", coats:"Coat", scarves:"Scarf", shoes:"Shoes" };
 const STYLE1 = { pumps:"Pumps", sandals:"Sandals", booties:"Booties", clogs:"Clogs", slippers:"Slippers" };
 const catOf = p => p.cat || "midi";
-const BRANDS = { sp:"Self-Portrait", md:"Mac Duggal", rl:"Lauren Ralph Lauren", jc:"Juicy Couture", bj:"Betsey Johnson", kl:"KARL LAGERFELD PARIS", ck:"Calvin Klein", inc:"I.N.C. International Concepts", sm:"Steve Madden" };
+const BRANDS = { sp:"Self-Portrait", md:"Mac Duggal", rl:"Lauren Ralph Lauren", jc:"Juicy Couture", bj:"Betsey Johnson", kl:"KARL LAGERFELD PARIS", ck:"Calvin Klein", inc:"I.N.C. International Concepts", sm:"Steve Madden", ef:"ELISABETTA FRANCHI" };
 const brandOf = p => p.brand || "sp";
 const isMD = p => brandOf(p) === "md";
 const isRL = p => brandOf(p) === "rl";
 const isSP = p => brandOf(p) === "sp";
+const isEF = p => brandOf(p) === "ef";
 const isMC = p => p.src === "macys" && !isRL(p);          // Macy's shoes
 const isMacys = p => isRL(p) || isMC(p);
 const isUS = p => isMD(p) || isMacys(p);
@@ -521,15 +527,15 @@ const colorOf = p => { const w = p.title.split(/\s+/); return /^(off|light|dark|
 
 /* ---------- colours ---------- */
 const COLOR_FAMS = [
-  ["black","أسود","black onyx jet"],["white","أبيض","white"],["ivory","عاجي وكريمي","ivory cream ecru"],
+  ["black","أسود","black onyx jet nero"],["white","أبيض","white bianco"],["ivory","عاجي وكريمي","ivory cream ecru avorio"],
   ["beige","بيج ونود","beige nude taupe sand camel tan mocha latte oatmeal rattan stone khaki natural birch"],
-  ["brown","بني","brown chocolate coffee espresso cocoa nutmeg chestnut cognac"],
-  ["red","أحمر","red scarlet cherry crimson ruby"],["burgundy","عنابي","burgundy wine bordeaux plum berry merlot oxblood maroon"],
+  ["brown","بني","brown chocolate coffee espresso cocoa nutmeg chestnut cognac sugar"],
+  ["red","أحمر","red scarlet cherry crimson ruby rosso"],["burgundy","عنابي","burgundy wine bordeaux plum berry merlot oxblood maroon rouge"],
   ["pink","وردي","pink blush rose fuchsia magenta raspberry candy petal"],["purple","بنفسجي","purple lilac lavender violet mauve orchid amethyst grape"],
-  ["navy","كحلي","navy midnight"],["blue","أزرق","blue cobalt ocean sky royal indigo denim periwinkle turquoise aqua cornflower sapphire"],
-  ["green","أخضر","green sage olive emerald mint seafoam lime teal jade hunter forest pistachio"],
+  ["navy","كحلي","navy midnight twilight"],["blue","أزرق","blue cobalt ocean sky royal indigo denim periwinkle turquoise aqua cornflower sapphire"],
+  ["green","أخضر","green sage olive emerald mint seafoam lime teal jade hunter forest pistachio iguana"],
   ["yellow","أصفر","yellow lemon butter mustard canary citrus"],["orange","برتقالي","orange coral peach apricot rust tangerine terracotta"],
-  ["gold","ذهبي","gold champagne bronze copper brass"],["silver","فضي ورمادي","silver grey gray gunmetal charcoal platinum pewter"],
+  ["gold","ذهبي","gold champagne bronze copper brass"],["silver","فضي ورمادي","silver grey gray gunmetal charcoal platinum pewter argento starlight"],
   ["multi","متعدد الألوان","multi multicolor floral print houndstooth polka check stripe leopard"]];
 const COLOR_WORD = {}; COLOR_FAMS.forEach(([k,, w]) => w.split(" ").forEach(x => COLOR_WORD[x] = k));
 const COLOR_AR = Object.fromEntries(COLOR_FAMS.map(([k, a]) => [k, a]));
@@ -537,7 +543,7 @@ const famOf = name => { for (const w of String(name).toLowerCase().split(/[\s\-\
 const famCache = new Map();
 function colorFams(p){
   if (famCache.has(p.handle + p.title)) return famCache.get(p.handle + p.title);
-  let f = isUS(p) ? [...new Set((p.colors || []).map(famOf).filter(Boolean))] : [];
+  let f = isUS(p) || isEF(p) ? [...new Set((p.colors || []).map(famOf).filter(Boolean))] : [];
   if (!f.length){ const t = famOf(p.title); if (t) f = [t]; }
   famCache.set(p.handle + p.title, f); return f;
 }
@@ -611,11 +617,12 @@ const rate = () => Number(C().settings && C().settings.rate) || Number(DATA.meta
 const extra = () => { const v = C().settings && C().settings.extra; return v !== undefined && v !== null && v !== "" && Number.isFinite(Number(v)) ? Number(v) : 450; };
 const extraBags = () => { const v = C().settings && C().settings.extraBags; return v !== undefined && v !== null && v !== "" && Number.isFinite(Number(v)) ? Number(v) : 450; };
 const extraMD = () => { const v = C().settings && C().settings.extraMD; return v !== undefined && v !== null && v !== "" && Number.isFinite(Number(v)) ? Number(v) : 450; };
+const extraEF = () => { const v = C().settings && C().settings.extraEF; return v !== undefined && v !== null && v !== "" && Number.isFinite(Number(v)) ? Number(v) : 660; };
 const extraShoes = () => { const v = C().settings && C().settings.extraShoes; return v !== undefined && v !== null && v !== "" && Number.isFinite(Number(v)) ? Number(v) : 450; };
 const extraRL = () => { const v = C().settings && C().settings.extraRL; return v !== undefined && v !== null && v !== "" && Number.isFinite(Number(v)) ? Number(v) : 450; };
 const usdRate = () => Number(C().settings && C().settings.usdRate) || Number(DATA.meta.usdRate && DATA.meta.usdRate.value) || 3.75;
 const rateFor = p => isUS(p) ? usdRate() : rate();
-const extraFor = p => isMC(p) ? extraShoes() : isRL(p) ? extraRL() : isMD(p) ? extraMD() : catOf(p) === "bags" ? extraBags() : extra();
+const extraFor = p => isEF(p) ? extraEF() : isMC(p) ? extraShoes() : isRL(p) ? extraRL() : isMD(p) ? extraMD() : catOf(p) === "bags" ? extraBags() : extra();
 /* Mac Duggal's extra 25% is taken in the cart from the current (sale) price, so it applies after any markdown */
 /* Self-Portrait's store-wide extra (e.g. Black Friday "Extra 20% off sale") applies automatically to sale items only (not full price);
    it is read from the store's own banner by the updater and disappears when the store stops showing it */
@@ -629,13 +636,13 @@ const wasSAR = p => Math.round(p.compare * rateFor(p) + extraFor(p));
 const pct = p => p.compare > p.price ? Math.round((1 - p.price / p.compare) * 100) : 0;
 const offShown = p => isMacys(p) || (COSTS() && !isMD(p) && !spExtra(p)) ? pct(p) : (wasSAR(p) > finalSAR(p) ? Math.round((1 - finalSAR(p) / wasSAR(p)) * 100) : 0);
 const money = (p, n) => isUS(p) ? "$" + (Math.round(n * 100) / 100).toLocaleString("en-US") : eur(n);
-const sizeLabel = (p, raw) => isUS(p) ? raw : "UK " + ukLabel(raw);
+const sizeLabel = (p, raw) => isUS(p) || isEF(p) ? raw : "UK " + ukLabel(raw);
 const isAvail = p => (p.sizes || []).some(s => s.a);
 const fmt = n => Number(n).toLocaleString("en-US");
 const eur = n => "€" + (Math.round(n * 100) / 100).toLocaleString("en-US");
 const when = iso => iso ? new Date(iso).toLocaleString("en-GB", { timeZone:"Asia/Riyadh", day:"numeric", month:"short", hour:"2-digit", minute:"2-digit" }) : "—";
 const ago = iso => { if (!iso) return ""; const m = Math.round((Date.now() - new Date(iso)) / 60000); return m < 1 ? "just now" : m < 60 ? m + " min ago" : m < 1440 ? Math.round(m/60) + " h ago" : Math.round(m/1440) + " days ago"; };
-const img = (src, w) => !src ? "" : /macysassets\.com/.test(src) ? src.split("?")[0] + "?wid=" + w + "&fmt=jpeg&qlt=85" : /cdn\.shopify\.com|self-portrait\.com\/cdn|macduggal\.com\/cdn/.test(src) ? src + (src.includes("?") ? "&" : "?") + "width=" + w : src;
+const img = (src, w) => !src ? "" : /elisabettafranchi\.com/.test(src) ? src.split("?")[0].replace("/on/demandware.static/", "/dw/image/v2/BGQZ_PRD/on/demandware.static/").replace("/dw/image/v2/BGQZ_PRD/dw/image/v2/BGQZ_PRD/", "/dw/image/v2/BGQZ_PRD/") + "?sw=" + w : /macysassets\.com/.test(src) ? src.split("?")[0] + "?wid=" + w + "&fmt=jpeg&qlt=85" : /cdn\.shopify\.com|self-portrait\.com\/cdn|macduggal\.com\/cdn/.test(src) ? src + (src.includes("?") ? "&" : "?") + "width=" + w : src;
 const url = p => p.url || ("https://eu.self-portrait.com/es-es/products/" + p.handle);
 const img2 = (src, w) => !src ? "" : /cdn\.shopify\.com|self-portrait\.com\/cdn|macduggal\.com\/cdn/.test(src) ? src + (src.includes("?") ? "&" : "?") + "width=" + w : src;
 const plink = p => "#item-" + p.handle;
@@ -739,6 +746,8 @@ function sizesHTML(p){
   const list = p.sizes || [];
   if (!list.length) return '<p class="small" style="margin-top:12px">Sizes not listed</p>';
   if (isRL(p) && list.length === 1 && /one size/i.test(list[0].s)) return '<p class="small" style="margin-top:12px">One size</p>';
+  if (isEF(p)) return '<ul class="sizes" aria-label="IT sizes">' + list.map((s, i) =>
+    `<li class="${s.a ? "on" : "off"}" title="${esc(s.s)} ${s.a ? "available" : "sold out"}">${i === 0 ? '<span class="sys">IT</span>' : ""}${esc(s.s.replace(/^IT\s*/, ""))}</li>`).join("") + "</ul>";
   if (isUS(p)) return '<ul class="sizes" aria-label="US sizes">' + list.map((s, i) =>
     `<li class="${s.a ? "on" : "off"}" title="${esc(s.s)} ${s.a ? "available" : "sold out"}">${i === 0 ? '<span class="sys">US</span>' : ""}${esc(s.s.replace(/^US\s*/, ""))}</li>`).join("") + "</ul>";
   const mine = S.settings.sizes;
@@ -783,9 +792,9 @@ function card(p, showCat){
     ${COSTS() ? `<p class="calc">${eur(p.price)}${spExtra(p) ? " × " + (1 - spExtra(p) / 100).toFixed(2) : ""} × ${rate().toFixed(3)} + ${fmt(extraFor(p))} SAR</p>` : ""}`}
     ${sizesHTML(p)}
     ${!isDress(p) && dims ? `<p class="dims">${esc(dims)}</p>` : ""}
-    ${isMacys(p) ? `<a class="guide-btn macys" href="${esc(url(p))}" target="_blank" rel="noopener">View on Macy's</a>` : `<button class="guide-btn" data-guide="${esc(p.handle)}">${isDress(p) ? "View size guide" : "View dimensions"}</button>`}
+    ${isMacys(p) ? `<a class="guide-btn macys" href="${esc(url(p))}" target="_blank" rel="noopener">View on Macy's</a>` : isEF(p) ? `<a class="guide-btn macys" href="${esc(url(p))}" target="_blank" rel="noopener">View on Elisabetta Franchi</a>` : `<button class="guide-btn" data-guide="${esc(p.handle)}">${isDress(p) ? "View size guide" : "View dimensions"}</button>`}
     ${favLine(p)}
-    ${OWNER ? `<div class="acts"><button data-edit="${esc(p.handle)}">Edit</button>${COSTS() && !isMacys(p) ? `<a href="${esc(url(p))}" target="_blank" rel="noopener">Store page</a>` : ""}</div>` : ""}
+    ${OWNER ? `<div class="acts"><button data-edit="${esc(p.handle)}">Edit</button>${COSTS() && !isMacys(p) && !isEF(p) ? `<a href="${esc(url(p))}" target="_blank" rel="noopener">Store page</a>` : ""}</div>` : ""}
     ${waLink(p)}
   </article>`;
 }
@@ -856,7 +865,7 @@ function secNav(all, r){
   let html = `<nav class="subnav" dir="rtl" aria-label="${S0.en} brands">${chip(r.sec, "الكل", !r.brand, true)}${brands.map(b => chip(r.sec + "-" + b, BRANDS[b], r.brand === b)).join("")}</nav>`;
   if (r.sec === "dresses" && r.brand){
     const subs = ["midi","maxi"].filter(c => inSec.some(p => brandOf(p) === r.brand && catOf(p) === c));
-    if (subs.length > 1) html += `<nav class="subnav sub2" dir="rtl" aria-label="${esc(BRANDS[r.brand])} dresses">${chip("dresses-" + r.brand, "الكل", !r.sub, true)}${subs.map(c => chip("dresses-" + r.brand + "-" + c, SUB_AR[c], r.sub === c, true)).join("")}</nav>`;
+    if (subs.length) html += `<nav class="subnav sub2" dir="rtl" aria-label="${esc(BRANDS[r.brand])} dresses">${chip("dresses-" + r.brand, "الكل", !r.sub, true)}${subs.map(c => chip("dresses-" + r.brand + "-" + c, SUB_AR[c], r.sub === c, true)).join("")}</nav>`;
   }
   return html;
 }
@@ -959,6 +968,7 @@ function viewHome(all){
     <section class="brands" aria-label="Shop by brand">
       ${brandCard("#dresses-sp", "Self-Portrait", spCover, "Midi · Maxi · Bags")}
       ${brandCard("#dresses-md", "Mac Duggal", mdCover, "Maxi dresses")}
+      ${avail.some(isEF) ? brandCard("#dresses-ef", "Elisabetta Franchi", byDisc(avail.filter(isEF)).sort((a,b) => engage(b.handle) - engage(a.handle))[0], "Maxi dresses") : ""}
       <div class="brandcard soon-card" aria-label="Victoria's Secret, coming soon"><span class="bc-cap"><b>Victoria's Secret</b><span>Coming Soon</span></span></div>
     </section>
     <div class="section-head"><h2>Self-Portrait</h2><a href="#dresses-sp">Shop Self-Portrait</a></div>
@@ -994,6 +1004,13 @@ function viewFav(all){
 
 /* original → official sale → extra store offer → final (shown only where an extra offer applies) */
 function priceBreak(p){
+  if (isEF(p)){   // original and discounted EUR converted to SAR, then the Elisabetta Franchi +660 SAR
+    if (!(p.compare > p.price)) return "";
+    const r = rate();
+    return `<dl class="pbreak"><div><dt>Original price</dt><dd><s>${fmt(Math.round(p.compare * r))} SAR</s></dd></div>
+      <div><dt>Discounted price</dt><dd>${fmt(Math.round(p.price * r))} SAR</dd></div>
+      <div class="fin"><dt>Final price</dt><dd>${fmt(finalSAR(p))} SAR</dd></div></dl>`;
+  }
   const x = extraPct(p); if (!x) return "";
   const sale = saleSAR(p), fin = finalSAR(p), was = p.compare > p.price ? wasSAR(p) : 0;
   return `<dl class="pbreak">${was ? `<div><dt>Original price</dt><dd><s>${fmt(was)} SAR</s></dd></div>` : ""}
@@ -1002,13 +1019,13 @@ function priceBreak(p){
     <div class="fin"><dt>Final price</dt><dd>${fmt(fin)} SAR</dd></div></dl>`;
 }
 
-/* ---------- Complete the look ---------- */
+/* ---------- Complete the look (one best item per slot) + You may also like (similar pieces) ---------- */
 const NEUTRAL = ["black","white","ivory","beige","gold","silver"];
 const GOES = { red:["black","beige","gold","white"], burgundy:["black","beige","gold","brown","pink"], pink:["beige","gold","silver","white","burgundy"],
   purple:["silver","gold","beige","black"], navy:["silver","white","beige","gold","pink"], blue:["silver","white","beige","gold"], green:["gold","beige","brown","black"],
   yellow:["white","beige","gold","brown"], orange:["beige","gold","brown","white"], brown:["beige","ivory","gold","green"], multi:["black","beige","white","gold"],
   black:["red","gold","silver","white","pink"], white:["gold","silver","beige","navy"], ivory:["gold","beige","brown"], beige:["brown","gold","white","black"], gold:[], silver:[] };
-function colorScore(a, b){
+function colorScore(a, b){   // 0 = clash, 1 = unknown, 2 = neutral, 2.5 = classic pairing, 3 = same colour family
   const A = colorFams(a), B = colorFams(b); if (!A.length || !B.length) return 1;
   let best = 0;
   for (const x of A) for (const y of B){
@@ -1017,53 +1034,80 @@ function colorScore(a, b){
   }
   return best;
 }
-const isEvening = p => catOf(p) === "maxi" || isMD(p);
-const isWinter = p => isRL(p) || /boot|bootie|clog|slipper|wool|velvet|knit|leather|boucle|coat/i.test(p.title + " " + (p.style || ""));
-function fitScore(base, c){   // occasion, formality and season
+const txt = p => (p.title + " " + (p.style || "") + " " + (p.details || "")).toLowerCase();
+const EVENING_RE = /sequin|paillett|satin|crystal|rhinestone|velvet|tulle|lace|organza|taffeta|metallic|lurex|laminat|chiffon|charmeuse|gown|bow|pearl|embellish|red carpet|beaded|feather|stiletto|clutch|micro|mini bag|bow bag|strappy|d'orsay|slingback|peep/;
+const CASUAL_RE = /knit|cotton|denim|quilted|puffer|sherpa|anorak|clog|slipper|tote|crochet|jersey casual|linen|canvas|fleece/;
+const formality = p => catOf(p) === "maxi" || isMD(p) || isEF(p) ? 2 : EVENING_RE.test(txt(p)) ? 1.5 : CASUAL_RE.test(txt(p)) ? 0 : 1;   // 0 casual … 2 evening
+const isWinterPc = p => isRL(p) || /boot|bootie|clog|slipper|wool|velvet|knit|leather|boucle|suede|coat|faux-fur|sherpa/i.test(p.title + " " + (p.style || ""));
+const MATERIALS = ["satin","sequin","paillett","velvet","lace","crystal","leather","suede","knit","tulle","metallic","patent","pearl","quilt","wool"];
+const matScore = (a, b) => { const A = txt(a), B = txt(b); return MATERIALS.some(m => A.includes(m) && B.includes(m)) ? 0.6 : 0; };
+function fitScore(base, c){   // occasion, formality and season between the viewed piece and a candidate
   const bc = catOf(base), cc = catOf(c), st = c.style || "";
+  let sc = 1.5 - Math.abs(formality(base) - formality(c));   // closer formality is better
   if (cc === "shoes"){
-    if (bc === "maxi" || isEvening(base)) return st === "pumps" || st === "sandals" ? 2 : st === "booties" ? 0.5 : -9;
-    if (bc === "midi") return st === "pumps" || st === "sandals" ? 1.5 : st === "booties" ? (isWinter(base) ? 1.5 : 0.5) : -9;
-    if (bc === "bags") return st === "pumps" || st === "sandals" ? 1.5 : st === "booties" ? 1 : -1;
-    if (bc === "coats" || bc === "jackets" || bc === "scarves") return st === "booties" ? 2 : st === "clogs" ? 1 : st === "pumps" ? 0.5 : st === "slippers" ? -9 : 0;
+    if (bc === "maxi") sc += st === "pumps" || st === "sandals" ? 1.5 : st === "booties" ? -1 : -9;
+    else if (bc === "midi") sc += st === "pumps" || st === "sandals" ? 1 : st === "booties" ? (isWinterPc(base) ? 1 : 0) : -9;
+    else if (bc === "bags") sc += st === "slippers" ? -9 : st === "clogs" ? -1 : 1;
+    else if (bc === "coats" || bc === "jackets" || bc === "scarves") sc += st === "booties" ? 2 : st === "clogs" ? 0.5 : st === "pumps" ? 0.3 : st === "slippers" ? -9 : 0;
   }
   if (cc === "midi" || cc === "maxi"){
-    if (bc === "shoes") return base.style === "slippers" || base.style === "clogs" ? -9 : base.style === "booties" ? (cc === "midi" ? 1.5 : -1) : cc === "maxi" ? 1.5 : 1;
-    if (bc === "coats" || bc === "jackets") return cc === "midi" ? 1 : -9;
-    return 1;
+    if (bc === "shoes") sc += base.style === "slippers" || base.style === "clogs" ? -9 : base.style === "booties" ? (cc === "midi" ? 1 : -2) : 1;
+    if (bc === "coats" || bc === "jackets") sc += cc === "midi" ? 1 : -9;
   }
-  if (cc === "bags") return bc === "maxi" ? (/clutch|mini|micro|pouch|bow/i.test(c.title) ? 2 : 0.5) : 1;
-  if (cc === "scarves") return 2;
-  if (cc === "coats" || cc === "jackets") return bc === "scarves" ? 2 : bc === "midi" ? 0.5 : bc === "shoes" && (base.style === "booties" || base.style === "clogs") ? 1.5 : -9;
-  return 0;
+  if (cc === "bags") sc += bc === "maxi" || formality(base) >= 2 ? (/clutch|mini|micro|pouch|bow|crystal/i.test(c.title) ? 1.5 : -0.5) : 0.5;
+  if (cc === "scarves") sc += bc === "coats" || bc === "jackets" ? 1.5 : 0;
+  if (cc === "coats" || cc === "jackets") sc += bc === "scarves" ? 1.5 : 0;
+  if (isWinterPc(base) && isWinterPc(c)) sc += 0.5;
+  return sc;
 }
-const LOOK_GROUPS = { midi:[["shoes",2],["bags",2]], maxi:[["shoes",2],["bags",2]], bags:[["midi maxi",2],["shoes",2]], shoes:[["midi maxi",2],["bags",2]],
-  coats:[["scarves",1],["shoes",2],["midi",1]], jackets:[["scarves",1],["shoes",2],["midi",1]], scarves:[["coats jackets",2],["shoes",2]] };
-const LOOK_TIPS = { midi:"Pair it with slim heeled sandals or pointed pumps in a neutral or metallic tone, and a small structured bag.",
-  maxi:"Finish with a strappy heeled sandal and a compact clutch in gold, silver or a matching tone.",
-  bags:"Let the bag lead: keep the dress in a solid tone and repeat one of the bag's colours in your shoes.",
-  shoes:"Pick a dress in a matching or neutral tone and keep the bag small so the shoes stand out.",
-  coats:"Add a soft knit scarf and ankle boots in a matching neutral for a polished winter look.",
-  jackets:"Layer over a midi dress, then add a scarf and ankle boots.", scarves:"Drape over a tailored coat in a neutral shade." };
-function completeLook(p, all){
-  const groups = catOf(p) === "shoes" && (p.style === "clogs" || p.style === "slippers") ? [["coats jackets",2],["scarves",1],["bags",1]] : LOOK_GROUPS[catOf(p)]; if (!groups) return "";
-  const picks = [], used = new Set([p.handle]);
-  const score = c => colorScore(p, c) * 2 + fitScore(p, c) + Math.min(2, (favCount(c.handle) + viewCount(c.handle) / 5) / 5) + offShown(c) / 100;
-  for (const [cats, n] of groups){
-    const cs = cats.split(" ");
-    const cands = all.filter(c => !used.has(c.handle) && cs.includes(catOf(c)) && isAvail(c) && c.image && c.status !== "verify" && colorScore(p, c) > 0 && fitScore(p, c) > -5)
-      .map(c => [score(c), c]).sort((x, y) => y[0] - x[0]);
-    const seen = new Set(); let taken = 0;
-    for (const [, c] of cands){
-      if (taken >= n || picks.length >= 4) break;
-      const key = brandOf(c) + "|" + (colorFams(c)[0] || "") + "|" + catOf(c);
-      if (seen.has(key)) continue; seen.add(key); picks.push(c); used.add(c.handle); taken++;
+/* slots per product type: exactly one item each */
+const SLOT_NAMES = { shoes:"Shoes · جزمة", bag:"Bag · شنطة", dress:"Dress · فستان", clothing:"Clothing · قطعة ملابس", accessory:"Bag or scarf · شنطة أو سكارف", outer:"Coat or jacket · جاكيت أو بالطو" };
+const SLOT_CATS = { shoes:["shoes"], bag:["bags"], dress:["midi","maxi"], clothing:["midi"], accessory:["bags","scarves"], outer:["coats","jackets"] };
+const LOOK_SLOTS = { midi:["shoes","bag"], maxi:["shoes","bag"], shoes:["dress","bag"], bags:["dress","shoes"], coats:["clothing","shoes","accessory"], jackets:["clothing","shoes","accessory"], scarves:["outer","shoes","bag"] };
+const lookScore = (p, c) => colorScore(p, c) * 2 + fitScore(p, c) + matScore(p, c) + Math.min(1, engage(c.handle) / 20) + offShown(c) / 200;
+const usable = c => isAvail(c) && c.image && c.status !== "verify";
+function pickLook(p, all){
+  const slots = LOOK_SLOTS[catOf(p)] || [], used = new Set([p.handle]), out = [];
+  for (const slot of slots){
+    let best = null, bestS = -Infinity;
+    for (const c of all){
+      if (used.has(c.handle) || !SLOT_CATS[slot].includes(catOf(c)) || !usable(c) || colorScore(p, c) === 0) continue;
+      const f = fitScore(p, c); if (f < -3) continue;
+      const sc = lookScore(p, c); if (sc > bestS){ bestS = sc; best = c; }
     }
+    if (best && bestS >= 3){ out.push([slot, best]); used.add(best.handle); }   // only genuinely matching pieces; otherwise the slot is left out
   }
-  const body = picks.length ? `<div class="look-row">${picks.slice(0, 4).map(c => `<a class="look" href="${plink(c)}"><span class="lph"><img loading="lazy" decoding="async" src="${esc(img(c.image, 360))}" alt="${esc(BRANDS[brandOf(c)] + " " + c.title)}"></span>
-      <span class="lk">${esc(kindOf(c))}</span><span class="ln">${esc(c.title)}</span><span class="lp${offShown(c) ? " hot" : ""}">${fmt(finalSAR(c))} SAR</span></a>`).join("")}</div>`
-    : `<p class="look-tip">${esc(LOOK_TIPS[catOf(p)] || "")}</p>`;
-  return `<section class="looks" aria-label="Complete the look"><h2>COMPLETE THE LOOK <span lang="ar" dir="rtl">— أكملي الإطلالة</span></h2>${body}</section>`;
+  return out;
+}
+function completeLook(p, all){
+  const look = pickLook(p, all); if (!look.length) return "";
+  return `<section class="looks" aria-label="Complete the look"><h2>COMPLETE THE LOOK <span lang="ar" dir="rtl">— أكملي الإطلالة</span></h2>
+    <div class="look-row n${look.length}">${look.map(([slot, c]) => `<a class="look" href="${plink(c)}"><span class="slot">${SLOT_NAMES[slot]}</span><span class="lph"><img loading="lazy" decoding="async" src="${esc(img(c.image, 400))}" alt="${esc(BRANDS[brandOf(c)] + " " + c.title)}"></span>
+      <span class="lk">${esc(BRANDS[brandOf(c)])}</span><span class="ln">${esc(c.title)}</span><span class="lp${offShown(c) ? " hot" : ""}">${fmt(finalSAR(c))} SAR</span></a>`).join("")}</div></section>`;
+}
+const SIMILAR_CATS = { midi:["midi"], maxi:["maxi"], bags:["bags"], shoes:["shoes"], jackets:["jackets","coats"], coats:["coats","jackets"], scarves:["scarves"] };
+function alsoLike(p, all, skip){
+  const cats = SIMILAR_CATS[catOf(p)] || [catOf(p)], words = new Set(p.title.toLowerCase().split(/[^a-zà-ú]+/).filter(w => w.length > 3));
+  const sim = c => {
+    const A = colorFams(p), B = colorFams(c);
+    let sc = A.some(x => B.includes(x)) ? 3 : colorScore(p, c) >= 2.5 ? 1 : 0;
+    sc += catOf(c) === catOf(p) ? 1.5 : 0;
+    sc += (c.style && c.style === p.style) ? 2 : 0;
+    sc += brandOf(c) === brandOf(p) ? 0.8 : 0;
+    sc += 1 - Math.min(1, Math.abs(formality(c) - formality(p)));
+    sc += c.title.toLowerCase().split(/[^a-zà-ú]+/).filter(w => words.has(w)).length * 0.7;   // shared cut / fabric words
+    const r = finalSAR(c) / Math.max(1, finalSAR(p)); sc += r > 0.6 && r < 1.6 ? 0.8 : 0;
+    return sc + Math.min(0.8, engage(c.handle) / 25);
+  };
+  const list = all.filter(c => c.handle !== p.handle && !skip.has(c.handle) && cats.includes(catOf(c)) && usable(c))
+    .map(c => [sim(c), c]).sort((a, b) => b[0] - a[0]).slice(0, 8).map(x => x[1]);
+  if (!list.length) return "";
+  return `<section class="alike" aria-label="You may also like"><h2>YOU MAY ALSO LIKE <span lang="ar" dir="rtl">— منتجات قد تعجبك</span></h2>
+    <div class="grid">${list.map(c => card(c, true)).join("")}</div></section>`;
+}
+function recos(p, all){
+  const look = pickLook(p, all);
+  return completeLook(p, all) + alsoLike(p, all, new Set(look.map(x => x[1].handle)));
 }
 
 /* ---------- product views (aggregate counts only; no customer identity) ---------- */
@@ -1143,19 +1187,19 @@ function viewItem(all, handle){
       ${off ? `<p class="eur"><s>${fmt(wasSAR(p))} SAR</s><span class="pct">−${off}%</span></p>` : ""}
       ${priceBreak(p)}
       ${COSTS() ? `<p class="calc">${eur(p.price)} (was ${eur(p.compare)}, −${pct(p)}%) × ${rate().toFixed(3)} + ${fmt(extraFor(p))} SAR</p>` : ""}`}
-      <div class="pdp-sizes">${isDress(p) ? `<p class="small">${out ? "Sold out in every size" : catOf(p) === "scarves" ? "Size" : isUS(p) ? "Available US sizes" : "Available UK sizes"}</p>${sizesHTML(p)}
+      <div class="pdp-sizes">${isDress(p) ? `<p class="small">${out ? "Sold out in every size" : catOf(p) === "scarves" ? "Size" : isEF(p) ? "Available IT sizes" : isUS(p) ? "Available US sizes" : "Available UK sizes"}</p>${sizesHTML(p)}
         ${!out && isSP(p) && S.settings.sizes.length ? `<p class="small" style="margin-top:8px">${avail.some(s => anyFits(s, S.settings.sizes)) ? "In your size" : "Not available in your saved sizes"}</p>` : ""}`
         : `<p class="small">${out ? "Sold out" : "In stock"}</p>${dims ? `<p class="dims">Dimensions: ${esc(dims)}</p>` : ""}`}
-        ${isMacys(p) ? (p.variants && p.variants.length > 1 ? p.variants.map(v => `<a class="guide-btn macys" href="${esc(v.url)}" target="_blank" rel="noopener">View ${esc(v.color)} on Macy's</a>`).join(" ") : `<a class="guide-btn macys" href="${esc(url(p))}" target="_blank" rel="noopener">View on Macy's</a>`) : `<button class="guide-btn" data-guide="${esc(p.handle)}">${isDress(p) ? "View size guide" : "View dimensions"}</button>`}</div>
+        ${isMacys(p) ? (p.variants && p.variants.length > 1 ? p.variants.map(v => `<a class="guide-btn macys" href="${esc(v.url)}" target="_blank" rel="noopener">View ${esc(v.color)} on Macy's</a>`).join(" ") : `<a class="guide-btn macys" href="${esc(url(p))}" target="_blank" rel="noopener">View on Macy's</a>`) : isEF(p) ? `<a class="guide-btn macys" href="${esc(url(p))}" target="_blank" rel="noopener">View on Elisabetta Franchi</a>` : `<button class="guide-btn" data-guide="${esc(p.handle)}">${isDress(p) ? "View size guide" : "View dimensions"}</button>`}</div>
       <button class="btn ${fav ? "" : "solid"} favbtn" data-fav="${esc(p.handle)}" aria-pressed="${fav}">${fav ? (isDress(p) && favOf(p.handle).size ? "Saved · " + esc(favOf(p.handle).size) + " — change" : "Saved to favorites") : "Save to favorites"}</button>
       ${fav && isDress(p) && favOf(p.handle).size && !favSizeOk(p) ? `<p class="warnline">${esc(favOf(p.handle).size)} is no longer available</p>` : ""}
       ${waLink(p)}
       ${p.details ? `<div class="details"><h2>Details</h2><p>${esc(p.details)}</p></div>` : ""}
-      ${OWNER ? `<div class="acts"><button data-edit="${esc(p.handle)}">Edit</button>${COSTS() && !isMacys(p) ? `<a href="${esc(url(p))}" target="_blank" rel="noopener">Store page</a>` : ""}</div>` : ""}
+      ${OWNER ? `<div class="acts"><button data-edit="${esc(p.handle)}">Edit</button>${COSTS() && !isMacys(p) && !isEF(p) ? `<a href="${esc(url(p))}" target="_blank" rel="noopener">Store page</a>` : ""}</div>` : ""}
       <div class="pn">${prev ? `<a href="${plink(prev)}">‹ Previous</a>` : "<span></span>"}${next ? `<a href="${plink(next)}">Next ›</a>` : ""}</div>
     </div>
   </section>
-  ${completeLook(p, all)}`;
+  ${recos(p, all)}`;
 }
 
 /* ---------- size guide drawer ---------- */
@@ -1239,6 +1283,7 @@ function viewAdmin(all){
       <label class="f">Mac Duggal — fixed amount added to every dress (SAR)<input id="sExtraMD" type="number" inputmode="decimal" step="1" value="${extraMD()}"></label>
       <label class="f">Winter Sale (Lauren Ralph Lauren) — fixed amount added to every piece (SAR)<input id="sExtraRL" type="number" inputmode="decimal" step="1" value="${extraRL()}"></label>
       <label class="f">Shoes (Macy's) — fixed amount added to every pair (SAR)<input id="sExtraShoes" type="number" inputmode="decimal" step="1" value="${extraShoes()}"></label>
+      <label class="f">Elisabetta Franchi — fixed amount added to every dress (SAR)<input id="sExtraEF" type="number" inputmode="decimal" step="1" value="${extraEF()}"></label>
       <p class="small">Mac Duggal: US price, less any Black Friday markdown, less the extra 25% where Mac Duggal labels it “+25% Off In Cart”, × USD/SAR ${usdRate().toFixed(4)} (${esc(m.usdRate && m.usdRate.source || "peg 3.75")}) + the fixed amount.</p>
       <label class="f">EUR → SAR rate<input id="sRate" type="number" inputmode="decimal" step="0.0001" placeholder="Live: ${Number(m.rate && m.rate.value || 0).toFixed(4)}" value="${S.settings.rate || ""}"></label>
       <p class="small">Live rate ${Number(m.rate && m.rate.value || 0).toFixed(4)} from ${esc(m.rate && m.rate.source || "—")}${m.rate && m.rate.asOf ? ", " + esc(m.rate.asOf) : ""}. Leave empty to use the live rate.</p>
@@ -1453,6 +1498,7 @@ function wireAdmin(list){
   $("#aRefreshAll").onclick = () => runCheck("all");
   $("#aNewDeals").onclick = () => runCheck("new");
   $("#sExtra").onchange = e => { const v = Number(e.target.value); if (!Number.isFinite(v) || v < 0) return toast("Enter a number of riyals, 0 or more."); S.settings.extra = v; save(); render(); toast("Every dress now adds " + fmt(v) + " SAR."); };
+  $("#sExtraEF").onchange = e => { const v = Number(e.target.value); if (!Number.isFinite(v) || v < 0) return toast("Enter a number of riyals, 0 or more."); S.settings.extraEF = v; save(); render(); toast("Every Elisabetta Franchi dress now adds " + fmt(v) + " SAR."); };
   $("#sExtraShoes").onchange = e => { const v = Number(e.target.value); if (!Number.isFinite(v) || v < 0) return toast("Enter a number of riyals, 0 or more."); S.settings.extraShoes = v; save(); render(); toast("Every pair of shoes now adds " + fmt(v) + " SAR."); };
   $("#sExtraRL").onchange = e => { const v = Number(e.target.value); if (!Number.isFinite(v) || v < 0) return toast("Enter a number of riyals, 0 or more."); S.settings.extraRL = v; save(); render(); toast("Every Winter Sale piece now adds " + fmt(v) + " SAR."); };
   $("#sExtraMD").onchange = e => { const v = Number(e.target.value); if (!Number.isFinite(v) || v < 0) return toast("Enter a number of riyals, 0 or more."); S.settings.extraMD = v; save(); render(); toast("Every Mac Duggal dress now adds " + fmt(v) + " SAR."); };

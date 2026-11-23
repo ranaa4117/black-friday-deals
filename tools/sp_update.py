@@ -259,13 +259,23 @@ def ef_product(href, debug=False):
         offers = offers[0] if offers else {}
     price = prices[0] if prices else float(offers.get("price") or 0)
     compare = 0.0
+    books = {}
+    for pr, pb in re.findall(r'"price":([\d.]+),"pricebook":"([^"]+)"', h):
+        books[pb] = min(books.get(pb, 1e9), float(pr))
+    if len(set(books.values())) > 1:
+        compare = max(books.values())
+        price = min(min(books.values()), price) if price else min(books.values())
     for k in EF_LIST_KEYS:   # a crossed-out official price, only if the store publishes one
         m = re.search(r'"%s"\s*:\s*\{?[^}]{0,80}?"?(?:value|amount)?"?\s*:?\s*"?([\d.]+)' % k, h)
-        if m and float(m.group(1)) > price:
+        if not compare and m and float(m.group(1)) > price:
             compare = float(m.group(1))
             break
     imgs = ld.get("image") or []
     imgs = list(dict.fromkeys([i for i in (imgs if isinstance(imgs, list) else [imgs]) if i]))
+    code = re.search(r"([A-Z0-9]{9})_([A-Z0-9]{3})_0\.jpg", " ".join(imgs))
+    if code:   # every official photo of this colour (…_0.jpg, _1.jpg …) as listed in the page
+        more = sorted(set(re.findall(r"(https://[^\"'\s]*?/images/zoom/%s_%s_\d\.jpg)" % (code.group(1), code.group(2)), h)))
+        imgs = list(dict.fromkeys(imgs + more))
     if debug:
         print("  EF", name, color, "| length", length, "| prices", prices, "| sizes", sizes, "| compare", compare,
               "| keys:", {k: h.count('"' + k + '"') for k in EF_LIST_KEYS}, "| pricebooks", sorted(set(re.findall(r'"pricebook":"([^"]+)"', h))))
@@ -291,8 +301,6 @@ def fetch_ef(debug=False):
             why = "not a dress"
         elif d["length"] is not None and d["length"] < 125:
             why = f"length {d['length']} cm — not maxi"
-        elif d["length"] is None and not re.search(r"\b(lungo|lunga|maxi|fino ai piedi|floor)\b", d["desc"], re.I):
-            why = "length not stated — maxi not confirmed"
         if not d["price"]:
             why = why or "no price"
         if why:
@@ -350,7 +358,7 @@ def write_sitemap(products):
                 extra += [p for p in json.load(fh).get("products", []) if p.get("status") != "verify"]
         except Exception:  # noqa: BLE001
             pass
-    secs = ["dresses", "dresses-sp", "dresses-md", "dresses-sp-midi", "dresses-sp-maxi", "bags", "shoes", "winter",
+    secs = ["dresses", "dresses-sp", "dresses-md", "dresses-ef", "dresses-ef-maxi", "dresses-sp-midi", "dresses-sp-maxi", "bags", "shoes", "winter",
             "winter-jackets", "winter-coats", "winter-scarves"]
     urls = [site] + [f"{site}?c={c}" for c in secs] + sorted(f"{site}?p={urllib.parse.quote(p['handle'])}" for p in list(products) + extra)
     xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + \

@@ -83,7 +83,7 @@ jobs:
           SG_PROBE: ${{ github.event.inputs.probe || '' }}
           SG_FORCE: ${{ github.event.inputs.force || '0' }}
           MD_ENABLE: "1"
-          EF_ENABLE: "0"
+          EF_ENABLE: "1"
           MD_CHART_DEBUG: "1"
         run: python3 tools/sp_update.py
       - name: Publish new data
