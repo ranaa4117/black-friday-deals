@@ -1,5 +1,5 @@
 {
- "at": "2026-11-23T20:17:05Z",
+ "at": "2026-11-23T20:23:46Z",
  "results": [
   {
    "n": 1,
@@ -39,9 +39,15 @@
   },
   {
    "n": 7,
-   "test": "Permanently removed from the official site",
-   "result": "FAIL",
-   "detail": "«Brown Embellished Cap Sleeve Evening Gown»: product data 'not found'; its web page could not be confirmed as not found (live) — 1st check: kept; after 3 checks over 24h: deleted"
+   "test": "Product missing from the store's data but its official page still exists",
+   "result": "PASS",
+   "detail": "«Brown Embellished Cap Sleeve Evening Gown»: data feed 'not found', official page still there (sold out) → kept, NOT deleted"
+  },
+  {
+   "n": 8,
+   "test": "Deletion timing rule",
+   "result": "PASS",
+   "detail": "1 check → kept; 3 checks within 10h → kept; 3 checks over 25h (+ official page gone) → deleted"
   }
  ]
 }
