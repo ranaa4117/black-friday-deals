@@ -194,6 +194,8 @@ def normalize_md(p, bf_handles, retain=False):
     compare = float(cheapest.get("compare_at_price") or 0)
     markdown = compare > price
     hit = md_promo_for(p)
+    if hit and hit.get("tag") == "markdown" and not markdown:
+        hit = None   # "Extra N% Off" on sale items: only dresses actually reduced (the page shows no label otherwise)
     promo = bool(hit)
     if not markdown and not promo and not retain:
         return None  # full price and not eligible for the cart promotion
