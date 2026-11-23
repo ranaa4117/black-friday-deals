@@ -349,6 +349,7 @@ nav.tabs .dot{display:inline-block;width:6px;height:6px;border-radius:50%;backgr
 .two{display:grid;grid-template-columns:1fr 1fr;gap:4px 32px}@media (max-width:760px){ .two{grid-template-columns:1fr} .bar{grid-template-columns:minmax(90px,42%) 1fr auto} }
 .st-t td.pc{display:flex;gap:8px;align-items:center;min-width:220px}.st-t td.pc img{width:30px;height:40px;object-fit:cover}
 .nodata{color:var(--stone);font-size:13px;margin:6px 0}
+.audit{border-left:3px solid #1e7a46;padding:6px 10px;margin:0 0 10px;font-size:13px}.audit.bad{border-color:var(--red)}.audit ul{margin:4px 0 0 18px;padding:0}
 .consent{position:fixed;left:12px;right:12px;bottom:12px;z-index:60;background:#fff;border:1px solid var(--rule);box-shadow:0 6px 24px rgba(0,0,0,.08);padding:10px 14px;display:flex;gap:10px;align-items:center;font:400 13px/1.5 "Tajawal",var(--sans);max-width:620px;margin:0 auto}
 .consent span{flex:1}.consent button{border:1px solid var(--ink);background:var(--ink);color:#fff;padding:6px 14px;font:inherit;cursor:pointer}.consent button.q{background:#fff;color:var(--ink)}
 /* ---- size guide illustration ---- */
@@ -516,7 +517,7 @@ const PASS_HASH = "3c29f0bb09f7f11433b993fb3a8d945503758c57eacb6ecfe88c49e1ef74e
 const REPO = "ranaa4117/black-friday-deals";
 const WORKFLOW = "self-portrait-update.yml";
 const LS = "sp-edit-v1";
-const APP_VERSION = "22";
+const APP_VERSION = "23";
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
@@ -1487,6 +1488,9 @@ function viewAdmin(all){
   return `<div class="list-head"><div><h2>Admin & settings</h2><p>Changes save instantly on this device${GH.token && GH.sync ? " and are published to customers" : ". Customers see your edits once sync is on (Sync & publish below)"}.</p></div>
     <div class="owner-tools"><button class="btn quiet" id="aCosts">${SHOWCOSTS ? "Hide my costs" : "Show my costs"}</button><button class="btn quiet" id="aLeave">View as a customer</button><a class="btn solid" href="#stats">Analytics dashboard</a></div></div>
 
+  <section class="panel"><div><h3>Brand health checks</h3><p class="why">Four times a day every brand is compared with its official site: missing or wrongly removed pieces, prices, extra discounts and stock. Problems are fixed and listed here.</p></div>
+    <div class="fields" id="auditBox"><p class="small">Loading…</p></div></section>
+
   <section class="panel"><div><h3>Updates</h3><p class="why">GitHub checks the Spain store every 15 minutes: new sale items, prices, discounts, sizes, stock, photos and the exchange rate.</p></div>
     <div class="fields">
       <div class="row"><button class="btn solid" id="aRefreshAll">Refresh all products</button><button class="btn" id="aNewDeals">Check for new deals</button></div>
@@ -1715,6 +1719,12 @@ function wireList(route){
 }
 
 function wireAdmin(list){
+  fetch(BASE + "audit.json?t=" + Date.now(), { cache:"no-store" }).then(r => r.ok ? r.json() : { audits: [] }).catch(() => ({ audits: [] })).then(a => {
+    const box = $("#auditBox"); if (!box) return;
+    const list = (a.audits || []).slice(0, 8);
+    box.innerHTML = list.length ? list.map(x => `<div class="audit ${x.ok ? "ok" : "bad"}"><b>${when(x.at)} · ${x.ok ? "All brands OK" : (x.problems || 0) + " problem" + (x.problems === 1 ? "" : "s") + " found" + (x.fixed ? ", " + x.fixed + " fixed" : "")}</b>${(x.notes || []).length ? `<ul>${x.notes.map(n => `<li>${esc(n)}</li>`).join("")}</ul>` : ""}</div>`).join("")
+      : '<p class="small">The first health check hasn\'t run yet.</p>';
+  });
   editList(list); $("#aQ").oninput = () => editList(products());
   $("#aCosts").onclick = () => { SHOWCOSTS = !SHOWCOSTS; render(); toast(SHOWCOSTS ? "Showing your € costs on every page. Only you can see this." : "Costs hidden."); };
   $("#aLeave").onclick = () => { store.set("sp-unlock", ""); OWNER = false; SHOWCOSTS = false; location.hash = "#home"; render(); loadData(false); toast("Customer view. Open #admin to sign back in."); };
