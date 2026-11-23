@@ -71,6 +71,9 @@ jobs:
       - name: Mac Duggal diagnostics
         if: ${{ github.event.inputs.md_probe == '1' }}
         run: python3 tools/md_probe.py
+      - name: Mac Duggal product page diagnostics
+        if: ${{ github.event.inputs.md_probe == '2' }}
+        run: python3 tools/md_page_probe.py
       - name: Test shared favorites database
         if: ${{ github.event.inputs.fav_test == '1' }}
         run: |
