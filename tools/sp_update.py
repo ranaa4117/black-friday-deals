@@ -20,6 +20,7 @@ import os
 import re
 import time
 import urllib.request
+import urllib.parse
 from html.parser import HTMLParser
 
 STORE = "https://eu.self-portrait.com/es-es"
@@ -212,6 +213,61 @@ def fetch_md_chart():
         for t in tables[:4]:
             print("   ", t[:4])
     return {"tables": tables[:8], "headings": [x for x in titles if x][:12], "url": f"{MD_STORE}/pages/size-chart", "at": now_iso()}
+
+
+SP_PROMO_PAGES = ["/collections/sale-last-chance", "/collections/sale", ""]
+SP_PROMO_RE = re.compile(r"extra\s+(\d{1,2})\s*%\s*(?:off\s+)?(?:sale|rebajas)|(\d{1,2})\s*%\s*(?:extra|adicional)\s+(?:en\s+)?(?:sale|rebajas)", re.I)
+
+
+def fetch_sp_promo():
+    """Self-Portrait's store-wide extra discount on sale items (e.g. 'Black Friday - Extra 20% off sale'),
+    read from the store's own banners. Returns the promo, None when no page shows one, or raises if no page could be read."""
+    read = 0
+    for path in SP_PROMO_PAGES:
+        try:
+            html = fetch(STORE + path, accept="text/html")
+        except Exception as e:  # noqa: BLE001
+            print("sp promo page failed:", path, e)
+            continue
+        read += 1
+        text = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", re.sub(r"(?is)<(script|style)[^>]*>.*?</\1>", " ", html)))
+        m = SP_PROMO_RE.search(text)
+        if m:
+            pct = int(m.group(1) or m.group(2))
+            start = max(0, m.start() - 40)
+            banner = text[start:m.end() + 30].strip()
+            if 5 <= pct <= 60:
+                return {"pct": pct, "text": banner[:140], "source": STORE + path, "appliesTo": "sale items (not full price), automatically at checkout"}
+    if not read:
+        raise RuntimeError("no Self-Portrait page could be read")
+    return None
+
+
+def write_sitemap(products):
+    """sitemap.xml + robots.txt for the public address; only rewritten when the list of pages changes."""
+    site = "https://raghad-outlet.pages.dev/"
+    extra = []
+    for name in ("winter.json", "shoes.json"):
+        try:
+            with open(os.path.join(os.path.dirname(OUT), name), encoding="utf-8") as fh:
+                extra += [p for p in json.load(fh).get("products", []) if p.get("status") != "verify"]
+        except Exception:  # noqa: BLE001
+            pass
+    secs = ["dresses", "dresses-sp", "dresses-md", "dresses-sp-midi", "dresses-sp-maxi", "bags", "shoes", "winter",
+            "winter-jackets", "winter-coats", "winter-scarves"]
+    urls = [site] + [f"{site}?c={c}" for c in secs] + sorted(f"{site}?p={urllib.parse.quote(p['handle'])}" for p in list(products) + extra)
+    xml = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + \
+        "".join(f"  <url><loc>{u.replace('&', '&amp;')}</loc></url>\n" for u in urls) + "</urlset>\n"
+    path = os.path.join(os.path.dirname(OUT), "sitemap.xml")
+    try:
+        with open(path, encoding="utf-8") as fh:
+            if fh.read() == xml:
+                return
+    except FileNotFoundError:
+        pass
+    with open(path, "w", encoding="utf-8") as fh:
+        fh.write(xml)
+    print("sitemap:", len(urls), "pages")
 
 
 def fetch_usd_rate():
@@ -439,6 +495,16 @@ def main():
     if rate:
         meta["rate"] = rate
     meta["usdRate"] = fetch_usd_rate()
+    try:
+        promo = fetch_sp_promo()
+        if promo:
+            meta["spPromo"] = promo
+        elif "spPromo" in meta:
+            print("Self-Portrait extra promotion no longer shown — removed")
+            meta.pop("spPromo", None)
+    except Exception as e:  # noqa: BLE001
+        print("sp promo check failed (keeping last known):", e)
+    print("sp promo:", meta.get("spPromo"))
     if os.environ.get("MD_ENABLE", "1") == "1":
         try:
             chart = fetch_md_chart()
@@ -541,6 +607,10 @@ def main():
     log.insert(0, {"at": ts, "added": len(added), "removed": len(gone), "changed": len(changed), "guides": guides})
     meta["log"] = log[:40]
     write({"meta": meta, "products": products, "removed": removed})
+    try:
+        write_sitemap(products)
+    except Exception as e:  # noqa: BLE001
+        print("sitemap failed:", e)
     print(f"ok: {counts} (store feed {raw_counts}), +{len(added)} new, -{len(gone)} removed, "
           f"{len(changed)} changed, {guides} size guides read, rate {meta.get('rate', {}).get('value')}, errors {errors}")
 
