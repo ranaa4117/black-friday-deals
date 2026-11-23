@@ -127,7 +127,7 @@ MD_NOT_MAXI = re.compile(r"\b(mini|midi|short|tea length|cocktail dress|jumpsuit
 def fetch_md_collection(handle):
     items, page = [], 1
     while page <= 20:
-        batch = get_json(f"{MD_STORE}/collections/{handle}/products.json?limit=250&page={page}").get("products") or []
+        batch = get_json(f"{MD_STORE}/collections/{handle}/products.json?limit=250&page={page}&_rc={int(time.time())}").get("products") or []
         items += batch
         if len(batch) < 250:
             break
@@ -137,17 +137,15 @@ def fetch_md_collection(handle):
 
 
 MD_PROMO = {"tag": MD_PROMO_TAG, "pct": 25, "label": "+25% Off In Cart"}
+MD_STALE = set()   # labels not seen on the latest checks (kept for now, but unverified)
+MD_LABELS_OK = False   # True when this run read the store's current promotion labels from its official pages
 MD_PROMOS = [MD_PROMO]   # every extra-%-off label the store shows right now (a product gets the first one whose tag it carries)
 
 
-def fetch_md_promos():
-    """Mac Duggal's own product-label promotions (window.cardHighlights): which tag gets which extra % off.
-    Returns every extra-discount label for the main (core) market — [] when the store shows none —
-    or raises when the page can't be read. Labels that say "Price as marked" are not an extra discount."""
-    h = fetch(MD_STORE + "/", accept="text/html")
-    m = re.search(r"cardHighlights\s*=\s*(\[.*?\])\s*;", h, re.S)
+def _md_labels(html_text):
+    m = re.search(r"cardHighlights\s*=\s*(\[.*?\])\s*;", html_text, re.S)
     if not m:
-        return []
+        return None
     out = []
     for obj in re.findall(r"\{[^{}]*\}", m.group(1)):
         val = lambda k: (re.search(k + r'\s*:\s*"([^"]*)"', obj) or [None, ""])[1]
@@ -160,6 +158,25 @@ def fetch_md_promos():
     return out
 
 
+def fetch_md_promos(tries=3):
+    """Mac Duggal's own product-label promotions (window.cardHighlights, the data the official product pages use to
+    show labels such as "Extra 25% Off"): which product tag gets which extra % off, for the main (core) market.
+    Read fresh (cache-busted) from two official pages that must agree. Returns [] only when both pages were read
+    and show no label; raises when they can't be read or disagree — that is "unverified", never "expired".
+    Labels that say "Price as marked" are not an extra discount."""
+    last = None
+    for i in range(tries):
+        bust = "%d%d" % (time.time(), i)
+        a = _md_labels(fetch(f"{MD_STORE}/?_rc={bust}", accept="text/html"))
+        time.sleep(1)
+        b = _md_labels(fetch(f"{MD_STORE}/collections/{MD_MAXI}?_rc={bust}", accept="text/html"))
+        if a is not None and b is not None and sorted(map(str, a)) == sorted(map(str, b)):
+            return a
+        last = (a, b)
+        time.sleep(3)
+    raise RuntimeError(f"promotion labels unreadable or inconsistent: {last}")
+
+
 def fetch_md_promo():
     """First extra-discount label (kept for diagnostics)."""
     found = fetch_md_promos()
@@ -169,6 +186,19 @@ def fetch_md_promo():
 def md_promo_for(p):
     tags = set(tag_list(p))
     return next((x for x in MD_PROMOS if x.get("tag") in tags), None)
+
+
+MD_EXEMPT = re.compile(r"exempt|no\s*promo", re.I)
+
+
+def md_promo_state(p, hit):
+    """active = the official page shows the label for this product; checkout = it shows the label but the product
+    also carries the store's own exclusion tag, so the final price must be confirmed at checkout."""
+    if not hit:
+        return "none"
+    if hit.get("tag") in MD_STALE:
+        return "unverified"
+    return "checkout" if any(MD_EXEMPT.search(t) for t in tag_list(p)) else "active"
 
 
 def tag_list(p):
@@ -193,9 +223,7 @@ def normalize_md(p, bf_handles, retain=False):
     price = float(cheapest["price"])
     compare = float(cheapest.get("compare_at_price") or 0)
     markdown = compare > price
-    hit = md_promo_for(p)
-    if hit and hit.get("tag") == "markdown" and not markdown:
-        hit = None   # "Extra N% Off" on sale items: only dresses actually reduced (the page shows no label otherwise)
+    hit = md_promo_for(p)   # the label the official product page shows for this product's tags (price may not be reduced)
     promo = bool(hit)
     if not markdown and not promo and not retain:
         return None  # full price and not eligible for the cart promotion
@@ -225,6 +253,9 @@ def normalize_md(p, bf_handles, retain=False):
         "markdown": markdown,
         "extra25": promo and hit["pct"] == 25,
         "extraPct": hit["pct"] if promo else 0,
+        "promoStatus": md_promo_state(p, hit),
+        "promoLabel": hit["label"] if promo else "",
+        "promoTag": hit["tag"] if promo else "",
         "colors": colors[:8],
         "sizes": [{"s": k, "a": a} for k, a in sizes.items()],
         "publishedAt": (p.get("published_at") or "")[:10],
@@ -581,6 +612,31 @@ def load_prev():
         return {"meta": {}, "products": [], "removed": []}
 
 
+GONE_CHECKS, GONE_SPAN_H = 3, 24   # a product is deleted only after 3 "not found" checks spread over at least 24 hours
+
+
+def removal_confirmed(checks):
+    return len(checks) >= GONE_CHECKS and age_s(checks[0]) >= GONE_SPAN_H * 3600
+
+
+def url_of(p):
+    return p.get("url") or (f"{STORE}/products/{p['handle']}" if p.get("brand", "sp") == "sp" else "")
+
+
+def page_gone(p):
+    """Second, independent confirmation: the product's own official web page answers "not found" (404/410)."""
+    u = url_of(p)
+    if not u:
+        return False
+    try:
+        fetch(u + ("&" if "?" in u else "?") + "_rc=%d" % time.time(), accept="text/html")
+        return False
+    except urllib.error.HTTPError as e:
+        return e.code in (404, 410)
+    except Exception:  # noqa: BLE001
+        return False
+
+
 class Gone(Exception):
     pass
 
@@ -588,10 +644,11 @@ class Gone(Exception):
 def product_json(store, handle):
     """One product from a Shopify store's own page data. /products/<h>.json has no stock flags,
     so stock is taken from the same product's /products/<h>.js (per variant)."""
-    raw = get_json(f"{store}/products/{handle}.json").get("product")
+    bust = int(time.time())
+    raw = get_json(f"{store}/products/{handle}.json?_rc={bust}").get("product")
     if raw:
         try:
-            js = get_json(f"{store}/products/{handle}.js")
+            js = get_json(f"{store}/products/{handle}.js?_rc={bust}")
             avail = {v.get("id"): bool(v.get("available")) for v in js.get("variants") or []}
             for v in raw.get("variants") or []:
                 if v.get("id") in avail:
@@ -632,7 +689,7 @@ def refresh_product(p, bf_handles):
 
 def _state(p):
     return {"price": p.get("price"), "compare": p.get("compare"), "extraPct": p.get("extraPct") or 0,
-            "listed": p.get("listed", True), "status": p.get("status", "ok")}
+            "listed": p.get("listed", True), "status": p.get("status", "ok"), "ps": p.get("promoStatus") or ""}
 
 
 def change_item(n, msgs, o=None):
@@ -640,6 +697,38 @@ def change_item(n, msgs, o=None):
     if o:
         item["o"] = _state(o)
     return item
+
+
+def md_promo_decide(n, o, ts, fresh_read=True):
+    """Decide a Mac Duggal product's extra-discount status from a fresh official read (n) and its previous record (o).
+    - label on the product now            -> active / checkout (restored at once if it had ended)
+    - label missing, product just read     -> unverified for 2 more checks, expired only on the 3rd check in a row
+    - product could not be read            -> unverified, last verified discount kept
+    Never turns a failed read into "expired"."""
+    had = o.get("extraPct") or (25 if o.get("extra25") else 0)
+    if n.get("extraPct"):
+        n.pop("extraMiss", None)
+        n.pop("promoEndedAt", None)
+        n["promoCheckedAt"] = ts
+        return n
+    if had and not fresh_read:
+        n.update(extraPct=had, extra25=had == 25, promoStatus="unverified", promoLabel=o.get("promoLabel", ""), promoTag=o.get("promoTag", ""))
+        return n
+    if had:
+        miss = o.get("extraMiss", 0) + 1
+        if miss < 3:
+            n.update(extraPct=had, extra25=had == 25, extraMiss=miss, promoStatus="unverified",
+                     promoLabel=o.get("promoLabel", ""), promoTag=o.get("promoTag", ""), promoCheckedAt=ts)
+            return n
+        n.pop("extraMiss", None)
+        n.update(extraPct=0, extra25=False, promoStatus="expired", promoEndedAt=ts, promoCheckedAt=ts)
+        return n
+    n.pop("extraMiss", None)
+    n["promoStatus"] = "expired" if o.get("promoStatus") == "expired" else "none"
+    if o.get("promoEndedAt") and n["promoStatus"] == "expired":
+        n["promoEndedAt"] = o["promoEndedAt"]
+    n["promoCheckedAt"] = ts
+    return n
 
 
 CHANGES = os.path.join(os.path.dirname(__file__), "..", "self-portrait", "changes.json")
@@ -782,13 +871,14 @@ def main():
     try:
         if os.environ.get("MD_ENABLE", "1") != "1":
             raise RuntimeError("Mac Duggal disabled")
-        global MD_PROMO, MD_PROMOS
+        global MD_PROMO, MD_PROMOS, MD_LABELS_OK, MD_STALE
         known = [dict(x) for x in (meta.get("mdPromos") or ([meta["mdPromo"]] if meta.get("mdPromo") else []))]
         for x in known:
             x.setdefault("pct", int((re.search(r"(\d{1,2})\s*%", x.get("label", "")) or [0, 25])[1]))
             x.pop("source", None)
         try:
             found = fetch_md_promos()
+            MD_LABELS_OK = True
             tags = {x["tag"] for x in found}
             promos = [dict(x, miss=0) for x in found]
             for x in known:   # a label no longer shown: confirm on 3 checks in a row before removing it everywhere
@@ -804,6 +894,10 @@ def main():
             print("md promo page failed (keeping last known):", e)
         meta["mdPromos"] = promos
         MD_PROMOS = [{k: v for k, v in x.items() if k != "miss"} for x in promos]
+        MD_STALE.clear()
+        MD_STALE.update(x["tag"] for x in promos if x.get("miss"))
+        if not MD_LABELS_OK:
+            MD_STALE.update(x["tag"] for x in promos)
         MD_PROMO = MD_PROMOS[0] if MD_PROMOS else None
         print("md promos:", promos)
         md_items, raw_counts["md"] = fetch_md()
@@ -849,6 +943,7 @@ def main():
     missing += [r for r in prev.get("removed", []) if r.get("handle") and r["handle"] not in fresh and r["handle"] not in old]
     missing.sort(key=lambda p: p.get("pageCheckedAt", ""))   # least recently checked first
     budget, refreshed, retired = int(os.environ.get("REFRESH_LIMIT", "60")), 0, 0
+    deleted = []   # confirmed permanently removed from the official store
     for p in missing:
         h = p["handle"]
         if h in old and p.get("brand") == "md" and h in MD_RAW and "md:maxi" in ok_cats:
@@ -870,6 +965,8 @@ def main():
                 n = refresh_product(p, bf_set)
                 (meta.get("verifyFail") or {}).pop(h, None)
                 if n:
+                    n.pop("goneChecks", None)
+                if n:
                     n.update(listed=False, status="ok", pageCheckedAt=ts)
                     if h not in old:   # restored after an older version removed it: not new to the sale
                         n.update(firstSeen=p.get("firstSeen") or meta.get("initialImport", ts), restored=True)
@@ -879,8 +976,14 @@ def main():
                     continue
             except Gone:
                 retired += 1
-                fresh[h] = dict(p, listed=False, status="discontinued", pageCheckedAt=ts, compare=p.get("price", 0),
-                                sizes=[dict(x, a=False) for x in p.get("sizes", [])], extra25=False, extraPct=0)
+                checks = [t for t in p.get("goneChecks", []) if t] + [ts]
+                if removal_confirmed(checks) and page_gone(p):
+                    # removed from the official store: confirmed on its product page several times over a day
+                    deleted.append(dict(p, goneChecks=checks))
+                    print("  permanently removed by the store — deleted:", h, url_of(p))
+                    continue
+                fresh[h] = dict(p, listed=False, status="discontinued", pageCheckedAt=ts, goneChecks=checks,
+                                sizes=[dict(x, a=False) for x in p.get("sizes", [])])
                 continue
             except Exception as e:  # noqa: BLE001
                 print("  re-check failed (kept as is):", h, e)
@@ -888,6 +991,8 @@ def main():
                 vf.setdefault(h, {"t": p.get("title", h), "b": p.get("brand", "sp"), "since": ts})["last"] = ts
         if h in old:
             fresh[h] = dict(old[h], listed=False)   # kept exactly as last verified until its page can be re-checked
+            if fresh[h].get("extraPct") and fresh[h].get("brand") == "md":
+                fresh[h]["promoStatus"] = "unverified"
     print(f"kept off-list products: {sum(1 for p in fresh.values() if p.get('listed') is False)} "
           f"(re-checked {refreshed}, no longer sold by the store {retired})")
 
@@ -896,10 +1001,14 @@ def main():
     added, changed = [], []
     known_before = {r.get("handle") for r in prev.get("removed", [])} | set(meta.get("everSeen", []))
     run_items = []   # what changed in this update, product by product (shown on the Admin page)
+    for p in deleted:
+        it = change_item(p, ["Permanently removed by the store"], p)
+        it.update(removed=True, url=url_of(p), n={})
+        run_items.append(it)
     for h, n in fresh.items():
         o = old.get(h)
-        if grp(n) in ok_cats:
-            n["verifiedAt"] = ts
+        if grp(n) in ok_cats and (n.get("listed", True) or n.get("pageCheckedAt") == ts):
+            n["verifiedAt"] = ts   # read from the official store in this run
             (meta.get("verifyFail") or {}).pop(h, None)
         if not o:
             if n.pop("restored", False) or h in known_before:
@@ -914,12 +1023,8 @@ def main():
                 run_items.append(change_item(n, ["Newly discovered on sale"]))
             continue
         n["firstSeen"] = o.get("firstSeen", ts)
-        if n.get("brand") == "md" and MD_PROMOS and (o.get("extraPct") or o.get("extra25")) and not n.get("extraPct"):
-            miss = o.get("extraMiss", 0) + 1
-            if miss < 3:
-                n.update(extraPct=o.get("extraPct") or 25, extra25=o.get("extra25", True), extraMiss=miss)
-        else:
-            n.pop("extraMiss", None)
+        if n.get("brand") == "md":
+            md_promo_decide(n, o, ts, fresh_read=MD_LABELS_OK and (n.get("pageCheckedAt") == ts or n.get("verifiedAt") == ts))
         msgs = []
         sym = "$" if n.get("cur") == "USD" else "€"
         if o.get("price") != n["price"]:
@@ -930,8 +1035,10 @@ def main():
             msgs.append("Back in the sale" if n.get("listed", True) else "Left the store's sale list")
         if o.get("status", "ok") != n.get("status", "ok"):
             msgs.append("No longer sold by the store" if n.get("status") == "discontinued" else "Available again")
-        if o.get("extra25") != n.get("extra25") and n.get("brand") == "md":
-            msgs.append("Extra 25% in cart " + ("now applies" if n.get("extra25") else "no longer applies"))
+        if (o.get("extraPct") or 0) != (n.get("extraPct") or 0) and n.get("brand") == "md":
+            msgs.append(f"Extra {n.get('extraPct') or o.get('extraPct')}% " + ("now applies" if n.get("extraPct") else "no longer applies"))
+        if (o.get("promoStatus") or "none") != (n.get("promoStatus") or "none") and n.get("brand") == "md":
+            msgs.append(f"Promotion status: {o.get('promoStatus') or 'none'} → {n.get('promoStatus') or 'none'}")
         if o.get("image") != n["image"]:
             msgs.append("Image updated")
         msgs += size_msgs(o.get("sizes", []), n["sizes"])
@@ -942,7 +1049,7 @@ def main():
         else:
             n.update(lastChanged=o.get("lastChanged", ts), changes=o.get("changes", []))
 
-    gone = []          # nothing is ever removed automatically
+    gone = [p["handle"] for p in deleted]   # only products confirmed permanently removed by their official store
     removed = [r for r in prev.get("removed", []) if r["handle"] not in fresh][:120]   # older removals not restored yet
 
     products = sorted(fresh.values(), key=lambda p: p.get("firstSeen", ""), reverse=True)

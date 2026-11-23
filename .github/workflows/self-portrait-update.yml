@@ -33,6 +33,10 @@ on:
         description: "Test the shared favorites database (1 = yes)"
         required: false
         default: "0"
+      selftest:
+        description: "Test discount verification and removal rules against the live stores (1 = yes)"
+        required: false
+        default: "0"
       recheck:
         description: "Re-check every product that is off the sale list now (1 = yes)"
         required: false
@@ -87,6 +91,10 @@ jobs:
           echo "remove:";  curl -s -w " [%{http_code}]\n" -X POST "$U/rpc/remove_fav" -H "apikey: $K" -H "Content-Type: application/json" -d "{\"p_device\":\"$D\",\"p_handle\":\"__connection-test__\"}"
           echo "count after remove:"; curl -s -w " [%{http_code}]\n" "$U/fav_totals?handle=eq.__connection-test__&select=handle,total" -H "apikey: $K"
           echo "CORS:"; curl -s -o /dev/null -D - -X OPTIONS "$U/rpc/add_fav" -H "Origin: https://ranaa4117.github.io" -H "Access-Control-Request-Method: POST" -H "Access-Control-Request-Headers: apikey,content-type" | grep -i "access-control-allow-origin" || echo "no CORS header"
+      - name: Self-test (live official stores)
+        if: ${{ github.event.inputs.selftest == '1' }}
+        continue-on-error: true
+        run: python3 tools/selftest.py
       - name: Read the Spain store (midi, maxi, bags), size guides and EUR/SAR rate
         env:
           SG_LIMIT: ${{ github.event.inputs.sg_limit || '60' }}
@@ -109,7 +117,7 @@ jobs:
         run: |
           git config user.name "self-portrait-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          touch self-portrait/changes.json; git add self-portrait/data.json self-portrait/more.json self-portrait/full.json self-portrait/sitemap.xml self-portrait/audit.json self-portrait/changes.json self-portrait/fixes.json
+          touch self-portrait/changes.json self-portrait/selftest.json; git add self-portrait/data.json self-portrait/more.json self-portrait/full.json self-portrait/sitemap.xml self-portrait/audit.json self-portrait/changes.json self-portrait/fixes.json self-portrait/selftest.json
           if git diff --cached --quiet; then echo "No changes"; exit 0; fi
           git commit -m "Self-Portrait sale check $(date -u +%Y-%m-%dT%H:%MZ)"
           for i in 1 2 3; do git pull --rebase -X theirs origin main && git push && exit 0; sleep 5; done
