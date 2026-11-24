@@ -130,6 +130,30 @@ class Fixes:
     def latest(self, key):
         return next((x for x in self.items if x.get("key") == key), None)
 
+    @staticmethod
+    def meta_for(key):
+        """Brand, priority and what was checked, for the Admin's problem details."""
+        kind, _, rest = key.partition(":")
+        brand = {"md": "Mac Duggal", "ef": "Elisabetta Franchi", "vs": "Victoria's Secret", "rl": "Macy's", "mc": "Macy's"}.get(rest.split("-")[0], "Self-Portrait")
+        if kind in ("efprice", "ef-verify"):
+            brand = "Elisabetta Franchi"
+        if kind == "store":
+            brand = NAMES.get(rest, rest)
+        if kind == "stale":
+            brand = "Macy's" if rest in ("winter.json", "shoes.json") else "Self-Portrait / Mac Duggal / Elisabetta Franchi"
+        if kind in ("site", "updater-error"):
+            brand = "الموقع" if kind == "site" else "النظام"
+        prio = {"site": "critical", "store": "high", "updater-error": "high", "stale": "high" if rest == "full.json" else "medium",
+                "data": "medium", "efprice": "high", "ef-verify": "medium", "verify": "medium", "url": "low"}.get(kind, "medium")
+        how = {"data": "الفحص الآلي كل ساعة قرأ صفحة القطعة في المتجر الأصلي وقارنها بالموقع.",
+               "efprice": "الفحص الآلي فتح صفحة Elisabetta Franchi المعتمدة (الصفحة ٢) في متصفح حقيقي وقارن السعر الأصلي والخصم والسعر بعد الخصم.",
+               "ef-verify": "الفحص الآلي حاول فتح صفحة Elisabetta Franchi المعتمدة في متصفح حقيقي.",
+               "verify": "التحديث حاول قراءة صفحة القطعة في المتجر الأصلي ولم ينجح.",
+               "store": "الفحص الآلي حاول فتح المتجر الأصلي.", "site": "الفحص الآلي حاول فتح الموقع.",
+               "stale": "الفحص الآلي راجع وقت آخر تحديث للملف على GitHub.", "url": "الفحص الآلي راجع رابط القطعة المحفوظ.",
+               "updater-error": "مراجعة نتيجة آخر تحديث."}.get(kind, "")
+        return {"brand": brand, "priority": prio, "investigation": how}
+
     def problem(self, key, text, status, fix):
         """Record that a problem exists now (status 'progress' or 'open'). A problem that comes back after
         being resolved is a new, linked occurrence (same key, n + 1)."""
@@ -139,13 +163,14 @@ class Fixes:
             cur.update(problem=text, status=status, fix=fix, updated=ts)
             return
         n = (cur.get("n", 1) + 1) if cur else 1
-        self.items.insert(0, {"key": key, "at": ts, "updated": ts, "status": status, "problem": text, "fix": fix, "n": n, "src": "auto"})
+        self.items.insert(0, dict({"key": key, "at": ts, "updated": ts, "status": status, "problem": text, "fix": fix, "n": n, "src": "auto",
+                                   "cause": "لم يُحدَّد السبب بعد."}, **self.meta_for(key)))
 
     def resolve(self, key, fix):
         """Only called after the fix has been verified."""
         cur = self.latest(key)
         if cur and cur.get("status") != "resolved":
-            cur.update(status="resolved", fix=fix, updated=now())
+            cur.update(status="resolved", fix=fix, updated=now(), verification="الفحص الآلي في " + now()[:16].replace("T", " ") + " UTC أعاد التحقق ووجد المشكلة غير موجودة.")
 
     def open_keys(self, prefix):
         return [x["key"] for x in self.items if x.get("key", "").startswith(prefix) and x.get("status") != "resolved"]
