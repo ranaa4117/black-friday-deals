@@ -548,7 +548,7 @@ const PASS_HASH = "d6f7961e955b42afb04e910ef174ce7b82af4efe180a05605bc68aee28cad
 const REPO = "ranaa4117/black-friday-deals";
 const WORKFLOW = "self-portrait-update.yml";
 const LS = "sp-edit-v1";
-const APP_VERSION = "38";
+const APP_VERSION = "39";
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
@@ -647,7 +647,8 @@ let TOTALS = null;   // { handle: { n, t } } from every customer's device; null 
 const deviceId = (() => { let d = store.get("sp-device"); if (!d){ d = (crypto.randomUUID ? crypto.randomUUID() : "xxxxxxxx-xxxx-4xxx-8xxx-xxxxxxxxxxxx".replace(/x/g, () => (Math.random() * 16 | 0).toString(16))); store.set("sp-device", d); } return d; })();
 async function sb(path, opts = {}){
   const r = await fetch(SB_URL + "/rest/v1/" + path, Object.assign({}, opts, { headers: Object.assign({ apikey: SB_KEY, "Content-Type": "application/json" }, opts.headers || {}) }));
-  if (!r.ok) throw new Error("favorites service " + r.status);
+  if (!r.ok){ let msg = ""; try { const j = await r.json(); msg = [j.code, j.message].filter(Boolean).join(" "); } catch {}
+    throw new Error("favorites service " + r.status + (msg ? " — " + msg : "")); }
   return r.status === 204 ? null : r.json().catch(() => null);
 }
 async function loadTotals(){
@@ -1514,7 +1515,7 @@ async function loadStats(){
   const [a, b] = stRange();
   try { ST.data = await sb("rpc/admin_stats", { method:"POST", body: JSON.stringify({ p_key: adminKey(), p_from: a.toISOString(), p_to: b.toISOString() }) }); }
   catch (e) { ST.data = null; const m = String(e.message);
-    ST.err = /401|403|42501/.test(m) ? "قاعدة البيانات لم تقبل رمز الدخول بعد. شغّلي ملف الإحصاءات المحدّث في Supabase ثم حاولي مرة أخرى." : /404/.test(m) ? "قاعدة بيانات الإحصاءات غير جاهزة بعد — شغّلي ملف الإحصاءات في Supabase أولاً." : "تعذّر تحميل الإحصاءات. حاولي مرة أخرى."; }
+    ST.err = /57014|timeout/i.test(m) ? "الحساب استغرق وقتاً أطول من المسموح في قاعدة البيانات (البيانات كبرت). جربي فترة أقصر الآن؛ الحل الدائم يحتاج تعديلاً بسيطاً في Supabase." : /401|403|42501|not authorized/i.test(m) ? "قاعدة البيانات لم تقبل رمز الدخول المحفوظ على هذا الجهاز. اخرجي من الإدارة وادخلي بكلمة السر مرة أخرى؛ وإذا استمر، شغّلي ملف الإحصاءات المحدّث في Supabase." : /404|PGRST202/.test(m) ? "قاعدة بيانات الإحصاءات غير جاهزة بعد — شغّلي ملف الإحصاءات في Supabase أولاً." : /Failed to fetch|NetworkError|Load failed/i.test(m) ? "لم يصل المتصفح إلى قاعدة البيانات (الاتصال أو مانع إعلانات). تأكدي من الإنترنت وحاولي مرة أخرى." : "تعذّر تحميل الإحصاءات. حاولي مرة أخرى."; ST.errDetail = m; }
   ST.loading = false; if (routeOf() === "stats") render();
 }
 function barList(rows, fmt = arN){   // horizontal bars, one calm hue; labels stay in text ink
@@ -1547,7 +1548,7 @@ function viewStats(all){
     <span class="sp"></span><label>الماركة <select id="stBrand"><option value="">كل الماركات</option>${brandsAll.map(b => `<option value="${b}" ${ST.f.brand === b ? "selected" : ""}>${esc(BRANDS[b])}</option>`).join("")}</select></label>
     <label>القسم <select id="stCat"><option value="">كل الأقسام</option>${Object.entries(SECTIONS).map(([k, S0]) => `<option value="${k}" ${ST.f.cat === k ? "selected" : ""}>${S0.ar}</option>`).join("")}</select></label></div>`;
   const wrap = inner => `<div class="stats" dir="rtl" lang="ar">${head}${filt}${inner}</div>`;
-  if (ST.err) return wrap(`<p class="warnline" style="margin:16px 0">${esc(ST.err)}</p>`);
+  if (ST.err) return wrap(`<p class="warnline" style="margin:16px 0">${esc(ST.err)}</p><p class="small muted" dir="ltr">${esc(ST.errDetail || "")}</p><button class="btn" id="stRetry">حاولي مرة أخرى</button>`);
   const D = ST.data;
   if (!D) return wrap(`<p class="small" style="margin:24px 0">${ST.loading ? "جارٍ تحميل الإحصاءات…" : "لم تُحمَّل الإحصاءات بعد."}</p>`);
   if (!D.visitors) return wrap(`<p class="nodata" style="margin:24px 0">لا توجد بيانات كافية حتى الآن. ${D.firstEventAt ? "بدأ القياس في " + when(D.firstEventAt) + "." : "يبدأ العدّ مع أول زيارة حقيقية."}</p>`);
@@ -1632,6 +1633,7 @@ function wireStats(){
   if ($("#stBrand")) $("#stBrand").onchange = e => { ST.f.brand = e.target.value; render(); };
   if ($("#stCat")) $("#stCat").onchange = e => { ST.f.cat = e.target.value; render(); };
   if (adminKey() && !ST.data && !ST.loading && !ST.err) loadStats();
+  if ($("#stRetry")) $("#stRetry").onclick = () => { ST.err = ""; loadStats(); };
 }
 
 /* ---------- admin: one page per job, with a sidebar ---------- */
