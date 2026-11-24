@@ -38,6 +38,7 @@ FIXED = [  # (official product id, catalog, section, exact official name)
     ("5000011697", "accessories-catalog", "vsbags", "4-Piece Nested Beauty Case Set"),
 ]
 SLIPPERS_PAGE = SITE + "/us/vs/sleepwear/slippers"
+GAL = {}
 NO_MODEL = {"offModelFront", "offModelBack", "offModelSide", "digitalOffModelFront", "digitalOffModelBack", "detail", "flat", "flatFront", "flatBack"}
 
 
@@ -264,6 +265,9 @@ def main():
         try:
             pd = read_page(f"{SITE}/us/vs/{catalog}/{pid}")
             n, why = build(pid, catalog, section, name, pd)
+            if os.environ.get("VS_DEBUG") == "1":
+                GAL[h] = [{"g": g.get("label"), "choice": code, "color": c.get("label"), "images": c.get("images")}
+                          for g in pd.values() if (g.get("shortDescription") or "").strip() == name for code, c in (g.get("choices") or {}).items()]
             if not n:
                 raise RuntimeError(why)
         except U.Gone:
@@ -322,8 +326,20 @@ def main():
     print("vs:", meta["counts"], "errors:", meta["errors"])
     if os.environ.get("VS_DEBUG") == "1":   # save each product's chosen pictures for a visual check
         os.makedirs("/tmp/vs/img", exist_ok=True)
+        json.dump(GAL, open("/tmp/vs/gallery.json", "w"), indent=1)
         for p in out:
-            for i, u in enumerate((p.get("variants") or [{}])[0].get("images", [])[:6]):
+            ch = (GAL.get(p["handle"]) or [{}])
+            for j, chx in enumerate(ch[:2]):
+                for img in chx.get("images") or []:
+                    u = IMG.format(img["image"])
+                    try:
+                        req = U.urllib.request.Request(u, headers={"User-Agent": U.UA})
+                        with U.urllib.request.urlopen(req, timeout=30) as r:
+                            open(f"/tmp/vs/img/{p['handle']}_{j}_{img['type']}.jpg", "wb").write(r.read())
+                    except Exception as e:  # noqa: BLE001
+                        print("img fail", u, e)
+        for p in []:
+            for i, u in enumerate([]):
                 try:
                     req = U.urllib.request.Request(u, headers={"User-Agent": U.UA})
                     with U.urllib.request.urlopen(req, timeout=30) as r:
