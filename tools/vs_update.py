@@ -109,7 +109,8 @@ def gallery(images, section):
     Slippers: product-only when there are any. Bags: every picture (they are product shots)."""
     names = [i.get("image", "") for i in images]
     if section in ("pajamas", "robes"):
-        prod = [n for n in names if product_only(n)]
+        rank = lambda n: 0 if "_OF_F" in n else 1 if "_OF_B" in n else 2
+        prod = sorted([n for n in names if product_only(n)], key=rank)   # whole product first, then back, then close-ups
         return prod + [n for n in names if n in FABRIC_CARDS] if prod else []
     if section == "slippers":
         prod = [n for n in names if product_only(n)]
