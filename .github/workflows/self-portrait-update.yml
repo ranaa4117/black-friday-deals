@@ -33,6 +33,10 @@ on:
         description: "Test the shared favorites database (1 = yes)"
         required: false
         default: "0"
+      vs:
+        description: "Victoria's Secret: 1 = read now, 2 = read now and save the chosen photos for checking"
+        required: false
+        default: "0"
       selftest:
         description: "Test discount verification and removal rules against the live stores (1 = yes)"
         required: false
@@ -130,6 +134,19 @@ jobs:
           RECHECK_ALL: ${{ github.event.inputs.recheck || '0' }}
           REFRESH_LIMIT: ${{ github.event.inputs.recheck == '1' && '400' || '60' }}
         run: python3 tools/sp_update.py
+      - name: Victoria's Secret (official US site, every 30 minutes)
+        continue-on-error: true
+        env:
+          VS_FORCE: ${{ (github.event.inputs.vs == '1' || github.event.inputs.vs == '2') && '1' || '0' }}
+          VS_DEBUG: ${{ github.event.inputs.vs == '2' && '1' || '0' }}
+        run: |
+          pip install -q playwright==1.48.0 || true
+          python3 tools/vs_update.py
+      - name: Save Victoria's Secret photos for checking (debug branch)
+        if: ${{ github.event.inputs.vs == '2' }}
+        run: |
+          mkdir -p /tmp/vs/img && cd /tmp/vs && rm -rf .git && git init -q && git checkout -q -b debug-vs && git add -A
+          git -c user.name=bot -c user.email=bot@users.noreply.github.com commit -qm "VS photos" && git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" debug-vs
       - name: Elisabetta Franchi prices as shoppers see them (hourly, real browser)
         continue-on-error: true
         env:
@@ -147,7 +164,7 @@ jobs:
         run: |
           git config user.name "self-portrait-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          touch self-portrait/changes.json self-portrait/selftest.json self-portrait/ef_verify.json; git add self-portrait/data.json self-portrait/more.json self-portrait/full.json self-portrait/sitemap.xml self-portrait/audit.json self-portrait/changes.json self-portrait/fixes.json self-portrait/selftest.json self-portrait/ef_verify.json
+          touch self-portrait/changes.json self-portrait/selftest.json self-portrait/ef_verify.json self-portrait/vs.json; git add self-portrait/data.json self-portrait/more.json self-portrait/full.json self-portrait/sitemap.xml self-portrait/audit.json self-portrait/changes.json self-portrait/fixes.json self-portrait/selftest.json self-portrait/ef_verify.json self-portrait/vs.json
           if git diff --cached --quiet; then echo "No changes"; exit 0; fi
           git commit -m "Self-Portrait sale check $(date -u +%Y-%m-%dT%H:%MZ)"
           for i in 1 2 3; do git pull --rebase --autostash -X theirs origin main && git push && exit 0; sleep 5; done
