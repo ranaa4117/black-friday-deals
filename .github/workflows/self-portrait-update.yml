@@ -81,13 +81,12 @@ jobs:
       - name: Victoria's Secret diagnostics
         if: ${{ github.event.inputs.ef_probe == '9' }}
         run: python3 tools/vs_probe.py
-      - name: Keep Victoria's Secret pages for inspection
+      - name: Keep Victoria's Secret pages for inspection (debug branch)
         if: ${{ github.event.inputs.ef_probe == '9' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: vs-pages
-          path: /tmp/vs/
-          retention-days: 1
+        run: |
+          cd /tmp/vs && git init -q && git checkout -q -b debug-vs && git add -A
+          git -c user.name=bot -c user.email=bot@users.noreply.github.com commit -qm "VS pages"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" debug-vs
       - name: Elisabetta Franchi as a shopper sees it (real browser)
         continue-on-error: true
         if: ${{ github.event.inputs.ef_probe == '3' }}

@@ -10,7 +10,7 @@ pages = {"slippers": B + "sleepwear/slippers", "slippers-robes": B + "sleepwear/
          "p_flannel": B + "sleepwear-and-lingerie-catalog/5000000360", "p_modal": B + "sleepwear-and-lingerie-catalog/5000007337",
          "p_satin": B + "sleepwear-and-lingerie-catalog/5000000279", "p_plush": B + "sleepwear-and-lingerie-catalog/5000008347",
          "p_4bag": B + "accessories-catalog/5000007992", "p_nested": B + "accessories-catalog/5000011697",
-         "search_slipper": "https://www.victoriassecret.com/us/search?q=slippers", "shoes": B + "shoes", "sale": B + "sale"}
+         "robes2": B + "sleepwear/slippers-and-robes?scroll=true"}
 for k, url in pages.items():
     try:
         h = u.fetch(url, accept="text/html")
