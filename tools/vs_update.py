@@ -92,15 +92,29 @@ def size_label(k, s):
     return a or k
 
 
+# Victoria's Secret's own fabric/feature cards (the "about the fabric" picture at the end of a gallery). Shared campaign
+# banners such as "There's no fabric like cotton" are NOT fabric information and are never used.
+FABRIC_CARDS = {"png/zz/26/11/09/23/112716047XKK_alt2",   # Signature Satin: soft & sleek, luxurious, smooth glossy shine, relaxed fit
+                "png/zz/26/11/09/23/112534037USV_alt",    # CozyFlannel: ultra-soft, cozy, lightweight, brushed fabric
+                "png/zz/26/11/09/23/1125072098S4_alt"}    # SoSoft Modal: ultra-soft, 4-way stretch, breathable, helps keep you cool
+
+
+def product_only(img):
+    """Victoria's Secret names its pictures by what they show: _OF_ = off figure (the product alone), _OM_ = on a model."""
+    return "_OF_" in img or "_DOF" in img
+
+
 def gallery(images, section):
-    """Product-only pictures for clothing (no models); the gallery's last picture is kept when it is a
-    detail/feature card (fabric, lining, construction). Bags/slippers: every product picture."""
+    """Pajamas/robes: product-only pictures (no models) + the fabric card at the end when the gallery has one.
+    Slippers: product-only when there are any. Bags: every picture (they are product shots)."""
+    names = [i.get("image", "") for i in images]
     if section in ("pajamas", "robes"):
-        keep = [i["image"] for i in images if i.get("type") in NO_MODEL]
-        if images and images[-1].get("type") in ("alternate", "detail") and images[-1]["image"] not in keep:
-            keep.append(images[-1]["image"])
-        return keep
-    return [i["image"] for i in images if not str(i.get("type", "")).startswith("onModel") or section in ("vsbags", "slippers")]
+        prod = [n for n in names if product_only(n)]
+        return prod + [n for n in names if n in FABRIC_CARDS] if prod else []
+    if section == "slippers":
+        prod = [n for n in names if product_only(n)]
+        return prod or names
+    return names
 
 
 def build(pid, catalog, section, name, pd):
@@ -199,6 +213,9 @@ async def rendered_cards(url):
 def find_slippers():
     """Victoria's Secret-branded slippers on the official slippers page that show a sale price right now."""
     cards = asyncio.run(rendered_cards(SLIPPERS_PAGE))
+    if os.environ.get("VS_DEBUG") == "1":
+        for c in cards[:40]:
+            print("   card:", c["id"], c["catalog"], c["text"][:200])
     found = {}
     for c in cards:
         t = c["text"]
