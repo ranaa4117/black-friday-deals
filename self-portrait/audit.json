@@ -1,6 +1,16 @@
 {
  "audits": [
   {
+   "at": "2026-11-24T17:02:24Z",
+   "ok": false,
+   "problems": 2,
+   "fixed": 0,
+   "auto": true,
+   "notes": [
+    "تمت مقارنة 18 منتجاً مع المتاجر الأصلية؛ روابط غير مؤكدة: 0"
+   ]
+  },
+  {
    "at": "2026-11-24T16:50:31Z",
    "ok": false,
    "problems": 2,
@@ -301,25 +311,6 @@
    "fixed": 0,
    "auto": true,
    "notes": [
-    "تمت مقارنة 18 منتجاً مع المواقع الرسمية (Self-Portrait وMac Duggal وElisabetta Franchi)"
-   ]
-  },
-  {
-   "at": "2026-11-23T18:47:10Z",
-   "ok": false,
-   "problems": 9,
-   "fixed": 0,
-   "auto": true,
-   "notes": [
-    "Self-Portrait: «Burgundy Off Shoulder Gathered Lace Maxi Dress» يختلف عن الموقع الرسمي (التوفر نفد في الموقع الرسمي) — سيُصحَّح في التحديث القادم",
-    "Self-Portrait: «Burgundy Bandeau Maxi Dress» يختلف عن الموقع الرسمي (التوفر نفد في الموقع الرسمي) — سيُصحَّح في التحديث القادم",
-    "Self-Portrait: «Navy Rhinestone Mesh Cut Out Maxi Dress» يختلف عن الموقع الرسمي (التوفر نفد في الموقع الرسمي) — سيُصحَّح في التحديث القادم",
-    "Mac Duggal: «French Blue Flutter Sleeve Floral Embroidered Net Gown» يختلف عن الموقع الرسمي (التوفر نفد في الموقع الرسمي) — سيُصحَّح في التحديث القادم",
-    "Mac Duggal: «Violet Multi Sleeveless Pleated Floral Print Chiffon V-Neck Gown» يختلف عن الموقع الرسمي (التوفر نفد في الموقع الرسمي) — سيُصحَّح في التحديث القادم",
-    "Mac Duggal: «Sage Beaded Bishop Sleeve Wrap Gown» يختلف عن الموقع الرسمي (التوفر نفد في الموقع الرسمي) — سيُصحَّح في التحديث القادم",
-    "Mac Duggal: «Blue Sleeveless Halter Neck Gown with Rosette Detail» يختلف عن الموقع الرسمي (التوفر نفد في الموقع الرسمي) — سيُصحَّح في التحديث القادم",
-    "Mac Duggal: «Black Embellished Strapless Gown With Sculptural Drape» يختلف عن الموقع الرسمي (التوفر نفد في الموقع الرسمي) — سيُصحَّح في التحديث القادم",
-    "Mac Duggal: «Pink Jersey One Shoulder Draped Back Gown - FINAL SALE» يختلف عن الموقع الرسمي (التوفر نفد في الموقع الرسمي) — سيُصحَّح في التحديث القادم",
     "تمت مقارنة 18 منتجاً مع المواقع الرسمية (Self-Portrait وMac Duggal وElisabetta Franchi)"
    ]
   }
