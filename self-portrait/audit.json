@@ -1,1 +1,152 @@
-{"audits":[{"at":"2026-11-23T23:50:14Z","ok":true,"problems":3,"fixed":1,"auto":false,"src":"claude","notes":["الاختبار الذاتي: كل الاختبارات ناجحة (7 PASS، 1 LIMIT)","أعداد المنتجات ثابتة: Self-Portrait 448، Mac Duggal 985، Elisabetta Franchi 18؛ لا حذف","فشل تحديثين بسبب فحوص تجريبية — تم الإصلاح","Macy's: لم يُسمح بفتح صفحات Macy's في هذا الفحص — تبقى آخر الأسعار المؤكدة"]},{"at":"2026-11-23T23:44:15Z","ok":false,"problems":2,"fixed":0,"auto":true,"notes":["تمت مقارنة 18 منتجاً مع المتاجر الأصلية؛ روابط غير مؤكدة: 0"]},{"at":"2026-11-23T23:33:38Z","ok":false,"problems":2,"fixed":0,"auto":true,"notes":["تمت مقارنة 18 منتجاً مع المتاجر الأصلية؛ روابط غير مؤكدة: 0"]},{"at":"2026-11-23T22:30:42Z","ok":false,"problems":2,"fixed":0,"auto":true,"notes":["تمت مقارنة 18 منتجاً مع المتاجر الأصلية؛ روابط غير مؤكدة: 0"]},{"at":"2026-11-23T21:33:04Z","ok":false,"problems":2,"fixed":0,"auto":true,"notes":["تمت مقارنة 18 منتجاً مع المتاجر الأصلية؛ روابط غير مؤكدة: 0"]},{"at":"2026-11-23T20:29:30Z","ok":false,"problems":2,"fixed":0,"auto":true,"notes":["تمت مقارنة 18 منتجاً مع المتاجر الأصلية؛ روابط غير مؤكدة: 0"]},{"at":"2026-11-23T20:07:13Z","ok":false,"problems":2,"fixed":0,"auto":true,"notes":["تمت مقارنة 18 منتجاً مع المتاجر الأصلية؛ روابط غير مؤكدة: 0"]},{"at":"2026-11-23T19:46:21Z","ok":false,"problems":2,"fixed":0,"auto":true,"notes":["تمت مقارنة 18 منتجاً مع المتاجر الأصلية؛ روابط غير مؤكدة: 0"]},{"at":"2026-11-23T18:52:27Z","ok":false,"problems":2,"fixed":0,"auto":true,"notes":["Macy's — التخفيضات الشتوية: آخر تحديث قبل 4 ساعة","Macy's — الأحذية: آخر تحديث قبل 4 ساعة","تمت مقارنة 18 منتجاً مع المواقع الرسمية (Self-Portrait وMac Duggal وElisabetta Franchi)"]},{"at":"2026-11-23T18:49:51Z","ok":true,"problems":0,"fixed":0,"auto":true,"notes":["تمت مقارنة 18 منتجاً مع المواقع الرسمية (Self-Portrait وMac Duggal وElisabetta Franchi)"]},{"at":"2026-11-23T18:47:10Z","ok":false,"problems":9,"fixed":0,"auto":true,"notes":["Self-Portrait: «Burgundy Off Shoulder Gathered Lace Maxi Dress» يختلف عن الموقع الرسمي (التوفر نفد في الموقع الرسمي) — سيُصحَّح في التحديث القادم","Self-Portrait: «Burgundy Bandeau Maxi Dress» يختلف عن الموقع الرسمي (التوفر نفد في الموقع الرسمي) — سيُصحَّح في التحديث القادم","Self-Portrait: «Navy Rhinestone Mesh Cut Out Maxi Dress» يختلف عن الموقع الرسمي (التوفر نفد في الموقع الرسمي) — سيُصحَّح في التحديث القادم","Mac Duggal: «French Blue Flutter Sleeve Floral Embroidered Net Gown» يختلف عن الموقع الرسمي (التوفر نفد في الموقع الرسمي) — سيُصحَّح في التحديث القادم","Mac Duggal: «Violet Multi Sleeveless Pleated Floral Print Chiffon V-Neck Gown» يختلف عن الموقع الرسمي (التوفر نفد في الموقع الرسمي) — سيُصحَّح في التحديث القادم","Mac Duggal: «Sage Beaded Bishop Sleeve Wrap Gown» يختلف عن الموقع الرسمي (التوفر نفد في الموقع الرسمي) — سيُصحَّح في التحديث القادم","Mac Duggal: «Blue Sleeveless Halter Neck Gown with Rosette Detail» يختلف عن الموقع الرسمي (التوفر نفد في الموقع الرسمي) — سيُصحَّح في التحديث القادم","Mac Duggal: «Black Embellished Strapless Gown With Sculptural Drape» يختلف عن الموقع الرسمي (التوفر نفد في الموقع الرسمي) — سيُصحَّح في التحديث القادم","Mac Duggal: «Pink Jersey One Shoulder Draped Back Gown - FINAL SALE» يختلف عن الموقع الرسمي (التوفر نفد في الموقع الرسمي) — سيُصحَّح في التحديث القادم","تمت مقارنة 18 منتجاً مع المواقع الرسمية (Self-Portrait وMac Duggal وElisabetta Franchi)"]},{"at":"2026-11-23T18:03:36Z","ok":false,"problems":4,"fixed":1,"notes":["Mac Duggal: the store changed its promotion — '+25% Off In Cart' (BFCM25) is no longer shown; it now shows 'Extra 25% Off' only on dresses tagged as sale (markdown). ~810 full-price dresses were still showing the old 25% — fixed in the updater (reads every label, ignores 'Price as marked'); now 133 sale dresses keep the 25%, the others show their real price. No product removed (983 kept).","Mac Duggal: 4 dresses no longer in the store feed still show 25% until their own page is re-checked by the updater.","Updater: all recent runs succeeded, no errors, nothing in 'removed'; counts steady (Self-Portrait 448, Mac Duggal 983, Elisabetta Franchi 18). But GitHub ran the 15-minute schedule only a few times today (gap 10:38→ manual runs), so data can be hours old between checks.","Spot-check vs official pages (Self-Portrait, Mac Duggal, Elisabetta Franchi, Macy's) and the live-site check could not run: page reading was not permitted in this unattended run. Mac Duggal was checked through the store's own data in the updater instead. Self-Portrait 'Extra 20% off sale' still detected.","Macy's winter.json/shoes.json last updated 14:28 UTC; files look valid (33 + 21 items) but were not compared with Macy's pages."]}]}
+{
+ "audits": [
+  {
+   "at": "2026-11-24T00:48:55Z",
+   "ok": false,
+   "problems": 2,
+   "fixed": 0,
+   "auto": true,
+   "notes": [
+    "تمت مقارنة 18 منتجاً مع المتاجر الأصلية؛ روابط غير مؤكدة: 0"
+   ]
+  },
+  {
+   "at": "2026-11-23T23:50:14Z",
+   "ok": true,
+   "problems": 3,
+   "fixed": 1,
+   "auto": false,
+   "src": "claude",
+   "notes": [
+    "الاختبار الذاتي: كل الاختبارات ناجحة (7 PASS، 1 LIMIT)",
+    "أعداد المنتجات ثابتة: Self-Portrait 448، Mac Duggal 985، Elisabetta Franchi 18؛ لا حذف",
+    "فشل تحديثين بسبب فحوص تجريبية — تم الإصلاح",
+    "Macy's: لم يُسمح بفتح صفحات Macy's في هذا الفحص — تبقى آخر الأسعار المؤكدة"
+   ]
+  },
+  {
+   "at": "2026-11-23T23:44:15Z",
+   "ok": false,
+   "problems": 2,
+   "fixed": 0,
+   "auto": true,
+   "notes": [
+    "تمت مقارنة 18 منتجاً مع المتاجر الأصلية؛ روابط غير مؤكدة: 0"
+   ]
+  },
+  {
+   "at": "2026-11-23T23:33:38Z",
+   "ok": false,
+   "problems": 2,
+   "fixed": 0,
+   "auto": true,
+   "notes": [
+    "تمت مقارنة 18 منتجاً مع المتاجر الأصلية؛ روابط غير مؤكدة: 0"
+   ]
+  },
+  {
+   "at": "2026-11-23T22:30:42Z",
+   "ok": false,
+   "problems": 2,
+   "fixed": 0,
+   "auto": true,
+   "notes": [
+    "تمت مقارنة 18 منتجاً مع المتاجر الأصلية؛ روابط غير مؤكدة: 0"
+   ]
+  },
+  {
+   "at": "2026-11-23T21:33:04Z",
+   "ok": false,
+   "problems": 2,
+   "fixed": 0,
+   "auto": true,
+   "notes": [
+    "تمت مقارنة 18 منتجاً مع المتاجر الأصلية؛ روابط غير مؤكدة: 0"
+   ]
+  },
+  {
+   "at": "2026-11-23T20:29:30Z",
+   "ok": false,
+   "problems": 2,
+   "fixed": 0,
+   "auto": true,
+   "notes": [
+    "تمت مقارنة 18 منتجاً مع المتاجر الأصلية؛ روابط غير مؤكدة: 0"
+   ]
+  },
+  {
+   "at": "2026-11-23T20:07:13Z",
+   "ok": false,
+   "problems": 2,
+   "fixed": 0,
+   "auto": true,
+   "notes": [
+    "تمت مقارنة 18 منتجاً مع المتاجر الأصلية؛ روابط غير مؤكدة: 0"
+   ]
+  },
+  {
+   "at": "2026-11-23T19:46:21Z",
+   "ok": false,
+   "problems": 2,
+   "fixed": 0,
+   "auto": true,
+   "notes": [
+    "تمت مقارنة 18 منتجاً مع المتاجر الأصلية؛ روابط غير مؤكدة: 0"
+   ]
+  },
+  {
+   "at": "2026-11-23T18:52:27Z",
+   "ok": false,
+   "problems": 2,
+   "fixed": 0,
+   "auto": true,
+   "notes": [
+    "Macy's — التخفيضات الشتوية: آخر تحديث قبل 4 ساعة",
+    "Macy's — الأحذية: آخر تحديث قبل 4 ساعة",
+    "تمت مقارنة 18 منتجاً مع المواقع الرسمية (Self-Portrait وMac Duggal وElisabetta Franchi)"
+   ]
+  },
+  {
+   "at": "2026-11-23T18:49:51Z",
+   "ok": true,
+   "problems": 0,
+   "fixed": 0,
+   "auto": true,
+   "notes": [
+    "تمت مقارنة 18 منتجاً مع المواقع الرسمية (Self-Portrait وMac Duggal وElisabetta Franchi)"
+   ]
+  },
+  {
+   "at": "2026-11-23T18:47:10Z",
+   "ok": false,
+   "problems": 9,
+   "fixed": 0,
+   "auto": true,
+   "notes": [
+    "Self-Portrait: «Burgundy Off Shoulder Gathered Lace Maxi Dress» يختلف عن الموقع الرسمي (التوفر نفد في الموقع الرسمي) — سيُصحَّح في التحديث القادم",
+    "Self-Portrait: «Burgundy Bandeau Maxi Dress» يختلف عن الموقع الرسمي (التوفر نفد في الموقع الرسمي) — سيُصحَّح في التحديث القادم",
+    "Self-Portrait: «Navy Rhinestone Mesh Cut Out Maxi Dress» يختلف عن الموقع الرسمي (التوفر نفد في الموقع الرسمي) — سيُصحَّح في التحديث القادم",
+    "Mac Duggal: «French Blue Flutter Sleeve Floral Embroidered Net Gown» يختلف عن الموقع الرسمي (التوفر نفد في الموقع الرسمي) — سيُصحَّح في التحديث القادم",
+    "Mac Duggal: «Violet Multi Sleeveless Pleated Floral Print Chiffon V-Neck Gown» يختلف عن الموقع الرسمي (التوفر نفد في الموقع الرسمي) — سيُصحَّح في التحديث القادم",
+    "Mac Duggal: «Sage Beaded Bishop Sleeve Wrap Gown» يختلف عن الموقع الرسمي (التوفر نفد في الموقع الرسمي) — سيُصحَّح في التحديث القادم",
+    "Mac Duggal: «Blue Sleeveless Halter Neck Gown with Rosette Detail» يختلف عن الموقع الرسمي (التوفر نفد في الموقع الرسمي) — سيُصحَّح في التحديث القادم",
+    "Mac Duggal: «Black Embellished Strapless Gown With Sculptural Drape» يختلف عن الموقع الرسمي (التوفر نفد في الموقع الرسمي) — سيُصحَّح في التحديث القادم",
+    "Mac Duggal: «Pink Jersey One Shoulder Draped Back Gown - FINAL SALE» يختلف عن الموقع الرسمي (التوفر نفد في الموقع الرسمي) — سيُصحَّح في التحديث القادم",
+    "تمت مقارنة 18 منتجاً مع المواقع الرسمية (Self-Portrait وMac Duggal وElisabetta Franchi)"
+   ]
+  },
+  {
+   "at": "2026-11-23T18:03:36Z",
+   "ok": false,
+   "problems": 4,
+   "fixed": 1,
+   "notes": [
+    "Mac Duggal: the store changed its promotion — '+25% Off In Cart' (BFCM25) is no longer shown; it now shows 'Extra 25% Off' only on dresses tagged as sale (markdown). ~810 full-price dresses were still showing the old 25% — fixed in the updater (reads every label, ignores 'Price as marked'); now 133 sale dresses keep the 25%, the others show their real price. No product removed (983 kept).",
+    "Mac Duggal: 4 dresses no longer in the store feed still show 25% until their own page is re-checked by the updater.",
+    "Updater: all recent runs succeeded, no errors, nothing in 'removed'; counts steady (Self-Portrait 448, Mac Duggal 983, Elisabetta Franchi 18). But GitHub ran the 15-minute schedule only a few times today (gap 10:38→ manual runs), so data can be hours old between checks.",
+    "Spot-check vs official pages (Self-Portrait, Mac Duggal, Elisabetta Franchi, Macy's) and the live-site check could not run: page reading was not permitted in this unattended run. Mac Duggal was checked through the store's own data in the updater instead. Self-Portrait 'Extra 20% off sale' still detected.",
+    "Macy's winter.json/shoes.json last updated 14:28 UTC; files look valid (33 + 21 items) but were not compared with Macy's pages."
+   ]
+  }
+ ]
+}
