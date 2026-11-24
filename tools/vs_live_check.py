@@ -13,7 +13,7 @@ async def main():
         pg.on("pageerror", lambda e: errs.append(str(e)))
         await pg.goto(SITE, wait_until="networkidle", timeout=90000)
         print("SITE", SITE, "APP_VERSION", await pg.evaluate("typeof APP_VERSION !== 'undefined' ? APP_VERSION : '?'"))
-        for route in ["vs", "vs-pajamas", "vs-slippers", "vs-robes", "vs-vsbags"]:
+        for route in ["vs", "vs-pajamas", "vs-pajamas-5000000360", "vs-pajamas-5000007337", "vs-pajamas-5000000279", "vs-robes", "vs-robes-5000008347", "vs-robes-5000012041", "vs-slippers", "vs-vsbags"]:
             await pg.goto(SITE + "#" + route, wait_until="networkidle", timeout=90000)
             await pg.wait_for_timeout(4000)
             titles = await pg.eval_on_selector_all(".grid .card", "e => e.map(c => (c.querySelector('h3, .t, .title') || c).innerText.split('\\n').slice(0,3).join(' / '))")
