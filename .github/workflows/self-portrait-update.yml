@@ -78,6 +78,9 @@ jobs:
         continue-on-error: true
         if: ${{ github.event.inputs.ef_probe == '2' }}
         run: python3 tools/ef_price_probe.py
+      - name: Victoria's Secret diagnostics
+        if: ${{ github.event.inputs.ef_probe == '9' }}
+        run: python3 tools/vs_probe.py
       - name: Elisabetta Franchi as a shopper sees it (real browser)
         continue-on-error: true
         if: ${{ github.event.inputs.ef_probe == '3' }}
