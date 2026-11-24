@@ -183,18 +183,19 @@ async def rendered_cards(url):
         pg = await b.new_page(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36")
         await pg.goto(url, wait_until="domcontentloaded", timeout=90000)
         await pg.wait_for_timeout(6000)
-        last = -1
+        last, same = -1, 0
         for _ in range(40):
-            n = await pg.evaluate("document.querySelectorAll('a[href*=\"-catalog/\"]').length")
-            if n == last:
+            n = await pg.evaluate("document.querySelectorAll('a[href*=catalog]').length")
+            same = same + 1 if n == last else 0
+            if same >= 3:
                 break
             last = n
-            await pg.mouse.wheel(0, 6000)
-            await pg.wait_for_timeout(1500)
-            for sel in ("button:has-text('Load More')", "button:has-text('Show More')"):
+            await pg.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+            await pg.wait_for_timeout(2500)
+            for sel in ("button:has-text('Load More')", "button:has-text('Show More')", "button:has-text('View More')"):
                 if await pg.locator(sel).count():
                     await pg.locator(sel).first.click()
-                    await pg.wait_for_timeout(2500)
+                    await pg.wait_for_timeout(3000)
         cards = await pg.evaluate("""() => {
           const out = []; const seen = new Set();
           document.querySelectorAll('a[href*="-catalog/"]').forEach(a => {
@@ -211,24 +212,34 @@ async def rendered_cards(url):
 
 
 def find_slippers():
-    """Victoria's Secret-branded slippers on the official slippers page that show a sale price right now."""
+    """Every product on the official slippers page, checked one by one on its own page: kept when it is a
+    Victoria's Secret-branded slipper (not socks, not other brands) with a sale price right now."""
     cards = asyncio.run(rendered_cards(SLIPPERS_PAGE))
-    if os.environ.get("VS_DEBUG") == "1":
-        for c in cards[:40]:
-            print("   card:", c["id"], c["catalog"], c["text"][:200])
-    found = {}
+    ids = {}
     for c in cards:
-        t = c["text"]
-        if not t.startswith("Victoria's Secret") and "Victoria's Secret " not in t[:40]:
+        if c["catalog"] in ("accessories-catalog", "shoes-catalog"):
+            ids.setdefault(c["id"], c["catalog"])
+    found = {}
+    for pid, catalog in ids.items():
+        try:
+            pd = read_page(f"{SITE}/us/vs/{catalog}/{pid}")
+        except Exception as e:  # noqa: BLE001
+            print("   slipper page unreadable:", pid, e)
             continue
-        m = re.search(r"Victoria's Secret\s*(.+?)(?:\s+(?:Limited Time Offer|Clearance|New Color|Just Dropped|Trending|Low Stock|Top Seller)\b|\s+\$)", t)
-        name = (m.group(1) if m else "").strip()
+        time.sleep(2)
+        names = collections.Counter((g.get("shortDescription") or "").strip() for g in pd.values())
+        name = names.most_common(1)[0][0] if names else ""
+        fam = {str(g.get(k) or "") for g in pd.values() for k in ("brand", "brandName", "family", "collectionName", "masterStyleBrand") if g.get(k)}
+        if os.environ.get("VS_DEBUG") == "1":
+            print("   slipper candidate:", pid, name, "| brand fields:", fam)
         if not name or re.search(r"(?i)sock", name) or not re.search(r"(?i)slipper|slide|scuff|mule|bootie", name):
             continue
-        prices = [float(x) for x in re.findall(r"\$(\d+(?:\.\d{2})?)", t)]
-        if len(prices) >= 2 and min(prices) < max(prices):
-            found.setdefault(c["id"], (c["catalog"], name))
-    print(f"slippers page: {len(cards)} cards read, {len(found)} discounted Victoria's Secret slipper styles")
+        if fam and not any("victoria" in x.lower() for x in fam):
+            continue
+        n, _ = build(pid, catalog, "slippers", name, pd)
+        if n and n["discPct"] > 0:
+            found[pid] = (catalog, name)
+    print(f"slippers page: {len(cards)} cards, {len(ids)} products checked, {len(found)} discounted Victoria's Secret slipper styles")
     return found
 
 
