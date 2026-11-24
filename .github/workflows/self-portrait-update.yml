@@ -81,6 +81,13 @@ jobs:
       - name: Victoria's Secret diagnostics
         if: ${{ github.event.inputs.ef_probe == '9' }}
         run: python3 tools/vs_probe.py
+      - name: Keep Victoria's Secret pages for inspection
+        if: ${{ github.event.inputs.ef_probe == '9' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: vs-pages
+          path: /tmp/vs/
+          retention-days: 1
       - name: Elisabetta Franchi as a shopper sees it (real browser)
         continue-on-error: true
         if: ${{ github.event.inputs.ef_probe == '3' }}
