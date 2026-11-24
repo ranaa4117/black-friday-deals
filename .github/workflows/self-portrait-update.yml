@@ -147,6 +147,7 @@ jobs:
         run: |
           pip install -q playwright==1.48.0 || true
           python3 tools/vs_live_check.py
+          LIVE=https://raghad-outlet.pages.dev/ python3 tools/vs_live_check.py
       - name: Save Victoria's Secret photos for checking (debug branch)
         if: ${{ github.event.inputs.vs == '2' }}
         run: |

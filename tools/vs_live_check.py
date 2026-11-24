@@ -11,9 +11,13 @@ async def main():
         pg = await b.new_page(viewport={"width": 420, "height": 900})
         errs = []
         pg.on("pageerror", lambda e: errs.append(str(e)))
+        await pg.goto(SITE, wait_until="networkidle", timeout=90000)
+        print("SITE", SITE, "APP_VERSION", await pg.evaluate("typeof APP_VERSION !== 'undefined' ? APP_VERSION : '?'"))
         for route in ["vs", "vs-pajamas", "vs-slippers", "vs-robes", "vs-vsbags"]:
             await pg.goto(SITE + "#" + route, wait_until="networkidle", timeout=90000)
             await pg.wait_for_timeout(4000)
+            titles = await pg.eval_on_selector_all(".grid .card", "e => e.map(c => (c.querySelector('h3, .t, .title') || c).innerText.split('\\n').slice(0,3).join(' / '))")
+            print(f"  {route}: {len(titles)} cards:", titles[:40])
             imgs = await pg.eval_on_selector_all(".grid img", "e => e.map(i => [i.currentSrc || i.src, i.complete && i.naturalWidth > 0])")
             ok = sum(1 for _, x in imgs if x)
             print(f"{route}: {len(imgs)} product photos, loaded {ok}", [u for u, x in imgs if not x][:3])
