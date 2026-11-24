@@ -117,58 +117,83 @@ def gallery(images, section):
     return names
 
 
+SIZE_ORDER = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XS/S", "M/L", "XL/XXL", "One Size", "O/S"]
+LEN_ORDER = ["Short", "Regular", "Long"]
+
+
+def gallery_for(images, section):
+    """Product-only pictures first (no models); a colour with no product-only picture keeps its official pictures."""
+    g = gallery(images, section)
+    if g:
+        return g
+    names = [i.get("image", "") for i in images if "_alt" not in i.get("image", "")]
+    return names
+
+
 def build(pid, catalog, section, name, pd):
-    """One site product from the official page data: the main price group (the price most colours are sold at)."""
+    """One site product = one official style; every official colour is its own variant with its own pictures,
+    price (per size and length when they differ), sizes, lengths and availability — nothing copied between colours."""
     groups = [g for g in pd.values() if (g.get("shortDescription") or "").strip() == name] or \
              [g for g in pd.values() if (g.get("shortDescription") or "").strip().lower() == name.lower()]
     if not groups:
         return None, "the page does not show a product called «%s»" % name
-    choices = []
+    url = f"{SITE}/us/vs/{catalog}/{pid}"
+    variants, seen = [], set()
     for g in groups:
         for code, c in (g.get("choices") or {}).items():
             sizes = c.get("availableSizes") or {}
-            avail = {k: s for k, s in sizes.items() if s.get("isAvailable")}
-            prices = collections.Counter((s.get("originalPriceNumerical"), s.get("salePriceNumerical") or s.get("originalPriceNumerical")) for s in (avail or sizes).values())
-            if not prices:
+            if not sizes:
                 continue
-            choices.append({"g": g, "code": code, "c": c, "avail": avail, "sizes": sizes, "price": prices.most_common(1)[0][0]})
-    if not choices:
-        return None, "no colours with a price on the page"
-    tally = collections.Counter(ch["price"] for ch in choices if ch["avail"]) or collections.Counter(ch["price"] for ch in choices)
-    (orig, sale) = tally.most_common(1)[0][0]
-    main = [ch for ch in choices if ch["price"] == (orig, sale)]
-    g0 = main[0]["g"]
-    url = f"{SITE}/us/vs/{catalog}/{pid}"
-    variants, images, colors, size_set = [], [], [], {}
-    for ch in main:
-        gal = gallery(ch["c"].get("images") or [], section)
-        if not gal:
-            continue
-        label = ch["c"].get("label") or ch["code"]
-        if label in colors:
-            label = f"{label} ({ch['g'].get('label') or ch['code']})"
-        colors.append(label)
-        variants.append({"color": label, "image": IMG.format(gal[0]), "images": [IMG.format(x) for x in gal[:6]],
-                         "url": f"{url}?genericId={ch['g'].get('genericId') or ''}&choice={ch['code']}".replace("genericId=&", ""),
-                         "a": bool(ch["avail"])})
-        if not images:
-            images = [IMG.format(x) for x in gal[:8]]
-        for k, s in ch["sizes"].items():
-            lab = size_label(k, s)
-            size_set[lab] = size_set.get(lab, False) or bool(s.get("isAvailable"))
+            rows = []
+            for k, sz in sizes.items():
+                o = sz.get("originalPriceNumerical")
+                p = sz.get("salePriceNumerical") or o
+                if not o:
+                    continue
+                s1 = (sz.get("size1") or k).strip()
+                s2 = (sz.get("size2") or "").strip()
+                rows.append({"s": s1, "l": s2 if s2 in LEN_ORDER else "", "a": bool(sz.get("isAvailable")), "p": round(p, 2), "c": round(o, 2)})
+            if not rows:
+                continue
+            gal = gallery_for(c.get("images") or [], section)
+            if not gal:
+                continue
+            label = (c.get("label") or code).strip()
+            if label in seen:
+                label = f"{label} ({g.get('label') or code})"
+            seen.add(label)
+            avail = [r for r in rows if r["a"]] or rows
+            (vo, vp) = collections.Counter((r["c"], r["p"]) for r in avail).most_common(1)[0][0]
+            rows.sort(key=lambda r: (SIZE_ORDER.index(r["s"]) if r["s"] in SIZE_ORDER else 99, LEN_ORDER.index(r["l"]) if r["l"] in LEN_ORDER else 9))
+            variants.append({"color": label, "code": code, "style": g.get("label") or "",
+                             "image": IMG.format(gal[0]), "images": [IMG.format(x) for x in gal[:8]],
+                             "productOnly": any(product_only(x) for x in gal),
+                             "url": f"{url}?genericId={g.get('genericId') or ''}&choice={code}".replace("genericId=&", ""),
+                             "a": any(r["a"] for r in rows), "price": vp, "compare": vo,
+                             "discPct": round((1 - vp / vo) * 100) if vo and vp < vo else 0, "sizes": rows})
     if not variants:
-        return None, "no product-only pictures on the page"
-    order = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XS/S", "M/L", "XL/XXL", "One Size", "O/S"]
-    sk = lambda x: (order.index(x.split(" / ")[0]) if x.split(" / ")[0] in order else 99, x)
+        return None, "no colours with a price and pictures on the page"
+    variants.sort(key=lambda v: (not v["a"], not v["productOnly"]))
+    tally = collections.Counter((v["compare"], v["price"]) for v in variants if v["a"]) or collections.Counter((v["compare"], v["price"]) for v in variants)
+    (orig, sale) = tally.most_common(1)[0][0]
+    g0 = groups[0]
     desc = re.sub(r"<[^>]+>", "\n", g0.get("longDescription") or "")
     desc = re.sub(r"\n\s*\n+", "\n", re.sub(r"&quot;", '"', desc)).strip()
     fab = re.sub(r"<[^>]+>", "\n", g0.get("fabrication") or "")
     fab = re.sub(r"\n\s*\n+", "\n", fab).strip()
     pct = round((1 - sale / orig) * 100) if orig and sale and sale < orig else 0
+    first = next(v for v in variants if v["a"]) if any(v["a"] for v in variants) else variants[0]
+    size_set = {}
+    for v in variants:
+        for r in v["sizes"]:
+            lab = r["s"] + (" / " + r["l"] if r["l"] else "")
+            size_set[lab] = size_set.get(lab, False) or r["a"]
+    shoe = {m[0]: f"US {m[1]}–{m[2]}" for m in re.findall(r"\b(XS|S|M|L|XL|XXL)\s*=\s*(?:&nbsp;)?\s*(\d+(?:\.5)?)\s*,\s*(\d+(?:\.5)?)", desc.replace("\u00a0", " "))}
     return {
         "handle": "vs-" + pid, "brand": "vs", "src": "vs", "cat": section, "cur": "USD", "title": name, "url": url,
-        "image": images[0], "images": images, "variants": variants, "colors": colors,
-        "sizes": [{"s": k, "a": v} for k, v in sorted(size_set.items(), key=lambda kv: sk(kv[0]))],
+        "shoeSizes": shoe if section == "slippers" else {},
+        "image": first["image"], "images": first["images"], "variants": variants, "colors": [v["color"] for v in variants],
+        "sizes": [{"s": k, "a": a} for k, a in size_set.items()],
         "price": round(sale, 2), "compare": round(orig, 2), "discPct": pct,
         "promoStatus": "active" if pct else "none", "details": desc[:900], "fabric": fab[:400],
         "status": "ok" if any(v["a"] for v in variants) else "unavailable",
