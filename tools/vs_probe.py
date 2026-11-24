@@ -1,22 +1,26 @@
 #!/usr/bin/env python3
-"""Victoria's Secret: dump listing + product pages for inspection (writes /tmp/vs/*.html)."""
-import os, re, sys, time
+"""Victoria's Secret: list collections through the store's own listing data (prints only)."""
+import os, re, sys, time, json, urllib.parse
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import sp_update as u
 os.makedirs("/tmp/vs", exist_ok=True)
-B = "https://www.victoriassecret.com/us/vs/"
-pages = {"slippers": B + "sleepwear/slippers", "slippers-robes": B + "sleepwear/slippers-and-robes", "robes": B + "sleepwear/robes",
-         "cosmetic": B + "accessories/cosmetic-bags", "pajamas": B + "sleepwear/pajamas",
-         "p_flannel": B + "sleepwear-and-lingerie-catalog/5000000360", "p_modal": B + "sleepwear-and-lingerie-catalog/5000007337",
-         "p_satin": B + "sleepwear-and-lingerie-catalog/5000000279", "p_plush": B + "sleepwear-and-lingerie-catalog/5000008347",
-         "p_4bag": B + "accessories-catalog/5000007992", "p_nested": B + "accessories-catalog/5000011697",
-         "robes2": B + "sleepwear/slippers-and-robes?scroll=true"}
-for k, url in pages.items():
+API = "https://api.victoriassecret.com/stacks/v45/"
+for name, cid in (("slippers", "1678ea9f-3adc-4a62-aabe-dec05cde7d7c"), ("robes", "5c14bb13-c3d3-4f7b-a3ad-a6632a3f0060"), ("cosmetic", "6bf40943-0852-4c12-bbe3-ead7386ec189")):
+    q = {"collectionId": cid, "brand": "vs", "orderBy": "REC", "isDomestic": "true", "isBrasOrPanties": "false", "limit": "180", "platform": "web", "activeCountry": "US"}
     try:
-        h = u.fetch(url, accept="text/html")
-        open(f"/tmp/vs/{k}.html", "w").write(h)
-        names = sorted(set(re.findall(r'"name":"([^"]{4,90})"', h)))
-        print("OK", k, len(h), "names:", [n for n in names if re.search(r"(?i)slipper|robe|bag|case|pajama|slide|bootie|mule", n)][:60])
+        d = json.loads(u.fetch(API + "?" + urllib.parse.urlencode(q)))
     except Exception as e:  # noqa: BLE001
-        print("FAIL", k, url, e)
+        print("FAIL", name, e); continue
+    json.dump(d, open(f"/tmp/vs/stack_{name}.json", "w"))
+    seen = set()
+    print("==", name, "total", d.get("TotalItems"))
+    for st in d.get("stacks", []):
+        for it in st.get("list", []):
+            pid = re.search(r"catalog/(\d+)", it["url"]).group(1)
+            k = (it["name"], pid)
+            if k in seen: continue
+            seen.add(k)
+            print("  ", it["name"], "|", pid, "|", json.dumps(it.get("price"))[:160])
     time.sleep(2)
+for k, url in {"p_revrobe": "https://www.victoriassecret.com/us/vs/sleepwear-and-lingerie-catalog/5000012041"}.items():
+    open(f"/tmp/vs/{k}.html", "w").write(u.fetch(url, accept="text/html"))
