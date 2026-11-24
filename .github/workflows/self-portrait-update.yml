@@ -142,6 +142,11 @@ jobs:
         run: |
           pip install -q playwright==1.48.0 || true
           python3 tools/vs_update.py
+      - name: Check the live Victoria's Secret pages (real browser)
+        if: ${{ github.event.inputs.vs == '3' }}
+        run: |
+          pip install -q playwright==1.48.0 || true
+          python3 tools/vs_live_check.py
       - name: Save Victoria's Secret photos for checking (debug branch)
         if: ${{ github.event.inputs.vs == '2' }}
         run: |
