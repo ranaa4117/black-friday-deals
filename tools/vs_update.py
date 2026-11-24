@@ -133,6 +133,8 @@ def gallery_for(images, section):
 def build(pid, catalog, section, name, pd):
     """One site product = one official style; every official colour is its own variant with its own pictures,
     price (per size and length when they differ), sizes, lengths and availability — nothing copied between colours."""
+    for gid, g in pd.items():
+        g.setdefault("genericId", gid)
     groups = [g for g in pd.values() if (g.get("shortDescription") or "").strip() == name] or \
              [g for g in pd.values() if (g.get("shortDescription") or "").strip().lower() == name.lower()]
     if not groups:
