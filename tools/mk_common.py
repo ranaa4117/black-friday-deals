@@ -46,7 +46,7 @@ CAT_RULES = [   # first match wins
     ("eyes", r"\blash|eye primer|\beye"), ("face", r"fixing|face|cushion|complexion|flawless filter|palette"),
 ]
 
-FRAGRANCE = r"parfum|perfume|eau de|cologne|fragrance|body mist|hair (& |and )?body mist|scent|rollerball|roll-on perfume|\bedp\b|\bedt\b|parfum|discovery set|olfactory"
+FRAGRANCE = r"parfum|perfume|eau de|cologne|fragrance|body mist|hair (& |and )?body mist|\\bscents?\\b|rollerball|roll-on perfume|\bedp\b|\bedt\b|parfum|discovery set|olfactory"
 
 
 def is_fragrance(*texts):
