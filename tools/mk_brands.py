@@ -127,11 +127,11 @@ def record(brand, base, p):
         rec["discPct"] = round(100 * (1 - rec["price"] / rec["compare"]))
     if is_set:
         n, how = mk.set_items(title, desc)
-        rec.update(items=n, itemsHow=how, add=n * mk.ADD["per_item"] if n else None, addWhy=f"{n} × 20" if n else how)
+        rec.update(items=n, itemsHow=how)                   # the fee is decided in the build by the set's size
         rec["contents"] = contents_list(desc)
         if mk.is_fragrance(" ".join(rec["contents"])):      # a set with a fragrance inside is left out entirely
             return None
-        if not n:
+        if not rec["contents"]:
             rec["descText"] = mk.text_of(desc)[:1200]     # kept so the admin can see why the count is missing
     else:
         cls, why = mk.add_class(title, cat, size, top=mk.top_of(f"{title} {ptype}"), detail=" ".join([v["name"] or "" for v in variants]) + " " + mk.text_of(desc)[:800])
