@@ -66,8 +66,8 @@ def not_beauty(name):
 
 def is_set(name, ptype="", tags=(), value_price=None):
     s = f"{ptype} {name}".lower()        # store tags are not used: they mark gift-guide pages, not what the product is
-    if value_price:      # Sephora shows "(… value)" only for sets
-        return True
+    if value_price and re.search(r"\b(set|kit|duo|trio|quad|bundle|vault|collection|minis|sampler|discovery|\d+[- ]piece)\b", s):
+        return True      # Sephora also shows "(… value)" on value-size single products, so the name must say it's a set
     if re.search(r"\b(set|kit|bundle|vault)\b", (ptype or "").lower()):
         return True
     if re.search(r"duo[- ]fib(re|er)|\bset(ting)? (spray|powder|mist)\b|\bsetting\b", s.replace("gift set", "")):
