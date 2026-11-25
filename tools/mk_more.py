@@ -97,13 +97,17 @@ async def toofaced():
         b = await p.chromium.launch(executable_path=os.environ.get("CHROME", "/usr/bin/google-chrome"), args=["--no-sandbox"])
         ctx = await b.new_context(user_agent=UA, locale="en-US", viewport={"width": 1366, "height": 900}, timezone_id="America/New_York")
         pg = await ctx.new_page()
-        await pg.goto("https://www.toofaced.com/products/23791/sale", wait_until="domcontentloaded", timeout=90000)
-        await pg.wait_for_timeout(9000)
-        for _ in range(12):
-            await pg.mouse.wheel(0, 2500); await pg.wait_for_timeout(700)
-        items = await pg.evaluate("""() => [...document.querySelectorAll('.js-product-grid-item[data-product-id]')].map(e => {
-            const a = e.querySelector('a[href*="/product/"]'), im = e.querySelector('img');
-            return { id: e.dataset.productId, text: e.innerText, href: a ? a.href : '', img: im ? (im.currentSrc || im.src || im.dataset.src || '') : '' }; })""")
+        items = []
+        for path in ("/products/23790/makeup", "/products/23482/kits-and-sets", "/products/23791/sale"):   # all makeup, value sets, sale
+            await pg.goto("https://www.toofaced.com" + path, wait_until="domcontentloaded", timeout=90000)
+            await pg.wait_for_timeout(8000)
+            if "/products/" not in pg.url:
+                continue                                  # redirected away: page not available
+            for _ in range(15):
+                await pg.mouse.wheel(0, 2500); await pg.wait_for_timeout(600)
+            items += await pg.evaluate("""() => [...document.querySelectorAll('.js-product-grid-item[data-product-id]')].map(e => {
+                const a = e.querySelector('a[href*="/product/"]'), im = e.querySelector('img');
+                return { id: e.dataset.productId, text: e.innerText, href: a ? a.href : '', img: im ? (im.currentSrc || im.src || im.dataset.src || '') : '' }; })""")
         await b.close()
     seen = set()
     for i, it in enumerate(items):
