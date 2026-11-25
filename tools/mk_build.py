@@ -336,6 +336,7 @@ def main():
     rest = [p for c in campaigns for sec in c["sections"] if sec.get("kind") != "deal" for p in sec.get("products") or []]
     shown = deal + [p for p in mk_sale if p.get("src") == "sephora"] + [g for g in gifts if g.get("src") == "sephora"] + \
             sorted(rest, key=lambda p: p.get("rank") or 10**6)          # most visible first
+    all_ids = {p["pid"] for p in shown if p.get("pid")}
     need = list(dict.fromkeys(p["url"].split("?")[0] for p in shown if p.get("pid") and p["pid"] not in pinfo and p.get("url")))
     hist = {h["label"]: h for h in (old.get("history") or [])}
     for c in campaigns:
@@ -344,7 +345,7 @@ def main():
     removed_ship = list({x["title"]: x for x in removed_ship}.values())
     out = {"meta": {"updatedAt": ts, "sephoraOk": sephora_ok, "pages": sorted(pages, key=lambda p: p["label"]), "sale": sale_meta,
                     "brands": (brands.get("meta") or {}).get("brands", {}), "brandsAt": (brands.get("meta") or {}).get("updatedAt"),
-                    "needProducts": need[:120], "needSets": need[:120], "needLists": need_lists, "pinfo": pinfo, "problems": problems,
+                    "needProducts": need[:400], "needSets": need[:400], "checks": {"total": len(all_ids), "done": len(all_ids & set(pinfo)), "pending": len(need)}, "needLists": need_lists, "pinfo": pinfo, "problems": problems,
                     "removedShipping": removed_ship, "add": mk.ADD, "giftAdd": mk.GIFT_ADD, "cats": mk.CATS, "brandNames": mk.BRANDS, "top": TOP},
            "campaigns": campaigns, "offers": [], "sale": [], "makeup": mk_sale, "gifts": gifts,
            "history": sorted(hist.values(), key=lambda h: h.get("endedAt") or "", reverse=True)[:60]}

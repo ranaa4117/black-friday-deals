@@ -87,15 +87,40 @@
     window.__srOut = JSON.stringify(out); return { bytes: window.__srOut.length, items: M.size, total: out.total, complete: out.complete, ms: Date.now() - t0 };
   }
   /* product page (for gift-set contents): the page's own product data */
-  async function product(){
-    const ls = document.getElementById("linkStore"); const page = ls ? JSON.parse(ls.textContent).page || {} : {};
+  async function product(doc, addr){
+    doc = doc || document; addr = addr || location.href;
+    const ls = doc.getElementById("linkStore"); const page = ls ? JSON.parse(ls.textContent).page || {} : {};
     const p = page.product || {}, cs = p.currentSku || {}, info = p.productDetails || {};
     const chain = []; for (let c = p.parentCategory; c && chain.length < 6; c = c.parentCategory) chain.unshift(c.displayName);
-    const out = { kind: "product", url: location.href.split("?")[0], pid: info.productId || p.productId, brand: (info.brand || {}).displayName, name: info.displayName,
+    const out = { kind: "product", url: addr.split("?")[0], pid: info.productId || p.productId, brand: (info.brand || {}).displayName, name: info.displayName,
       sku: cs.skuId, list: cs.listPrice, sale: cs.salePrice || null, value: cs.valuePrice || null, variation: cs.variationValue || "", size: cs.size || "",
       hazmat: cs.hawaiiHazmatFlag === true, appOnly: !!cs.isAppExclusive, onlineOnly: !!cs.isOnlineOnly, bi: cs.biExclusiveLevel || "none", oos: !!cs.isOutOfStock, limited: !!cs.isLimitedEdition,
-      desc: String(info.longDescription || "").slice(0, 8000), img: ((cs.skuImages || {}).imageUrl) || "", cats: chain };
-    window.__srOut = JSON.stringify(out); return { bytes: window.__srOut.length };
+      desc: String(info.longDescription || "").slice(0, 8000), img: ((cs.skuImages || {}).imageUrl) || "", cats: chain,
+      variants: (p.regularChildSkus || []).slice(0, 60).map(v => ({ sku: v.skuId, name: v.variationValue || "", list: v.listPrice, sale: v.salePrice || null, oos: !!v.isOutOfStock, size: v.size || "" })) };
+    window.__srOut = JSON.stringify(out); return { bytes: window.__srOut.length, ok: !!out.pid };
+  }
+  /* many Sephora product pages in one go: each public product page is loaded (same as opening it), read and saved,
+     one at a time with a pause between pages. Progress in window.__srb. */
+  function batch(urls, key, pause = 1500){
+    window.__srb = { total: urls.length, done: 0, failed: [], state: "running" };
+    (async () => {
+      for (const u of urls){
+        const label = (u.match(/-(P\d+)/) || [])[1];
+        try {
+          const r = await fetch(u, { credentials: "same-origin" });
+          if (!r.ok) throw new Error("HTTP " + r.status);
+          const doc = new DOMParser().parseFromString(await r.text(), "text/html");
+          const res = await product(doc, u);
+          if (!res.ok || !label) throw new Error("no product data");
+          window.__srStart = u;
+          await put(key, "product", label, JSON.parse(window.__srOut));
+          window.__srb.done++;
+        } catch (e){ window.__srb.failed.push({ id: label, url: u, error: String(e.message || e).slice(0, 80) }); }
+        await sleep(pause);
+      }
+      window.__srb.state = "done";
+    })();
+    return "started " + urls.length;
   }
   /* Sephora's own sale & offers navigation (header menu and the banner across the top of every page) */
   function offersMenu(){
@@ -129,6 +154,6 @@
     })();
     return "started " + job + " " + label;
   }
-  window.SR = { content, sale, product, offersMenu, run };
+  window.SR = { content, sale, product, offersMenu, run, batch };
   return "SR ready";
 })();
