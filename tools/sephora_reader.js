@@ -93,7 +93,7 @@
     const chain = []; for (let c = p.parentCategory; c && chain.length < 6; c = c.parentCategory) chain.unshift(c.displayName);
     const out = { kind: "product", url: location.href.split("?")[0], pid: info.productId || p.productId, brand: (info.brand || {}).displayName, name: info.displayName,
       sku: cs.skuId, list: cs.listPrice, sale: cs.salePrice || null, value: cs.valuePrice || null, variation: cs.variationValue || "", size: cs.size || "",
-      appOnly: !!cs.isAppExclusive, onlineOnly: !!cs.isOnlineOnly, bi: cs.biExclusiveLevel || "none", oos: !!cs.isOutOfStock, limited: !!cs.isLimitedEdition,
+      hazmat: cs.hawaiiHazmatFlag === true, appOnly: !!cs.isAppExclusive, onlineOnly: !!cs.isOnlineOnly, bi: cs.biExclusiveLevel || "none", oos: !!cs.isOutOfStock, limited: !!cs.isLimitedEdition,
       desc: String(info.longDescription || "").slice(0, 8000), img: ((cs.skuImages || {}).imageUrl) || "", cats: chain };
     window.__srOut = JSON.stringify(out); return { bytes: window.__srOut.length };
   }

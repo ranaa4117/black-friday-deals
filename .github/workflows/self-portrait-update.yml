@@ -41,6 +41,10 @@ on:
         description: "Makeup brands: read the official brand stores now (1 = yes)"
         required: false
         default: "0"
+      mk_sheet:
+        description: "Makeup photo check sheets (1 = all; or comma list of product ids for their galleries)"
+        required: false
+        default: "0"
       mk_probe:
         description: "Makeup sources test: Sephora USA and brand stores (1 = yes)"
         required: false
@@ -129,6 +133,16 @@ jobs:
           echo "remove:";  curl -s -w " [%{http_code}]\n" -X POST "$U/rpc/remove_fav" -H "apikey: $K" -H "Content-Type: application/json" -d "{\"p_device\":\"$D\",\"p_handle\":\"__connection-test__\"}"
           echo "count after remove:"; curl -s -w " [%{http_code}]\n" "$U/fav_totals?handle=eq.__connection-test__&select=handle,total" -H "apikey: $K"
           echo "CORS:"; curl -s -o /dev/null -D - -X OPTIONS "$U/rpc/add_fav" -H "Origin: https://ranaa4117.github.io" -H "Access-Control-Request-Method: POST" -H "Access-Control-Request-Headers: apikey,content-type" | grep -i "access-control-allow-origin" || echo "no CORS header"
+      - name: Makeup photo check sheets (saved to the debug branch)
+        continue-on-error: true
+        if: ${{ github.event.inputs.mk_sheet != '' && github.event.inputs.mk_sheet != '0' }}
+        env:
+          MK_SHEET_IDS: ${{ github.event.inputs.mk_sheet != '1' && github.event.inputs.mk_sheet || '' }}
+        run: |
+          pip install -q pillow || true
+          python3 tools/mk_sheet.py || true
+          cd /tmp/mksheet && rm -rf .git && git init -q && git checkout -q -b debug-mksheet && git add -A
+          git -c user.name=bot -c user.email=bot@users.noreply.github.com commit -qm "makeup sheets" && git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" debug-mksheet
       - name: Makeup sources test (saved to the debug branch)
         continue-on-error: true
         if: ${{ github.event.inputs.mk_probe == '1' }}

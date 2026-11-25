@@ -85,21 +85,33 @@ def tile_item(t, top):
     return r
 
 
-def price_rule(r, set_cache):
-    """Attach the add-on (SAR) and why. Sets: 20 SAR × products inside, only when the official contents list is known."""
+OVR_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mk_overrides.json")
+try:
+    OVR = json.load(open(OVR_PATH))     # owner/admin decisions: product-only photo, gift-set size after manual review
+except Exception:
+    OVR = {"images": {}, "giftSize": {}}
+
+
+def price_rule(r, pinfo):
+    """Add-on (SAR): gift sets 250 / 120 / 60 by the set's real size (manual review when unknown);
+    single products 30 / 40 / 60, large eyeshadow palettes 80."""
+    info = pinfo.get(r.get("pid") or "") or {}
     if r.get("set"):
-        info = set_cache.get(r.get("pid") or r.get("id")) or {}
-        n = r.get("items") or info.get("items")
-        if not n:
-            n, _how = mk.set_items(r.get("title", ""))          # "Duo" / "Trio" / "5-Piece" in the official name
-        if n:
-            r.update(items=n, add=n * mk.ADD["per_item"], addWhy=f"{n} منتجات × 20", contents=r.get("contents") or info.get("contents") or [])
+        contents = r.get("contents") or info.get("contents") or []
+        cls, why = mk.gift_class(r.get("title", ""), contents, info.get("desc", ""))
+        if OVR.get("giftSize", {}).get(r.get("id")):
+            cls, why = OVR["giftSize"][r["id"]], "size set by manual review"
+        r["contents"] = contents
+        if cls:
+            r.update(add=mk.GIFT_ADD[cls], addClass="gift_" + cls, addWhy=why)
         else:
-            r.update(add=None, addWhy="عدد المنتجات داخل المجموعة غير منشور بعد — لا تظهر للعميلات حتى يُتحقق منه")
+            r.update(add=None, addClass=None, addWhy="حجم المجموعة غير واضح من المصدر الرسمي — تحتاج مراجعة يدوية ولا تظهر للعميلات")
         return r
     cat = r.get("cat") or mk.category(r.get("title", ""))
     r["cat"] = cat
-    cls, why = mk.add_class(r.get("title", ""), cat, mk.size_of(r.get("variation", "")), top=r.get("top") or mk.top_of(r.get("title", "")))
+    detail = " ".join([r.get("variation", ""), info.get("size", ""), info.get("variation", ""), (info.get("desc") or "")[:800]])
+    cls, why = mk.add_class(r.get("title", ""), cat, mk.size_of(r.get("variation", "") + " " + info.get("size", "")),
+                            top=r.get("top") or mk.top_of(r.get("title", "")), detail=detail)
     r.update(add=mk.ADD[cls], addClass=cls, addWhy=why)
     return r
 
@@ -138,7 +150,9 @@ def campaign(snap, now):
         t = clean(s.get("title"))
         if s["type"] == "ProductList":
             today = bool(re.search(r"today only", t, re.I))
-            prods = [sephora_item(x) for x in s.get("products") or []]
+            if re.search(r"tools?\b|korean|k-beauty", t, re.I):
+                continue                                 # tools and K-beauty cards are not part of this section
+            prods = [x for x in (sephora_item(x) for x in s.get("products") or []) if not mk.is_fragrance(x["title"])]
             if not today:
                 prods = [x for x in prods if x.get("compare")]     # only pieces Sephora shows at a lower price
                 if not prods:
@@ -146,10 +160,7 @@ def campaign(snap, now):
             secs.append({"kind": "deal" if today else "products", "title": t, "todayOnly": today, "validDate": read_pt.strftime("%Y-%m-%d") if today else None,
                          "more": s.get("more") or "", "moreLabel": s.get("moreLabel") or "", "products": prods})
         elif s["type"] == "PromotionList":
-            ids = []
-            for o in s.get("offers") or []:
-                rec = offer_rec(o, t or "Offers", d.get("url")); offers.append(rec); ids.append(rec["id"])
-            secs.append({"kind": "promos", "title": t, "offers": ids, "personalized": bool(s.get("personalized") and not ids)})
+            continue                                     # promotion cards (sample bags, member gifts, codes…) are not shown
         elif s["type"] in ("BannerList", "Banner"):
             bs = [{"text": clean(b.get("text")), "image": (b.get("media") or {}).get("src", ""), "alt": clean((b.get("media") or {}).get("alt", "")),
                    "url": b.get("url") or "", "bg": b.get("bg") or "", "color": b.get("color") or ""} for b in s.get("banners") or []]
@@ -169,7 +180,7 @@ def campaign(snap, now):
                     starts = min(starts, st) if starts else st
             secs.append({"kind": "banners", "title": t, "planner": planner, "banners": bs})
         elif s["type"] == "SoftLinks":
-            secs.append({"kind": "links", "title": t, "links": s.get("links") or []})
+            continue
     navi = d.get("navigation") or {}
     tabs = [{"label": n.get("label"), "url": (n.get("url") or "").split("?")[0], "current": n.get("current")} for n in (navi.get("items") or [])]
     status = "ended" if end and now > end else "active"
@@ -184,6 +195,13 @@ def campaign(snap, now):
             "endsAt": iso(end.astimezone(timezone.utc)) if end else None, "startsAt": iso(starts.astimezone(timezone.utc)) if starts else None, "status": status, "sections": secs}, offers
 
 
+def norm(t):
+    return re.sub(r"[^a-z0-9]+", " ", (t or "").lower()).strip()
+
+
+SEPHORA_CAMPAIGN = r"cyber|black-friday"      # the only two Sephora sections shown (owner's decision)
+
+
 def main():
     now = now_utc(); ts = iso(now)
     try:
@@ -194,101 +212,137 @@ def main():
         brands = json.load(open(BR))
     except Exception:
         brands = {"products": [], "meta": {}}
-    set_cache = dict((old.get("meta") or {}).get("setInfo") or {})
-    problems, pages = [], []
+    pinfo = dict((old.get("meta") or {}).get("pinfo") or {})
+    problems, pages, removed_ship = [], [], []
     try:
         snaps = snapshots(); sephora_ok = True
     except Exception as e:
         snaps, sephora_ok = [], False
         problems.append({"key": "sephora-db", "text": f"تعذّر قراءة بيانات سيفورا المحفوظة: {type(e).__name__}"})
-    # gift-set contents read from Sephora product pages
-    for s in snaps:
+    from mk_brands import contents_list
+    for s in snaps:                                   # Sephora product pages: set contents, size, shipping flag
         if s["kind"] == "product":
-            d = s["data"]; n, how = mk.set_items(d.get("name") or "", d.get("desc") or "")
-            from mk_brands import contents_list
-            set_cache[d.get("pid")] = {"items": n, "how": how, "contents": contents_list(d.get("desc") or ""), "at": s["at"],
-                                       "appOnly": d.get("appOnly"), "onlineOnly": d.get("onlineOnly"), "cats": d.get("cats")}
-    campaigns, offers = [], {}
-    sale_items, gift_items = {}, {}
-    sale_meta = {}
+            d = s["data"]
+            pinfo[d.get("pid")] = {"at": s["at"], "contents": contents_list(d.get("desc") or ""), "desc": mk.text_of(d.get("desc") or "")[:1500],
+                                   "size": d.get("size") or "", "variation": d.get("variation") or "", "hazmat": d.get("hazmat"),
+                                   "appOnly": d.get("appOnly"), "cats": d.get("cats"), "url": d.get("url")}
+    rank = {}                                         # Sephora "Bestselling" order (lists are read sorted by bestselling)
+    campaigns, sale_items, gift_items, sale_meta, more_lists = [], {}, {}, {}, {}
     for s in snaps:
         age_h = (now - parse_t(s["at"])).total_seconds() / 3600
         pages.append({"kind": s["kind"], "label": s["label"], "url": s["url"], "at": s["at"], "ageH": round(age_h, 1)})
-        if s["kind"] == "content":
-            c, offs = campaign(s, now)
-            c["stale"] = age_h > 12
-            for o in offs:
-                if o["id"] in offers:
-                    offers[o["id"]]["sections"] = sorted(set(offers[o["id"]]["sections"] + o["sections"]))
-                else:
-                    offers[o["id"]] = dict(o, readAt=s["at"], page=s["label"])
-            campaigns.append(c)
+        if s["kind"] == "content" and re.search(SEPHORA_CAMPAIGN, s["label"]):
+            c, _ = campaign(s, now); c["stale"] = age_h > 12; campaigns.append(c)
         elif s["kind"] == "list":
-            d = s["data"]; lab = s["label"]
-            top = LIST_TOP.get(lab)
-            sale_meta[lab] = {"total": d.get("total"), "read": len(d.get("items") or []), "complete": d.get("complete"), "at": s["at"], "stale": age_h > 30}
-            for t in d.get("items") or []:
-                r = tile_item(t, top or "makeup")
-                if not r:
+            d, lab = s["data"], s["label"]
+            best = "BEST_SELLING" in (s.get("url") or "")
+            sale_meta[lab] = {"total": d.get("total"), "read": len(d.get("items") or []), "complete": d.get("complete"), "at": s["at"], "stale": age_h > 30, "bestselling": best}
+            items = []
+            for i, t in enumerate(d.get("items") or []):
+                r = tile_item(t, LIST_TOP.get(lab) or "makeup")
+                if not r or r["top"] == "fragrance" or mk.is_fragrance(r["title"]):
                     continue
-                if lab.startswith("gifts"):
-                    r["set"] = True
-                    gift_items.setdefault(r["id"], r)
-                elif top:
+                if best:
+                    r["rank"] = i + 1
+                    rank[r["pid"]] = min(rank.get(r["pid"], 10**6), i + 1)
+                items.append(r)
+            if lab.startswith("more-"):
+                more_lists[lab] = items
+            elif lab.startswith("gifts"):
+                for r in items:
+                    gift_items.setdefault(r["id"], dict(r, set=True))
+            elif lab in LIST_TOP:
+                for r in items:
                     sale_items.setdefault(r["id"], r)
-    # Sephora sale: only pieces Sephora shows with a lower price than before
-    sale = [price_rule(r, set_cache) for r in sale_items.values() if r.get("compare")]
+    def ok_ship(r):                                   # retailer's own hazardous-material flag = can't fly → removed
+        info = pinfo.get(r.get("pid") or "") or {}
+        if info.get("hazmat"):
+            removed_ship.append({"id": r.get("id"), "title": f'{r.get("brand", "")} {r.get("title", "")}', "url": r.get("url"),
+                                 "reason": "Sephora marks it as a hazardous material (restricted from air shipping to Hawaii/Alaska)"})
+            return False
+        r["ship"] = "unverified"                      # no retailer page confirms air shipping either way
+        return True
+    def ranked(r):
+        r["rank"] = r.get("rank") or rank.get(r.get("pid") or "")
+        return r
+    # Sephora Cyber + Black Friday: every eligible product from the section's own "shop more" list when it was read
+    need_lists = []
+    for c in campaigns:
+        for sec in c["sections"]:
+            if "products" not in sec:
+                continue
+            if sec.get("more"):
+                slug = "more-" + re.sub(r"[^a-z0-9]+", "-", sec["more"].split("sephora.com/")[-1].split("?")[0].lower()).strip("-")[:80]
+                sep = "&" if "?" in sec["more"] else "?"
+                need_lists.append({"label": slug, "url": sec["more"] + ("" if "sortBy=" in sec["more"] else sep + "sortBy=BEST_SELLING")})
+                if slug in more_lists:
+                    sec["products"] = [x for x in more_lists[slug] if x.get("compare")]
+                    sec["allRead"] = True
+            sec["products"] = sorted([price_rule(ranked(dict(p, top=mk.top_of(p["title"]))), pinfo) for p in sec["products"]
+                                      if not mk.is_fragrance(p["title"]) and ok_ship(p)], key=lambda p: (p.get("rank") or 10**6))
+    # Makeup Sale (13 brands): Sephora USA sale + official US brand stores, makeup only
+    sale = [price_rule(r, pinfo) for r in sale_items.values() if r.get("compare")]
+    by_name = {}
     for r in sale:
         r["brandKey"] = mk.SEPHORA_NAMES.get(r["brand"].lower())
-    # Makeup Sale (13 brands): official brand stores + those brands' individual pieces in the Sephora sale
+        if r["brandKey"] and r.get("rank"):
+            by_name[(r["brandKey"], norm(r["title"]))] = r["rank"]
     mk_sale = []
     for p in brands.get("products") or []:
-        if p.get("set"):
+        if p.get("set") or mk.is_fragrance(p["title"], p.get("type")) or mk.top_of(f'{p["title"]} {p.get("type", "")}') != "makeup":
             continue
-        mk_sale.append(price_rule(dict(p, top="makeup"), set_cache))
+        q = price_rule(dict(p, top="makeup", cat=mk.category(p["title"], p.get("type", ""))), pinfo)
+        q["rank"] = by_name.get((p["brand"], norm(p["title"])))     # same product's place on Sephora's bestselling list
+        q["ship"] = "unverified"
+        mk_sale.append(q)
     for r in sale:
-        if r["brandKey"] and not r["set"] and r["top"] == "makeup":
-            mk_sale.append(dict(r, brand=r["brandKey"], retailer="Sephora", src="sephora"))
-    # Gifts: genuine sets from the brand stores and from Sephora (sale sets + Sephora's gift-set listings)
-    gifts = []
+        if r["brandKey"] and not r["set"] and r["top"] == "makeup" and ok_ship(r):
+            mk_sale.append(dict(r, brand=r["brandKey"], retailer="Sephora", src="sephora", cat=mk.category(r["title"])))
+    mk_sale.sort(key=lambda p: (p.get("rank") or 10**6, p.get("storeRank") or 10**6))
+    # Gifts: genuine sets, no fragrance, fee by set size
+    gifts, seen = [], set()
     for p in brands.get("products") or []:
-        if p.get("set"):
-            gifts.append(price_rule(dict(p), set_cache))
-    seen = set()
+        if p.get("set") and not mk.is_fragrance(p["title"], " ".join(p.get("contents") or [])):
+            q = price_rule(dict(p), pinfo); q["ship"] = "unverified"; q["rank"] = by_name.get((p["brand"], norm(p["title"]))); gifts.append(q)
     for r in [x for x in sale if x["set"]] + list(gift_items.values()):
         if r["id"] in seen:
             continue
         seen.add(r["id"])
-        gifts.append(price_rule(dict(r, brandKey=mk.SEPHORA_NAMES.get(r["brand"].lower()), retailer="Sephora", src="sephora"), set_cache))
-    for c in campaigns:                      # products shown inside Sephora campaign pages and offers: same price rules
-        for sec in c["sections"]:
-            if "products" in sec:
-                sec["products"] = [price_rule(dict(p, top=mk.top_of(p["title"])), set_cache) for p in sec["products"]]
-    for o in offers.values():
-        o["products"] = [price_rule(dict(p, top=mk.top_of(p["title"])), set_cache) for p in o.get("products") or []]
-    camp_sets = [p["url"] for c in campaigns for sec in c["sections"] for p in sec.get("products") or [] if p.get("set") and p.get("add") is None and p.get("pid") not in set_cache]
-    need_sets = list(dict.fromkeys(camp_sets + [g["url"] for g in gifts if g.get("src") == "sephora" and g.get("add") is None and g.get("pid") not in set_cache]))[:40]
-    # campaign history: campaigns that disappeared or ended stay in the admin history
+        info = pinfo.get(r.get("pid") or "") or {}
+        if mk.is_fragrance(r["title"], " ".join(info.get("contents") or [])) or not ok_ship(r):
+            continue
+        gifts.append(price_rule(ranked(dict(r, brandKey=mk.SEPHORA_NAMES.get(r["brand"].lower()), retailer="Sephora", src="sephora")), pinfo))
+    gifts.sort(key=lambda p: (p.get("rank") or 10**6, p.get("storeRank") or 10**6))
+    # Sephora product pages still to read (shipping flag, set contents, palette size), most visible first
+    shown = [p for c in campaigns for sec in c["sections"] for p in sec.get("products") or []] + \
+            [p for p in mk_sale if p.get("src") == "sephora"] + [g for g in gifts if g.get("src") == "sephora"]
+    need = list(dict.fromkeys(p["url"].split("?")[0] for p in shown if p.get("pid") and p["pid"] not in pinfo and p.get("url")))
     hist = {h["label"]: h for h in (old.get("history") or [])}
     for c in campaigns:
         if c["status"] == "ended":
             hist[c["label"]] = {"label": c["label"], "title": c["title"], "url": c["url"], "endedAt": c.get("endsAt") or ts, "lastRead": c["readAt"]}
+    removed_ship = list({x["id"]: x for x in removed_ship}.values())
     out = {"meta": {"updatedAt": ts, "sephoraOk": sephora_ok, "pages": sorted(pages, key=lambda p: p["label"]), "sale": sale_meta,
                     "brands": (brands.get("meta") or {}).get("brands", {}), "brandsAt": (brands.get("meta") or {}).get("updatedAt"),
-                    "needSets": need_sets, "setInfo": set_cache, "problems": problems,
-                    "add": mk.ADD, "cats": mk.CATS, "brandNames": mk.BRANDS, "top": TOP},
-           "campaigns": campaigns, "offers": list(offers.values()), "sale": sale, "makeup": mk_sale, "gifts": gifts,
+                    "needProducts": need[:80], "needSets": need[:80], "needLists": need_lists, "pinfo": pinfo, "problems": problems,
+                    "removedShipping": removed_ship, "add": mk.ADD, "giftAdd": mk.GIFT_ADD, "cats": mk.CATS, "brandNames": mk.BRANDS, "top": TOP},
+           "campaigns": campaigns, "offers": [], "sale": [], "makeup": mk_sale, "gifts": gifts,
            "history": sorted(hist.values(), key=lambda h: h.get("endedAt") or "", reverse=True)[:60]}
     if not sephora_ok and old.get("meta"):
         # the snapshot database couldn't be read: keep every Sephora part exactly as last confirmed (never wipe it)
-        out["campaigns"], out["offers"], out["sale"] = old.get("campaigns", []), old.get("offers", []), old.get("sale", [])
+        out["campaigns"] = old.get("campaigns", [])
         out["makeup"] += [p for p in old.get("makeup", []) if p.get("src") == "sephora"]
         out["gifts"] += [p for p in old.get("gifts", []) if p.get("src") == "sephora"]
-        for k in ("pages", "sale", "needSets"):
-            out["meta"][k] = (old.get("meta") or {}).get(k, out["meta"][k])
+        for k in ("pages", "sale", "needProducts", "needSets", "needLists", "removedShipping"):
+            out["meta"][k] = (old.get("meta") or {}).get(k, out["meta"].get(k))
         out["meta"]["sephoraStaleSince"] = (old.get("meta") or {}).get("sephoraStaleSince") or ts
+    for lst in [out["makeup"], out["gifts"]] + [sec.get("products") or [] for c in out["campaigns"] for sec in c["sections"]]:
+        for p in lst:                                 # product-only photo chosen in the photo check
+            if OVR.get("images", {}).get(p.get("id")):
+                p["image"] = OVR["images"][p["id"]]
     json.dump(out, open(OUT, "w"), ensure_ascii=False, separators=(",", ":"))
-    print(f"makeup.json: campaigns {len(campaigns)}, offers {len(offers)}, sephora sale {len(sale)}, makeup sale {len(mk_sale)}, gifts {len(gifts)} (need contents: {len(need_sets)})")
+    print(f"makeup.json: campaigns {len(campaigns)}, makeup sale {len(mk_sale)}, gifts {len(gifts)} (priced {sum(1 for g in gifts if g.get('add'))}), "
+          f"product pages to read {len(need)}, removed for shipping {len(removed_ship)}, more-lists {len(need_lists)}")
 
 
 if __name__ == "__main__":

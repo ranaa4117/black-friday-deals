@@ -39,6 +39,32 @@ def get(url, tries=4):
             raise
 
 
+def us_store(base):
+    """The store must be the US store selling in US dollars (Shopify's public shop info)."""
+    try:
+        m = get(f"{base}/meta.json")
+        return (m.get("currency") == "USD", f"{m.get('country') or '?'} / {m.get('currency') or '?'}")
+    except Exception as e:
+        return (None, f"shop info not readable ({type(e).__name__})")
+
+
+def best_selling(base, pages=5):
+    """The store's own 'Best selling' order (official popularity signal), handle → rank."""
+    order = []
+    for pg in range(1, pages + 1):
+        try:
+            req = urllib.request.Request(f"{base}/collections/all?sort_by=best-selling&page={pg}", headers={"User-Agent": UA})
+            with urllib.request.urlopen(req, timeout=45) as r:
+                html_ = r.read().decode("utf-8", "replace")
+        except Exception:
+            break
+        found = [h for h in re.findall(r'href="/(?:[a-z-]+/)?products/([a-z0-9-]+)', html_) if h not in order]
+        if not found:
+            break
+        order += list(dict.fromkeys(found)); time.sleep(1)
+    return {h: i + 1 for i, h in enumerate(order)}
+
+
 def catalog(base):
     out, page = [], 1
     while page <= 40:
@@ -79,6 +105,8 @@ def record(brand, base, p):
         return None
     if mk.not_beauty(title):
         return None
+    if mk.is_fragrance(title, ptype):                     # no fragrance anywhere on the site
+        return None
     is_set = mk.is_set(title, ptype, tags)
     cat = mk.category(title, ptype)
     if not is_set:
@@ -101,10 +129,12 @@ def record(brand, base, p):
         n, how = mk.set_items(title, desc)
         rec.update(items=n, itemsHow=how, add=n * mk.ADD["per_item"] if n else None, addWhy=f"{n} × 20" if n else how)
         rec["contents"] = contents_list(desc)
+        if mk.is_fragrance(" ".join(rec["contents"])):      # a set with a fragrance inside is left out entirely
+            return None
         if not n:
             rec["descText"] = mk.text_of(desc)[:1200]     # kept so the admin can see why the count is missing
     else:
-        cls, why = mk.add_class(title, cat, size)
+        cls, why = mk.add_class(title, cat, size, top=mk.top_of(f"{title} {ptype}"), detail=" ".join([v["name"] or "" for v in variants]) + " " + mk.text_of(desc)[:800])
         rec.update(add=mk.ADD[cls], addClass=cls, addWhy=why, sizeMl=round(size) if size else None)
     return rec
 
@@ -134,7 +164,8 @@ def group_shades(brand, recs):
         disc = [v for v in vs if v.get("compare") and v.get("a")] or [v for v in vs if v.get("compare")] or vs
         best = min(disc, key=lambda v: v["price"])
         base.update(price=best["price"], compare=best.get("compare"), image=best.get("image") or base.get("image"), url=best.get("url") or base["url"],
-                    available=any(v.get("a") for v in vs), firstSeen=min(r.get("firstSeen", "") for r, _ in items))
+                    available=any(v.get("a") for v in vs), firstSeen=min(r.get("firstSeen", "") for r, _ in items),
+                    storeRank=min([r["storeRank"] for r, _ in items if r.get("storeRank")] or [None]) if any(r.get("storeRank") for r, _ in items) else None)
         base.pop("discPct", None)
         if base["compare"]:
             base["discPct"] = round(100 * (1 - base["price"] / base["compare"]))
@@ -175,8 +206,13 @@ def main():
     old_by = {p["id"]: p for p in old.get("products", [])}
     out, status = {}, {}
     for brand, base in SHOPIFY.items():
+        ok_us, us_note = us_store(base)
+        if ok_us is False:                                  # not a US-dollar store: nothing from it is shown
+            status[brand] = {"ok": False, "at": ts, "error": f"not the US store ({us_note})"}
+            print(brand, "NOT US", us_note); continue
         try:
             cat = catalog(base)
+            ranks = best_selling(base)
         except Exception as e:
             status[brand] = {"ok": False, "at": ts, "error": f"{type(e).__name__}: {str(e)[:160]}", "lastOk": (old.get("meta", {}).get("brands", {}).get(brand) or {}).get("lastOk")}
             for p in old.get("products", []):    # keep the last confirmed data, marked for re-check
@@ -192,6 +228,8 @@ def main():
             if not (r["compare"] or r["set"] or prev):     # Makeup Sale lists discounted pieces; gifts list every set
                 continue
             r["firstSeen"] = (prev or {}).get("firstSeen", ts)
+            r["storeRank"] = ranks.get(p.get("handle"))
+            r["source"] = f"{base} (official US store, {us_note})"
             r["checkedAt"] = ts
             if prev and prev.get("compare") and not r["compare"]:
                 r["discEndedAt"] = ts                      # discount ended: stays at the official regular price
@@ -208,7 +246,7 @@ def main():
             if g["n"] >= GONE_CHECKS and span >= GONE_SPAN_H:
                 print("removed (gone 3× / 24h):", p["id"]); continue
             out[p["id"]] = dict(p, gone=g)
-        status[brand] = {"ok": True, "at": ts, "lastOk": ts, "catalog": len(cat), "discounted": n_disc, "sets": n_set}
+        status[brand] = {"ok": True, "at": ts, "lastOk": ts, "catalog": len(cat), "discounted": n_disc, "sets": n_set, "us": us_note, "ranked": len(ranks)}
         print(brand, "catalog", len(cat), "discounted", n_disc, "sets", n_set)
         time.sleep(2)
     for b, name in NOT_READABLE.items():
