@@ -396,6 +396,27 @@ nav.tabs .dot{display:inline-block;width:6px;height:6px;border-radius:50%;backgr
 /* ---- v4: brands, Arabic filters, Black Friday home ---- */
 nav.tabs .brandlink{font-family:var(--serif);font-size:15px;letter-spacing:.06em}
 nav.tabs .soonlink small{font:300 10px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--sale);margin-inline-start:4px}
+/* Victoria's Secret banners */
+.vsb{--vsp:#f6d9e1;--vsd:#1a0f14;display:grid;gap:12px;margin:8px 0 18px}
+.vsb a{color:var(--vsd);text-decoration:none}
+.vsb-hero{display:grid;grid-template-columns:1.1fr 1fr;background:var(--vsp);min-height:300px;overflow:hidden}
+.vsb-hero .vsb-img{display:block;background:#fff}
+.vsb-img img{width:100%;height:100%;object-fit:cover;display:block}
+.vsb-hero .vsb-img img{object-fit:contain;max-height:420px}
+.vsb-txt{display:flex;flex-direction:column;justify-content:center;gap:6px;padding:22px 26px}
+.vsb-brand{font-family:var(--serif);font-size:13px;letter-spacing:.18em;text-transform:uppercase}
+.vsb-hero b{font-size:clamp(30px,5vw,52px);font-weight:500;line-height:1.1}
+.vsb-en{font-family:var(--serif);font-style:italic;font-size:17px}
+.vsb-off{align-self:flex-start;background:var(--vsd);color:#fff;font-size:14px;padding:4px 10px;margin-top:4px}
+.vsb-cta{margin-top:10px;font-size:15px;border-bottom:1px solid var(--vsd);align-self:flex-start;padding-bottom:2px}
+.vsb-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.vsb-card{display:grid;grid-template-columns:110px 1fr;background:#fbeef2;min-height:120px;overflow:hidden}
+.vsb-card .vsb-img{background:#fff}
+.vsb-card .vsb-img img{object-fit:contain}
+.vsb-card .vsb-txt{padding:12px 14px;gap:3px}.vsb-card b{font-size:20px;font-weight:500}
+.vsb a:hover .vsb-cta,.vsb a:focus-visible .vsb-cta{border-bottom-width:2px}
+.vsb a:focus-visible{outline:2px solid var(--vsd);outline-offset:2px}
+@media (max-width:600px){.vsb-hero{grid-template-columns:1fr;min-height:0}.vsb-hero .vsb-img img{max-height:260px}.vsb-txt{padding:16px 18px}}
 .subnav{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 4px}
 .subnav a{border:1px solid var(--rule);padding:8px 16px;text-decoration:none;font-size:15px}
 .subnav a[aria-current="page"]{background:var(--ink);color:#fff;border-color:var(--ink)}
@@ -548,7 +569,7 @@ const PASS_HASH = "d6f7961e955b42afb04e910ef174ce7b82af4efe180a05605bc68aee28cad
 const REPO = "ranaa4117/black-friday-deals";
 const WORKFLOW = "self-portrait-update.yml";
 const LS = "sp-edit-v1";
-const APP_VERSION = "40";
+const APP_VERSION = "41";
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
@@ -685,7 +706,7 @@ function favTime(h){ if (TOTALS && TOTALS[h]) return TOTALS[h].t; const b = favO
 const popular = list => list.filter(p => favCount(p.handle) > 0).sort((a,b) => favCount(b.handle) - favCount(a.handle) || favTime(b.handle) - favTime(a.handle));
 let GH = JSON.parse(store.get("sp-gh") || '{"token":"","sync":false}');
 const UI = {};
-const ui = r => UI[r] || (UI[r] = { q:"", sort: r === "discounts" ? "disc" : r === "popular" ? "pop" : r === "recent" ? "new" : "rank", pmin:"", pmax:"", color:"", limit:48 });
+const ui = r => UI[r] || (UI[r] = { q:"", sort: r === "discounts" ? "disc" : r === "popular" ? "pop" : r === "recent" ? "new" : "rank", pmin:"", pmax:"", color:"", size:"", limit:48 });
 
 /* ---------- helpers ---------- */
 const rate = () => Number(C().settings && C().settings.rate) || Number(DATA.meta.rate && DATA.meta.rate.value) || 0;
@@ -926,7 +947,8 @@ function applyFilters(list, u){
   const lo = u.pmin === "" || u.pmin == null ? -Infinity : Number(u.pmin), hi = u.pmax === "" || u.pmax == null ? Infinity : Number(u.pmax);
   let out = list.filter(p => (!q || p.title.toLowerCase().includes(q))
     && finalSAR(p) >= lo && finalSAR(p) <= hi
-    && (!u.color || colorFams(p).includes(u.color)));
+    && (!u.color || colorFams(p).includes(u.color))
+    && (!u.size || (p.sizes || []).some(x => x.a && x.s === u.size)));
   const by = {
     asc: (a,b) => finalSAR(a) - finalSAR(b), desc: (a,b) => finalSAR(b) - finalSAR(a),
     disc: (a,b) => offShown(b) - offShown(a) || finalSAR(a) - finalSAR(b),
@@ -941,6 +963,17 @@ function applyFilters(list, u){
   return out.sort((a, b) => down(a) - down(b) || by(a, b));
 }
 
+/* sizes for the Dresses size filter: only sizes in stock in the pieces on this page, grouped by size system */
+const SIZE_SYS = [["letter","المقاسات (XS–XL)", s => /^(US )?(XXS|XS|S|M|L|XL|XXL)$/.test(s)], ["us","المقاسات الأمريكية (US)", s => /^US \d+$/.test(s)], ["usp","المقاسات الأمريكية القصيرة (Petite)", s => /^US \d+P$/.test(s)],
+  ["usw","المقاسات الأمريكية الكبيرة (W)", s => /^US \\d+W$/.test(s)], ["fr","المقاسات الفرنسية (FR)", s => /^FR \d+$/.test(s)], ["it","المقاسات الإيطالية (IT)", s => /^IT \d+$/.test(s)], ["other","مقاسات أخرى", () => true]];
+const LETTER_ORDER = ["XXS","XS","S","M","L","XL","XXL"];
+function sizeOptions(list, cur){
+  const have = new Set(); for (const p of list) for (const x of p.sizes || []) if (x.a && x.s) have.add(x.s);
+  const groups = SIZE_SYS.map(([k, label]) => [k, label, []]);
+  for (const s of have) groups.find(([k], i) => SIZE_SYS[i][2](s))[2].push(s);
+  const key = s => { const l = LETTER_ORDER.indexOf(s.replace(/^US /, "")); return l >= 0 ? l : parseFloat(s.replace(/[^\d.]/g, "")) || 0; };
+  return groups.filter(g => g[2].length).map(([k, label, arr]) => `<optgroup label="${label}">${arr.sort((a, b) => key(a) - key(b) || a.localeCompare(b)).map(s => opt(s, s, cur)).join("")}</optgroup>`).join("");
+}
 const opt = (v, label, cur) => `<option value="${esc(v)}" ${String(cur) === String(v) ? "selected" : ""}>${esc(label)}</option>`;
 const SP_ROUTES = ["sp","midi","maxi","bags"];
 const WINTER_ROUTES = ["jackets","coats","scarves"];
@@ -952,7 +985,7 @@ const SECTIONS = {
   winter:  { en:"Winter Sale", ar:"التخفيضات الشتوية", has: p => isRL(p) },
   vs:      { en:"Victoria's Secret", ar:"فيكتوريا سيكريت", has: p => isVS(p), brandOnly: true },
 };
-const VS_ROUTES = ["pajamas","slippers","robes","vsbags"];
+const VS_ROUTES = ["vsbags","robes","pajamas","slippers"];   // the order customers see: Bags, Robes, Pajamas, Slippers
 const SUB_AR = { midi:"ميدي", maxi:"ماكسي", jackets:"جاكيتات", coats:"بالطوات", scarves:"سكارفات", pajamas:"بجامات", slippers:"سليبرز", robes:"أرواب", vsbags:"شنط" };
 const LEGACY = { sp:"dresses-sp", midi:"dresses-sp-midi", maxi:"dresses-sp-maxi", md:"dresses-md", jackets:"winter-jackets", coats:"winter-coats", scarves:"winter-scarves" };
 function parseSec(route){
@@ -995,7 +1028,11 @@ function viewList(route, all){
   const sp = all.filter(isSP), rl = all.filter(isRL);
   let base = sr ? secList(all, sr) : route === "recent" ? recentList(all) : route === "popular" ? popular(all) : all;
   const shownCat = !sr || !sr.brand;
-  const res = applyFilters(base, u), shown = res.slice(0, u.limit);
+  const isDressSec = !!(sr && sr.sec === "dresses");
+  if (isDressSec){ u.pmin = ""; u.pmax = ""; }   // Dresses has no price filter
+  let res = applyFilters(base, u);
+  if (sr && sr.sec === "vs" && !sr.sub){ const ord = c => { const i = VS_ROUTES.indexOf(c); return i < 0 ? 99 : i; }; res = res.map((p, i) => [p, i]).sort((a, b) => ord(catOf(a[0])) - ord(catOf(b[0])) || a[1] - b[1]).map(x => x[0]); }
+  const shown = res.slice(0, u.limit);
   const fams = COLOR_FAMS.filter(([k]) => base.some(p => colorFams(p).includes(k)));
   const sub = { all:"Every discounted piece from Self-Portrait and Mac Duggal, in one place.", sp:"Discounted Self-Portrait pieces from the official Spain store.", midi:"Discounted Self-Portrait midi dresses.", maxi:"Discounted Self-Portrait maxi dresses.", bags:"Discounted Self-Portrait bags.",
     md:"Mac Duggal maxi dresses on sale, from the official US store.",
@@ -1005,7 +1042,7 @@ function viewList(route, all){
     : route === "winter" || WINTER_ROUTES.includes(route) ? `<p class="winter-brand">Lauren Ralph Lauren</p><nav class="subnav" dir="rtl" aria-label="Winter Sale categories">${WINTER_ROUTES.map(c => `<a href="#${c}" lang="ar" ${route === c ? 'aria-current="page"' : ""}>${WCATS[c]}</a>`).join("")}</nav>` : "";
   let body;
   showPop = route === "popular" || u.sort === "pop";
-  const filtered = u.q || u.color || (u.pmin !== "" && u.pmin != null) || (u.pmax !== "" && u.pmax != null);
+  const filtered = u.q || u.color || u.size || (u.pmin !== "" && u.pmin != null) || (u.pmax !== "" && u.pmax != null);
   if (route === "popular" && !base.length){
     body = `<div class="empty"><h3>No favorites yet</h3><a class="cta" href="#all">Browse the sale</a></div>`;
   } else if (route === "recent" && !base.length){
@@ -1021,17 +1058,18 @@ function viewList(route, all){
       : `<div class="empty" dir="rtl" lang="ar"><h3>لا توجد نتائج</h3>${filtered ? '<button class="btn" id="resetF" style="margin-top:14px">مسح الكل</button>' : ""}</div>`;
   }
   return `<div class="list-head"><div><h2>${sr ? esc(secTitle(sr)) : TITLES[route]}</h2>${sr ? `<p class="sec-ar" lang="ar" dir="rtl">${SECTIONS[sr.sec].ar}</p>` : ""}</div></div>
+    ${sr && sr.sec === "vs" && !sr.sub && !sr.style ? vsBanners(all) : ""}
     ${subnav}
     <div class="toolbar ar-filters" id="toolbar" dir="rtl" lang="ar">
       <div class="fhead"><h3>الفلاتر</h3>${filtered ? '<button class="linkish" id="clearAll">مسح الكل</button>' : ""}</div>
       <label class="search"><input id="q" type="search" placeholder="ابحث باسم المنتج" value="${esc(u.q)}" aria-label="ابحث باسم المنتج" dir="auto"></label>
       <div class="frow">
         <label class="fld"><span>الترتيب</span><select id="f-sort">${opt("rank","الأكثر رواجاً",u.sort)}${opt("new","الأحدث",u.sort)}${opt("asc","السعر: من الأقل إلى الأعلى",u.sort)}${opt("desc","السعر: من الأعلى إلى الأقل",u.sort)}${opt("disc","أعلى خصم",u.sort)}${opt("fav","المفضلة أولاً",u.sort)}${opt("pop","الأكثر تفضيلاً",u.sort)}</select></label>
-        <fieldset class="fld fprice"><legend>السعر</legend>
+        ${isDressSec ? `<label class="fld"><span>المقاس</span><select id="f-size">${opt("","جميع المقاسات",u.size)}${sizeOptions(base, u.size)}</select></label>` : `<fieldset class="fld fprice"><legend>السعر</legend>
           <label><span>أقل سعر</span><input id="pmin" type="number" inputmode="numeric" min="0" step="1" value="${esc(u.pmin ?? "")}" placeholder="0"><i>ر.س</i></label>
           <label><span>أعلى سعر</span><input id="pmax" type="number" inputmode="numeric" min="0" step="1" value="${esc(u.pmax ?? "")}" placeholder="—"><i>ر.س</i></label>
           <button class="btn solid" id="pApply">تطبيق</button><button class="btn quiet" id="pReset">إعادة تعيين</button>
-        </fieldset>
+        </fieldset>`}
         <label class="fld"><span>اللون</span><select id="f-color">${opt("","جميع الألوان",u.color)}${fams.map(([k, a]) => opt(k, a, u.color)).join("")}</select></label>
       </div>
       <p class="ferr" id="fErr" role="alert"></p>
@@ -1039,6 +1077,24 @@ function viewList(route, all){
     ${body}`;
 }
 
+/* Victoria's Secret banners: only on the Victoria's Secret page; official product photos, real discounts from the data */
+function vsBanners(all){
+  const vs = all.filter(p => isVS(p));
+  const EN = { vsbags:"Bags", robes:"Robes", pajamas:"Pajamas", slippers:"Slippers" };
+  const pick = c => { const l = vs.filter(p => catOf(p) === c && isAvail(p)); if (!l.length) return null;
+    const cards = vsColourCards(l), best = Math.max(0, ...cards.map(x => offShown(x) || 0));
+    const po = cards.filter(x => x.image && (x.variants || [])[0] && x.variants[0].productOnly); const cover = (po.length ? po : cards.filter(x => x.image)).sort((a, b) => (offShown(b) || 0) - (offShown(a) || 0))[0];
+    return { c, n: cards.length, best, cover }; };
+  const B = VS_ROUTES.map(pick).filter(Boolean); if (!B.length) return "";
+  const hero = B.find(b => b.c === "pajamas") || B[0], rest = B.filter(b => b !== hero);
+  const off = b => b.best > 0 ? `<span class="vsb-off" lang="ar">خصم حتى ${arN(b.best)}٪</span>` : "";
+  const im = (b, w) => b.cover ? `<img src="${esc(img(b.cover.image, w))}" alt="${esc(b.cover.title || "")}" loading="eager">` : "";
+  return `<section class="vsb" aria-label="Victoria's Secret offers" dir="rtl">
+    <a class="vsb-hero" href="#vs-${hero.c}"><span class="vsb-img">${im(hero, W.hero)}</span>
+      <span class="vsb-txt"><span class="vsb-brand" dir="ltr">Victoria's Secret</span><b lang="ar">${SUB_AR[hero.c]}</b><span class="vsb-en" dir="ltr">${EN[hero.c]}</span>${off(hero)}<span class="vsb-cta" lang="ar">تسوّقي ${arN(hero.n)} ${hero.n > 10 ? "لوناً" : "ألوان"}</span></span></a>
+    <div class="vsb-row">${rest.map(b => `<a class="vsb-card" href="#vs-${b.c}"><span class="vsb-img">${im(b, W.tile)}</span><span class="vsb-txt"><b lang="ar">${SUB_AR[b.c]}</b><span class="vsb-en" dir="ltr">${EN[b.c]}</span>${off(b)}</span></a>`).join("")}</div>
+  </section>`;
+}
 function viewVS(){
   return `<section class="soon"><p class="soon-brand">Victoria's Secret</p><p class="soon-tag">Coming Soon</p>
     <a class="cta" href="#home">Back to home</a></section>`;
@@ -2034,15 +2090,16 @@ function wireList(route){
   const q = $("#q"); q.oninput = () => { u.q = q.value; trackSearch(q.value); u.limit = 48; const pos = q.selectionStart; render(); const n = $("#q"); n.focus(); n.setSelectionRange(pos, pos); };
   $("#f-sort").onchange = e => { u.sort = e.target.value; trackFilter("sort", e.target.value); u.limit = 48; render(); };
   $("#f-color").onchange = e => { u.color = e.target.value; trackFilter("color", e.target.value || "all"); u.limit = 48; render(); };
+  if ($("#f-size")) $("#f-size").onchange = e => { u.size = e.target.value; u.limit = 48; render(); };
   const applyPrice = () => {
     const a = $("#pmin").value.trim(), b = $("#pmax").value.trim();
     if ((a !== "" && !(Number(a) >= 0)) || (b !== "" && !(Number(b) >= 0))) return $("#fErr").textContent = "أدخلي أرقاماً صحيحة بالريال.";
     if (a !== "" && b !== "" && Number(a) > Number(b)) return $("#fErr").textContent = "أقل سعر يجب أن يكون أقل من أعلى سعر.";
     u.pmin = a; u.pmax = b; u.limit = 48; trackFilter("price", (a || "0") + "–" + (b || "∞")); render();
   };
-  $("#pApply").onclick = applyPrice;
-  ["#pmin","#pmax"].forEach(id => $(id).onkeydown = e => { if (e.key === "Enter") applyPrice(); });
-  $("#pReset").onclick = () => { u.pmin = ""; u.pmax = ""; render(); };
+  if ($("#pApply")){ $("#pApply").onclick = applyPrice;
+    ["#pmin","#pmax"].forEach(id => $(id).onkeydown = e => { if (e.key === "Enter") applyPrice(); });
+    $("#pReset").onclick = () => { u.pmin = ""; u.pmax = ""; render(); }; }
   const clear = () => { const keepSort = u.sort; delete UI[route]; ui(route).sort = keepSort; render(); };
   if ($("#clearAll")) $("#clearAll").onclick = clear;
   if ($("#resetF")) $("#resetF").onclick = clear;
