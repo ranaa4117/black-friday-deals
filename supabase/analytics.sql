@@ -25,10 +25,28 @@ create index if not exists events_handle_idx on public.events (handle) where han
 alter table public.events enable row level security;          -- no policies: nobody reads or writes it directly
 revoke all on public.events from anon, authenticated;
 
+-- one row per anonymous visitor: when they first came, when their second visit began, how many visits.
+-- kept up to date by track(), so the statistics never have to scan every event ever recorded.
+create table if not exists public.visitors (
+  visitor      text primary key,
+  first_at     timestamptz not null,
+  second_at    timestamptz,
+  last_session text,
+  sessions     integer not null default 1
+);
+alter table public.visitors enable row level security;
+revoke all on public.visitors from anon, authenticated;
+-- fill it once from the events already recorded (does nothing for visitors already there)
+insert into public.visitors (visitor, first_at, second_at, last_session, sessions)
+select visitor, min(t0), (array_agg(t0 order by t0))[2], (array_agg(session order by t0 desc))[1], count(*)
+from (select visitor, session, min(at) as t0 from public.events group by visitor, session) s
+group by visitor
+on conflict (visitor) do nothing;
+
 -- the only way the website writes: up to 40 events per call, each checked and size-limited
 create or replace function public.track(p_events jsonb)
 returns void language plpgsql security definer set search_path = public as $$
-declare e jsonb; n int := 0; k text;
+declare e jsonb; n int := 0; k text; v text; s text;
 begin
   if jsonb_typeof(p_events) <> 'array' then return; end if;
   for e in select value from jsonb_array_elements(p_events) loop
@@ -42,6 +60,16 @@ begin
             case when (e->>'ms') ~ '^\d{1,9}$' then least((e->>'ms')::int, 600000) else null end,
             case when jsonb_typeof(e->'meta') = 'object' then e->'meta' else null end,
             left(e->>'device', 10), left(e->>'source', 20), coalesce((e->>'isNew')::boolean, false));
+    -- keep the visitor row current (only when the visit changes, so it costs almost nothing)
+    if v is distinct from left(e->>'visitor', 40) or s is distinct from left(e->>'session', 40) then
+      v := left(e->>'visitor', 40); s := left(e->>'session', 40);
+      insert into public.visitors as t (visitor, first_at, last_session) values (v, now(), s)
+      on conflict (visitor) do update
+        set second_at = coalesce(t.second_at, case when t.last_session is distinct from excluded.last_session then now() end),
+            sessions = t.sessions + case when t.last_session is distinct from excluded.last_session then 1 else 0 end,
+            last_session = excluded.last_session
+        where t.last_session is distinct from excluded.last_session;
+    end if;
   end loop;
 end $$;
 revoke all on function public.track(jsonb) from public;
@@ -49,12 +77,19 @@ grant execute on function public.track(jsonb) to anon, authenticated;
 
 -- public ranking: a 0–100 score per product for sorting, never the counts behind it
 create or replace view public.product_scores as
-with win as (select now() - interval '30 days' as since),
-v as (select handle, count(*) as views, count(distinct session) as uniq
-      from public.events, win where kind = 'product_view' and at >= since and handle is not null group by handle),
-t as (select handle, sum(ms)::numeric as total_ms, count(*) as n
-      from public.events, win where kind = 'engage' and at >= since and handle is not null group by handle),
-r as (select handle, count(*) as clicks from public.events, win where kind = 'rec_click' and at >= since and handle is not null group by handle),
+with agg as (
+  select handle,
+         count(*) filter (where kind = 'product_view') as views,
+         count(distinct session) filter (where kind = 'product_view') as uniq,
+         sum(ms) filter (where kind = 'engage')::numeric as total_ms,
+         count(*) filter (where kind = 'engage') as n,
+         count(*) filter (where kind = 'rec_click') as clicks
+  from public.events
+  where at >= now() - interval '30 days' and handle is not null and kind in ('product_view','engage','rec_click')
+  group by handle),
+v as (select handle, views, uniq from agg where views > 0),
+t as (select handle, total_ms, n from agg where n > 0),
+r as (select handle, clicks from agg where clicks > 0),
 f as (select handle, total::numeric as favs from public.fav_totals where total > 0),
 allh as (select handle from v union select handle from f union select handle from r),
 x as (
@@ -92,47 +127,54 @@ create or replace function public.admin_ok(p_key text) returns boolean language 
 $$;
 revoke all on function public.admin_ok(text) from public, anon, authenticated;
 
--- everything the dashboard shows — people first (unique anonymous visitors), sessions and page views second
+-- ============================================================================
+-- Statistics (lighter version): every query reads only the chosen period (and the period before it,
+-- for comparison) through the date index, uses the visitors table for new/returning, and adds up
+-- each product in one pass instead of one search per product.
+-- ============================================================================
+create index if not exists events_at_visitor_idx on public.events (at) include (visitor, session, kind, handle);
+
 create or replace function public.admin_stats(p_key text, p_from timestamptz, p_to timestamptz)
-returns jsonb language plpgsql security definer set search_path = public stable as $$
+returns jsonb language plpgsql security definer set search_path = public stable
+set statement_timeout = '20s' as $$
 declare res jsonb; len interval := p_to - p_from;
+  t_day timestamptz := date_trunc('day', now() at time zone 'Asia/Riyadh') at time zone 'Asia/Riyadh';
 begin
   if not public.admin_ok(p_key) then raise exception 'not authorized' using errcode = '42501'; end if;
   if len <= interval '0' or len > interval '400 days' then raise exception 'bad period'; end if;
 
-  with ev0 as (
-    select e.*,
+  with ev as (
+    select e.at, e.visitor, e.session, e.kind, e.handle, e.route, e.ms, e.meta, e.device, e.source,
            coalesce(e.meta->>'b', case when e.handle like 'md-%' then 'md' when e.handle like 'ef-%' then 'ef'
                                        when e.handle like 'rl-%' then 'rl' when e.handle like 'mc-%' then 'mc'
-                                       when e.handle is not null then 'sp' end) as brand,
+                                       when e.handle like 'vs-%' then 'vs' when e.handle is not null then 'sp' end) as brand,
            e.meta->>'c' as cat
-    from public.events e),
-  ev as (select * from ev0 where at >= p_from and at < p_to),
-  pv as (select * from ev0 where at >= p_from - len and at < p_from),
-  -- every visitor's sessions (all time) to tell new from returning and measure return gaps
-  vs as (select visitor, session, min(at) as t0 from ev0 group by visitor, session),
-  vfirst as (select visitor, min(t0) as first_at,
-                    (array_agg(t0 order by t0))[2] as second_at, count(*) as sessions_all from vs group by visitor),
-  active as (select distinct visitor from ev),
-  pactive as (select distinct visitor from pv),
-  act as (select a.visitor, f.first_at, f.second_at, f.first_at >= p_from as is_new from active a join vfirst f using (visitor)),
-  pact as (select a.visitor, f.first_at >= p_from - len as is_new from pactive a join vfirst f using (visitor)),
-  eng as (select visitor, handle, brand, cat, sum(ms) as ms from ev where kind = 'engage' and handle is not null group by 1, 2, 3, 4),
-  prod as (
-    select h.handle,
-           (select count(distinct visitor) from ev x where x.kind = 'product_view' and x.handle = h.handle) as uv,
-           (select count(distinct visitor) from eng x where x.handle = h.handle and x.ms >= 10000) as engaged_uv,
-           (select coalesce(sum(ms), 0) from eng x where x.handle = h.handle) as total_ms,
-           (select count(distinct visitor) from eng x where x.handle = h.handle) as eng_uv,
-           (select count(distinct visitor) from ev x where x.kind = 'fav' and x.handle = h.handle) as fav_uv,
-           (select count(distinct x.visitor) from ev x join act a using (visitor) where x.kind = 'product_view' and x.handle = h.handle and not a.is_new) as ret_uv,
-           (select count(distinct visitor) from pv x where x.kind = 'product_view' and x.handle = h.handle) as prev_uv,
-           (select max(brand) from ev x where x.handle = h.handle) as brand,
-           (select max(cat) from ev x where x.handle = h.handle) as cat
-    from (select distinct handle from ev where handle is not null and kind in ('product_view','engage','fav')) h),
+    from public.events e where e.at >= p_from and e.at < p_to),
+  pv as (select visitor, session, kind, handle from public.events where at >= p_from - len and at < p_from),
+  act as (select a.visitor, f.first_at, f.second_at, coalesce(f.first_at, p_from) >= p_from as is_new
+          from (select distinct visitor from ev) a left join public.visitors f using (visitor)),
+  pact as (select a.visitor, coalesce(f.first_at, p_from - len) >= p_from - len as is_new
+           from (select distinct visitor from pv) a left join public.visitors f using (visitor)),
+  eng as (select visitor, handle, sum(ms) as ms from ev where kind = 'engage' and handle is not null group by 1, 2),
+  pa as (select handle, count(distinct visitor) filter (where kind = 'product_view') as uv,
+                count(distinct visitor) filter (where kind = 'fav') as fav_uv, max(brand) as brand, max(cat) as cat
+         from ev where handle is not null and kind in ('product_view','engage','fav') group by handle),
+  ea as (select handle, count(*) filter (where ms >= 10000) as engaged_uv, coalesce(sum(ms), 0) as total_ms, count(*) as eng_uv
+         from eng group by handle),
+  ra as (select x.handle, count(distinct x.visitor) as ret_uv from ev x join act a using (visitor)
+         where x.kind = 'product_view' and x.handle is not null and not a.is_new group by x.handle),
+  ph as (select handle, count(distinct visitor) as prev_uv from pv where kind = 'product_view' and handle is not null group by handle),
+  prod as (select pa.handle, pa.uv, coalesce(ea.engaged_uv, 0) as engaged_uv, coalesce(ea.total_ms, 0) as total_ms,
+                  coalesce(ea.eng_uv, 0) as eng_uv, pa.fav_uv, coalesce(ra.ret_uv, 0) as ret_uv, coalesce(ph.prev_uv, 0) as prev_uv,
+                  pa.brand, pa.cat
+           from pa left join ea using (handle) left join ra using (handle) left join ph using (handle)),
   grp as (select 'b' as dim, brand as k, visitor, kind, ms from ev where brand is not null and kind in ('product_view','engage','fav')
           union all
-          select 'c', cat, visitor, kind, ms from ev where cat is not null and kind in ('product_view','engage','fav'))
+          select 'c', cat, visitor, kind, ms from ev where cat is not null and kind in ('product_view','engage','fav')),
+  fx as (select count(distinct visitor) filter (where at >= t_day) as today,
+                count(distinct visitor) filter (where at >= now() - interval '7 days') as d7,
+                count(distinct visitor) as d30
+         from public.events where at >= now() - interval '30 days')
   select jsonb_build_object(
     'from', p_from, 'to', p_to, 'firstEventAt', (select min(at) from public.events),
     'visitors', (select count(*) from act),
@@ -146,16 +188,12 @@ begin
     'return30', (select count(*) from act where second_at is not null and second_at - first_at <= interval '30 days'),
     'prev', jsonb_build_object('visitors', (select count(*) from pact), 'newVisitors', (select count(*) from pact where is_new),
                                'returningVisitors', (select count(*) from pact where not is_new), 'sessions', (select count(distinct session) from pv)),
-    'fixed', jsonb_build_object(
-       'today', (select count(distinct visitor) from ev0 where at >= date_trunc('day', now() at time zone 'Asia/Riyadh') at time zone 'Asia/Riyadh'),
-       'd7', (select count(distinct visitor) from ev0 where at >= now() - interval '7 days'),
-       'd30', (select count(distinct visitor) from ev0 where at >= now() - interval '30 days'),
-       'all', (select count(distinct visitor) from ev0)),
+    'fixed', (select jsonb_build_object('today', today, 'd7', d7, 'd30', d30, 'all', greatest(d30, (select count(*) from public.visitors))) from fx),
     'series', jsonb_build_object(
        'day', coalesce((select jsonb_agg(jsonb_build_object('d', d, 'v', v, 'n', n) order by d) from (
-          select (at at time zone 'Asia/Riyadh')::date as d, count(distinct e.visitor) as v,
+          select (e.at at time zone 'Asia/Riyadh')::date as d, count(distinct e.visitor) as v,
                  count(distinct e.visitor) filter (where (f.first_at at time zone 'Asia/Riyadh')::date = (e.at at time zone 'Asia/Riyadh')::date) as n
-          from ev e join vfirst f using (visitor) group by 1) x), '[]'::jsonb),
+          from ev e left join public.visitors f using (visitor) group by 1) x), '[]'::jsonb),
        'week', coalesce((select jsonb_agg(jsonb_build_object('d', d, 'v', v) order by d) from (
           select date_trunc('week', at at time zone 'Asia/Riyadh')::date as d, count(distinct visitor) as v from ev group by 1) x), '[]'::jsonb),
        'month', coalesce((select jsonb_agg(jsonb_build_object('d', d, 'v', v) order by d) from (
@@ -173,7 +211,7 @@ begin
     'funnel', (select jsonb_build_object(
         'visitors', count(distinct visitor),
         'home', count(distinct visitor) filter (where kind = 'pageview' and route = 'home'),
-        'category', count(distinct visitor) filter (where kind = 'pageview' and route ~ '^(dresses|bags|shoes|winter|all|discounts|recent|popular)'),
+        'category', count(distinct visitor) filter (where kind = 'pageview' and route ~ '^(dresses|bags|shoes|winter|all|discounts|recent|popular|vs)'),
         'brand', count(distinct visitor) filter (where kind = 'pageview' and route ~ '^(dresses|bags|shoes|winter)-'),
         'product', count(distinct visitor) filter (where kind = 'product_view'),
         'favorite', count(distinct visitor) filter (where kind = 'fav')) from ev),
@@ -195,3 +233,40 @@ begin
 end $$;
 revoke all on function public.admin_stats(text, timestamptz, timestamptz) from public;
 grant execute on function public.admin_stats(text, timestamptz, timestamptz) to anon, authenticated;
+
+-- the admin Dashboard: one small call (visitor counts + top 3 lists for the last 30 days)
+create or replace function public.admin_summary(p_key text)
+returns jsonb language plpgsql security definer set search_path = public stable
+set statement_timeout = '15s' as $$
+declare res jsonb; t_day timestamptz := date_trunc('day', now() at time zone 'Asia/Riyadh') at time zone 'Asia/Riyadh';
+begin
+  if not public.admin_ok(p_key) then raise exception 'not authorized' using errcode = '42501'; end if;
+  with ev as (
+    select at, visitor, kind, handle, ms,
+           coalesce(meta->>'b', case when handle like 'md-%' then 'md' when handle like 'ef-%' then 'ef'
+                                     when handle like 'rl-%' then 'rl' when handle like 'mc-%' then 'mc'
+                                     when handle like 'vs-%' then 'vs' when handle is not null then 'sp' end) as brand,
+           meta->>'c' as cat
+    from public.events where at >= now() - interval '30 days'),
+  pr as (select handle, sum(ms) filter (where kind = 'engage') as total_ms, count(distinct visitor) filter (where kind = 'fav') as fav_uv
+         from ev where handle is not null and kind in ('engage','fav') group by handle)
+  select jsonb_build_object(
+    'today', (select count(distinct visitor) from ev where at >= t_day),
+    'd7', (select count(distinct visitor) from ev where at >= now() - interval '7 days'),
+    'd30', (select count(distinct visitor) from ev),
+    'all', greatest((select count(distinct visitor) from ev), (select count(*) from public.visitors)),
+    'brands', coalesce((select jsonb_agg(jsonb_build_object('k', k, 'uv', uv) order by uv desc) from (
+        select brand as k, count(distinct visitor) as uv from ev where kind = 'product_view' and brand is not null group by 1 order by 2 desc limit 3) x), '[]'::jsonb),
+    'cats', coalesce((select jsonb_agg(jsonb_build_object('k', k, 'uv', uv) order by uv desc) from (
+        select cat as k, count(distinct visitor) as uv from ev where kind = 'product_view' and cat is not null group by 1 order by 2 desc limit 3) x), '[]'::jsonb),
+    'engaged', coalesce((select jsonb_agg(jsonb_build_object('h', handle, 'totalMs', total_ms) order by total_ms desc) from (
+        select handle, total_ms from pr where total_ms > 0 order by total_ms desc limit 3) x), '[]'::jsonb),
+    'favs', coalesce((select jsonb_agg(jsonb_build_object('h', handle, 'favUv', fav_uv) order by fav_uv desc) from (
+        select handle, fav_uv from pr where fav_uv > 0 order by fav_uv desc limit 3) x), '[]'::jsonb)
+  ) into res;
+  return res;
+end $$;
+revoke all on function public.admin_summary(text) from public;
+grant execute on function public.admin_summary(text) to anon, authenticated;
+
+notify pgrst, 'reload schema';

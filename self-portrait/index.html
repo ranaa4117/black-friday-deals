@@ -548,7 +548,7 @@ const PASS_HASH = "d6f7961e955b42afb04e910ef174ce7b82af4efe180a05605bc68aee28cad
 const REPO = "ranaa4117/black-friday-deals";
 const WORKFLOW = "self-portrait-update.yml";
 const LS = "sp-edit-v1";
-const APP_VERSION = "39";
+const APP_VERSION = "40";
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
@@ -670,7 +670,9 @@ async function shareExistingFavs(){   // favorites saved before counting started
 /* ranking: 0–100 scores from product_scores (views, engaged time, favorites, recommendation clicks); counts stay private */
 let SCORES = null;
 async function loadScores(){
-  try { const rows = await sb("product_scores?select=handle,score,fav_score&limit=10000"); const t = {}; for (const r of rows || []) t[r.handle] = { s: Number(r.score) || 0, f: r.fav_score == null ? null : Number(r.fav_score) }; SCORES = t; }
+  try { let rows = null, c = null; try { c = JSON.parse(store.get("ro-scores") || "null"); } catch {}
+    if (c && Date.now() - c.at < 30 * 60e3) rows = c.rows;   // ranking changes slowly: reuse it for 30 minutes on this device
+    else { rows = await sb("product_scores?select=handle,score,fav_score&limit=10000"); try { store.set("ro-scores", JSON.stringify({ at: Date.now(), rows })); } catch {} } const t = {}; for (const r of rows || []) t[r.handle] = { s: Number(r.score) || 0, f: r.fav_score == null ? null : Number(r.fav_score) }; SCORES = t; }
   catch { /* analytics not set up yet: favorites only */ }
 }
 const interest = h => SCORES ? (SCORES[h] ? SCORES[h].s : 0) : favCount(h) * 10;
@@ -1303,7 +1305,7 @@ function track(kind, data = {}){
   if (!anOn()) return;
   const s = session();
   AN.q.push(Object.assign({ kind, visitor: visitor.id, session: s.id, device: DEVICE, source: SOURCE, isNew: s.isNew }, data));
-  clearTimeout(AN.timer); AN.timer = setTimeout(flush, AN.q.length >= 20 ? 0 : 3000);
+  clearTimeout(AN.timer); AN.timer = setTimeout(flush, AN.q.length >= 20 ? 0 : 8000);
 }
 function flush(){
   if (!AN.q.length) return;
@@ -1335,7 +1337,7 @@ addEventListener("pagehide", () => { endEngage(); flush(); });
 function trackRecView(p, sections){ for (const sec of sections) if (once("rv:" + sec + ":" + p.handle)) track("rec_view", { handle: p.handle, meta: { section: sec } }); }
 let lastSearch = "", searchTimer = null;
 function trackSearch(q){ clearTimeout(searchTimer); searchTimer = setTimeout(() => { q = q.trim(); if (q.length >= 2 && q !== lastSearch){ lastSearch = q; track("search", { meta: { q: q.slice(0, 60) } }); } }, 1500); }
-const trackFilter = (type, value) => track("filter", { meta: { type, value: String(value).slice(0, 40) } });
+const trackFilter = () => {};   // filter clicks are not recorded (they were never used in the statistics)
 function consentBar(){
   if (OWNER || store.get("ro-consent")) return;
   const b = document.createElement("div"); b.className = "consent"; b.dir = "rtl"; b.lang = "ar";
@@ -1736,29 +1738,32 @@ const dCard = (label, val, note, href) => `${href ? `<a class="dcard" href="${hr
 async function loadDash(){
   if (!adminKey() || DASH.loading || Date.now() - DASH.at < 5 * 60e3) return;
   DASH.loading = true;
-  const now = new Date(), end = new Date(now.getTime() + 60e3), ymd = now.toLocaleDateString("en-CA", { timeZone:"Asia/Riyadh" });
-  const q = (a) => sb("rpc/admin_stats", { method:"POST", body: JSON.stringify({ p_key: adminKey(), p_from: a.toISOString(), p_to: end.toISOString() }) });
-  try {
-    const [t, d7, d30, all] = await Promise.all([q(new Date(ymd + "T00:00:00+03:00")), q(new Date(now - 7 * 864e5)), q(new Date(now - 30 * 864e5)), q(new Date("2026-11-01T00:00:00+03:00"))]);
-    DASH.r = { t, d7, d30, all }; DASH.err = "";
-  } catch (e) { DASH.err = "تعذّر تحميل أرقام الزوار الآن."; }
+  try { DASH.r = await sb("rpc/admin_summary", { method:"POST", body: JSON.stringify({ p_key: adminKey() }) }); DASH.err = ""; }
+  catch (e) {
+    const m = String(e.message);
+    if (/404|PGRST202/.test(m)){   // the lighter database update hasn't been run yet: one 30-day call instead of four
+      try { const now = Date.now(), d = await sb("rpc/admin_stats", { method:"POST", body: JSON.stringify({ p_key: adminKey(), p_from: new Date(now - 30 * 864e5).toISOString(), p_to: new Date(now + 60e3).toISOString() }) });
+        const F = d.fixed || {}, top = (rows, k) => (rows || []).filter(r => r[k] > 0).sort((a, b) => b[k] - a[k]).slice(0, 3);
+        DASH.r = { today: F.today, d7: F.d7, d30: F.d30, all: F.all, brands: top((d.groups || []).filter(g => g.dim === "b"), "uv"), cats: top((d.groups || []).filter(g => g.dim === "c"), "uv"), engaged: top(d.products, "totalMs"), favs: top(d.products, "favUv") }; DASH.err = ""; }
+      catch (e2) { DASH.r = null; DASH.err = dashErr(String(e2.message)); }
+    } else { DASH.r = null; DASH.err = dashErr(m); }
+  }
   DASH.loading = false; DASH.at = Date.now();
   if (routeOf() === "admin") drawDash(products());
 }
+const dashErr = m => /57014|timeout/i.test(m) ? "أرقام الزوار تأخرت في قاعدة البيانات. شغّلي ملف الإحصاءات المحدّث في Supabase." : /401|403|42501|not authorized/i.test(m) ? "رمز الدخول غير مقبول. اخرجي من الإدارة وادخلي بكلمة السر مرة أخرى." : /Failed to fetch|NetworkError|Load failed/i.test(m) ? "لم يصل المتصفح إلى قاعدة البيانات. تأكدي من الإنترنت." : "تعذّر تحميل أرقام الزوار الآن.";
 function drawDash(all){
   const box = $("#dashBox"); if (!box) return;
-  const R = DASH.r, D = R && R.d30 || {}, byH = Object.fromEntries(all.map(p => [p.handle, p]));
-  const top = (rows, k) => (rows || []).filter(r => r[k] > 0).sort((a, b) => b[k] - a[k]).slice(0, 3);
+  const R = DASH.r, byH = Object.fromEntries(all.map(p => [p.handle, p]));
   const nm = r => esc((byH[r.h || r.handle] || {}).title || r.name || r.h || "");
-  const gb = top((D.groups || []).filter(g => g.dim === "b"), "uv"), gc = top((D.groups || []).filter(g => g.dim === "c"), "uv");
-  const eng = top(D.products, "totalMs"), fav = top(D.products, "favUv");
+  const gb = (R && R.brands) || [], gc = (R && R.cats) || [], eng = (R && R.engaged) || [], fav = (R && R.favs) || [];
   const need = all.filter(p => ["unverified","checkout"].includes(p.promoStatus)).length;
   const open = FIXL.list ? FIXL.list.filter(x => fixSt(x) !== "resolved").length : 0;
-  const v = x => R ? arN((x || {}).visitors || 0) : (adminKey() ? "…" : "—");
+  const v = x => R ? arN(x || 0) : (adminKey() ? (DASH.err ? "—" : "…") : "—");
   box.innerHTML = `${!adminKey() ? '<p class="small">لعرض أرقام الزوار افتحي «الإحصائيات» مرة واحدة على هذا الجهاز.</p>' : DASH.err ? `<p class="small warnline">${DASH.err}</p>` : ""}
   <div class="dash">
     ${dCard("كل الزوار الفريدين", v(R && R.all), "منذ بداية القياس", "#stats")}
-    ${dCard("زوار اليوم", v(R && R.t), "بتوقيت الرياض", "#stats")}
+    ${dCard("زوار اليوم", v(R && R.today), "بتوقيت الرياض", "#stats")}
     ${dCard("آخر ٧ أيام", v(R && R.d7), "زوار فريدون", "#stats")}
     ${dCard("آخر ٣٠ يوماً", v(R && R.d30), "زوار فريدون", "#stats")}
     ${dCard("خصومات نشطة", arN(all.filter(p => offShown(p) > 0).length), "منتجات عليها خصم الآن", "#admin-products")}
