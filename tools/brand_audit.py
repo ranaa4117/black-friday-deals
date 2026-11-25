@@ -161,10 +161,14 @@ class Fixes:
         ts = now()
         if cur and cur.get("status") != "resolved":
             cur.update(problem=text, status=status, fix=fix, updated=ts)
+            if not cur.get("desc"):
+                cur["desc"] = text
+            for k, v in self.meta_for(key).items():   # fill any missing detail field
+                cur.setdefault(k, v)
             return
         n = (cur.get("n", 1) + 1) if cur else 1
         self.items.insert(0, dict({"key": key, "at": ts, "updated": ts, "status": status, "problem": text, "fix": fix, "n": n, "src": "auto",
-                                   "cause": "لم يُحدَّد السبب بعد."}, **self.meta_for(key)))
+                                   "desc": text, "cause": "لم يُحدَّد السبب بعد.", "verification": "", "related": []}, **self.meta_for(key)))
 
     def resolve(self, key, fix):
         """Only called after the fix has been verified."""

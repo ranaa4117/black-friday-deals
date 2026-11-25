@@ -1019,7 +1019,11 @@ def main():
         pass
     missing = [p for h, p in old.items() if h not in fresh]
     missing += [r for r in prev.get("removed", []) if r.get("handle") and r["handle"] not in fresh and r["handle"] not in old]
-    missing.sort(key=lambda p: p.get("pageCheckedAt", ""))   # least recently checked first
+    # off-list Mac Duggal products that hold an extra discount are re-read on their own official page in EVERY run
+    # (first in line), so their discount status is always from a fresh read instead of flipping to "unverified"
+    # between the 3-hourly re-checks; everything else: least recently checked first
+    md_extra = lambda p: p.get("brand") == "md" and bool(p.get("extraPct") or p.get("extra25"))
+    missing.sort(key=lambda p: (0 if md_extra(p) else 1, p.get("pageCheckedAt", "")))
     budget, refreshed, retired = int(os.environ.get("REFRESH_LIMIT", "60")), 0, 0
     deleted = []   # confirmed permanently removed from the official store
     for p in missing:
@@ -1036,7 +1040,7 @@ def main():
                 refreshed += 1
                 (meta.get("verifyFail") or {}).pop(h, None)
                 continue
-        due = age_s(p.get("pageCheckedAt", "")) > 3 * 3600 or os.environ.get("RECHECK_ALL") == "1"
+        due = age_s(p.get("pageCheckedAt", "")) > 3 * 3600 or os.environ.get("RECHECK_ALL") == "1" or md_extra(p)
         if due and budget > 0 and grp(dict(p, cat=p.get("cat", "midi"))) in ok_cats:
             budget -= 1
             try:
