@@ -152,7 +152,7 @@ def campaign(snap, now):
             today = bool(re.search(r"today only", t, re.I))
             if re.search(r"tools?\b|korean|k-beauty", t, re.I):
                 continue                                 # tools and K-beauty cards are not part of this section
-            prods = [x for x in (sephora_item(x) for x in s.get("products") or []) if not mk.is_fragrance(x["title"])]
+            prods = [x for x in (sephora_item(x) for x in s.get("products") or []) if not mk.is_fragrance(x["title"], x.get("brand"))]
             if not today:
                 prods = [x for x in prods if x.get("compare")]     # only pieces Sephora shows at a lower price
                 if not prods:
@@ -240,7 +240,7 @@ def main():
             items = []
             for i, t in enumerate(d.get("items") or []):
                 r = tile_item(t, LIST_TOP.get(lab) or "makeup")
-                if not r or r["top"] == "fragrance" or mk.is_fragrance(r["title"]):
+                if not r or r["top"] == "fragrance" or mk.is_fragrance(r["title"], r["brand"]):
                     continue
                 if best:
                     r["rank"] = i + 1
@@ -283,7 +283,7 @@ def main():
                     sec["products"] = [x for x in more_lists[slug] if x.get("compare")]
                     sec["allRead"] = True
             sec["products"] = sorted([price_rule(ranked(dict(p, top=mk.top_of(p["title"]))), pinfo) for p in sec["products"]
-                                      if not mk.is_fragrance(p["title"]) and ok_ship(p)], key=lambda p: (p.get("rank") or 10**6))
+                                      if not mk.is_fragrance(p["title"], p.get("brand")) and ok_ship(p)], key=lambda p: (p.get("rank") or 10**6))
     # Makeup Sale (13 brands): Sephora USA sale + official US brand stores, makeup only
     sale = [price_rule(r, pinfo) for r in sale_items.values() if r.get("compare")]
     by_name = {}
