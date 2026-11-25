@@ -93,15 +93,15 @@
       bc: (page.breadcrumbs || p.parentCategory ? JSON.stringify(p.parentCategory || "").slice(0, 400) : "") };
     window.__srOut = JSON.stringify(out); return { bytes: window.__srOut.length };
   }
-  /* the site's "Offers" menu (from the page's own header data): where Sephora lists its current campaigns */
+  /* Sephora's own sale & offers navigation (header menu and the banner across the top of every page) */
   function offersMenu(){
-    const ls = document.getElementById("linkStore"); if (!ls) return [];
-    const h = (JSON.parse(ls.textContent).page || {}).headerFooterTemplate; const out = [];
-    (function walk(o, inOffers, d){ if (!o || typeof o !== "object" || d > 12) return;
-      const lab = o.label || o.title || o.name || "";
-      const here = inOffers || /^offers$/i.test(String(lab).trim());
-      if (here && (o.action || o.targetUrl)){ const u = link(o.action || o); if (u && /sephora\.com\/(beauty|sale|shop|brand)/.test(u)) out.push({ label: String(lab).trim(), url: u.split("?")[0] }); }
-      for (const k of Object.keys(o)) walk(o[k], here, d + 1); })(h, false, 0);
+    const out = [];
+    for (const a of document.querySelectorAll("header a[href], nav a[href], [data-at*='banner'] a[href]")){
+      const h = a.getAttribute("href") || "", label = (a.textContent || "").replace(/\s+/g, " ").trim();
+      if (!/^\/(beauty\/|sale|search\?keyword=sale)/.test(h)) continue;
+      if (!/^\/(sale|search)/.test(h) && !/offer|sale|deal|cyber|black-friday|savings|event|gift-guide|holiday/i.test(h + " " + label)) continue;
+      out.push({ label: label.slice(0, 80), url: abs(h.split("?")[0]) + (h.includes("node=") ? "?" + h.split("?")[1].split("&").filter(x => x.startsWith("node=")).join("&") : "") });
+    }
     return [...new Map(out.map(x => [x.url, x])).values()].slice(0, 40);
   }
   const UPLOAD = "https://qhuerltbkvihmqzsphpv.supabase.co/rest/v1/rpc/sephora_put", PUB = "sb_publishable_K35x9gcJMqTGCuj2MFj_7w_PsQSF8mU";
