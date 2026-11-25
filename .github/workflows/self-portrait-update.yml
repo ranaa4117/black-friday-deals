@@ -177,6 +177,9 @@ jobs:
         env:
           MK_FORCE: ${{ github.event.inputs.mk || '0' }}
         run: python3 tools/mk_brands.py
+      - name: Build the Makeup section (Sephora snapshots + brand stores)
+        continue-on-error: true
+        run: python3 tools/mk_build.py
       - name: Elisabetta Franchi prices as shoppers see them (hourly, real browser)
         continue-on-error: true
         env:

@@ -396,6 +396,33 @@ nav.tabs .dot{display:inline-block;width:6px;height:6px;border-radius:50%;backgr
 /* ---- v4: brands, Arabic filters, Black Friday home ---- */
 nav.tabs .brandlink{font-family:var(--serif);font-size:15px;letter-spacing:.06em}
 nav.tabs .soonlink small{font:300 10px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--sale);margin-inline-start:4px}
+/* Makeup */
+.mk-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:18px 0}
+.mk-tile{display:flex;flex-direction:column;gap:6px;padding:34px 24px;background:var(--ivory);color:var(--ink);text-decoration:none;min-height:170px;justify-content:flex-end}
+.mk-tile b{font-size:clamp(24px,3vw,34px);font-weight:500}.mk-tile span{font-family:var(--serif);font-style:italic;font-size:17px}.mk-tile small{color:var(--stone);font-size:14px}
+.mk-tile:hover b,.mk-tile:focus-visible b{text-decoration:underline;text-underline-offset:6px}
+.mk-ph{aspect-ratio:1/1!important;background:#fff!important}.mk-ph img{object-fit:contain!important}
+.mk-brand{font:500 11px/1.4 var(--sans);letter-spacing:.14em;text-transform:uppercase;margin-top:10px;color:var(--stone)}
+.mk-title{font:400 15px/1.35 var(--sans);margin:4px 0 0}.mk-title a{color:inherit;text-decoration:none}
+.mk-price{font:400 24px/1.1 var(--serif);margin-top:8px}.mk-price small{font:300 12px var(--sans);margin-left:5px;color:var(--stone)}.mk-price.hot{color:var(--red)}
+.mk-was{font-size:13px;color:var(--stone)}.mk-was span{color:var(--red)}.mk-src{color:var(--stone)}
+.mk-sec{font:400 24px var(--serif);margin:34px 0 4px}
+.mk-hero{display:grid;grid-template-columns:2fr 1fr;align-items:center;color:#fff;text-decoration:none;margin:8px 0 14px;overflow:hidden;background:#222}
+.mk-hero img{width:100%;display:block}.mk-hero span{padding:18px 22px;font:400 20px/1.35 var(--serif)}
+.offers{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.offer{border:1px solid var(--rule);display:flex;flex-direction:column}.of-img img{width:100%;display:block;aspect-ratio:4/3;object-fit:cover}
+.of-body{padding:14px 16px;display:flex;flex-direction:column;gap:8px;flex:1}.of-body h4{font:500 17px/1.3 var(--sans);margin:0}.of-kind{font-size:12px;color:var(--stone)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{font-size:12px;border:1px solid var(--rule);padding:3px 8px}.chip.code{border-color:var(--ink);font-weight:600;letter-spacing:.06em}.chip.warn{background:#fff4e5;border-color:#e9c58f}
+.of-prods{display:flex;gap:6px}.of-prods img{width:56px;height:56px;object-fit:contain;background:#fff;border:1px solid var(--rule)}
+.of-body .btn{margin-top:auto;align-self:flex-start}
+.mk-banners{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.mk-ban{display:flex;flex-direction:column;text-decoration:none;color:var(--ink);background:var(--ivory)}.mk-ban img{width:100%;display:block}.mk-ban span{padding:10px 12px;font-size:14px;line-height:1.4}
+.mk-item{display:grid;grid-template-columns:1fr 1fr;gap:40px;padding:24px 0}.mk-pic img{width:100%;background:#fff;object-fit:contain;max-height:640px}
+.mk-info h2{font:400 30px/1.2 var(--serif);margin:6px 0}.mk-info .wa{margin:18px 0 10px}
+.mk-shades{border:0;padding:0;margin:16px 0;display:flex;flex-wrap:wrap;gap:6px}.mk-shades legend{margin-bottom:8px}
+.mk-shades button{border:1px solid var(--rule);background:#fff;padding:6px 10px;font-size:13px;cursor:pointer}.mk-shades button[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}.mk-shades button.na{color:var(--stone);text-decoration:line-through}
+.mk-contents ul{padding-left:18px;margin:6px 0}
+@media (max-width:700px){.mk-tiles{grid-template-columns:1fr}.mk-item{grid-template-columns:1fr;gap:16px}.mk-hero{grid-template-columns:1fr}}
 /* Victoria's Secret banners */
 .vsb{--vsp:#f6d9e1;--vsd:#1a0f14;display:grid;gap:12px;margin:8px 0 18px}
 .vsb a{color:var(--vsd);text-decoration:none}
@@ -545,6 +572,7 @@ ul.breakdown li.tot{font-size:16px}
     <a href="#shoes" lang="ar">جزم</a>
     <a href="#winter" lang="ar" class="winterlink">التخفيضات الشتوية</a>
     <a href="#vs" class="brandlink" dir="ltr">Victoria's Secret</a>
+    <a href="#makeup" lang="ar">المكياج</a>
     <a href="#all" lang="ar">جميع المنتجات</a>
     <a href="#favorites" lang="ar">المفضلة<span id="c-fav"></span></a>
     <a href="#popular" lang="ar">الأكثر تفضيلاً</a>
@@ -569,7 +597,7 @@ const PASS_HASH = "d6f7961e955b42afb04e910ef174ce7b82af4efe180a05605bc68aee28cad
 const REPO = "ranaa4117/black-friday-deals";
 const WORKFLOW = "self-portrait-update.yml";
 const LS = "sp-edit-v1";
-const APP_VERSION = "41";
+const APP_VERSION = "42";
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
@@ -1695,8 +1723,8 @@ function wireStats(){
 }
 
 /* ---------- admin: one page per job, with a sidebar ---------- */
-const ADMIN_PAGES = [["admin","الرئيسية","Dashboard"],["stats","الإحصائيات","Analytics"],["admin-products","المنتجات","Products"],["admin-brands","البراندات","Brands"],["admin-problems","المشاكل والحلول","Problems & Fixes"],["admin-updates","سجل التحديثات","Website Updates"],["admin-monitor","المراقبة والتحقق","Monitoring & Verification"],["admin-settings","الإعدادات","Settings"]];
-const ADMIN_DESC = { admin:"ملخص سريع لما يحتاج انتباهك. اضغطي على أي بطاقة لفتح التفاصيل.", stats:"", "admin-products":"كل المنتجات: السعر، حالة الخصم، ورابط القطعة في المتجر الأصلي.", "admin-brands":"كل ماركة: حالتها، عدد منتجاتها، أقسامها، مصدرها، ومبلغ الإضافة في سعرها.", "admin-problems":"كل مشكلة في الموقع أو الماركات: ماذا حدث، سببها، كيف حُلّت، وكيف تم التحقق.", "admin-updates":"ما تغيّر فعلاً في الموقع وبياناته في كل تحديث.", "admin-monitor":"حالة المراقبة التلقائية للأسعار والخصومات، وما يحتاج تحققاً.", "admin-settings":"سعر الصرف، المزامنة والنشر، النسخ الاحتياطي، وطريقة العرض." };
+const ADMIN_PAGES = [["admin","الرئيسية","Dashboard"],["stats","الإحصائيات","Analytics"],["admin-products","المنتجات","Products"],["admin-brands","البراندات","Brands"],["admin-problems","المشاكل والحلول","Problems & Fixes"],["admin-updates","سجل التحديثات","Website Updates"],["admin-monitor","المراقبة والتحقق","Monitoring & Verification"],["admin-makeup","المكياج","Makeup"],["admin-settings","الإعدادات","Settings"]];
+const ADMIN_DESC = { admin:"ملخص سريع لما يحتاج انتباهك. اضغطي على أي بطاقة لفتح التفاصيل.", stats:"", "admin-products":"كل المنتجات: السعر، حالة الخصم، ورابط القطعة في المتجر الأصلي.", "admin-brands":"كل ماركة: حالتها، عدد منتجاتها، أقسامها، مصدرها، ومبلغ الإضافة في سعرها.", "admin-problems":"كل مشكلة في الموقع أو الماركات: ماذا حدث، سببها، كيف حُلّت، وكيف تم التحقق.", "admin-updates":"ما تغيّر فعلاً في الموقع وبياناته في كل تحديث.", "admin-monitor":"حالة المراقبة التلقائية للأسعار والخصومات، وما يحتاج تحققاً.", "admin-makeup":"عروض سيفورا وتخفيضات المكياج ومجموعات الهدايا: ما قُرئ ومتى، الحملات النشطة والمنتهية، الشروط، وما ينقصه سعر.", "admin-settings":"سعر الصرف، المزامنة والنشر، النسخ الاحتياطي، وطريقة العرض." };
 const isAdminRoute = r => r === "admin" || r === "stats" || r.startsWith("admin-");
 function adminShell(page, body){
   const cur = ADMIN_PAGES.find(x => x[0] === page) || ADMIN_PAGES[0], open = FIXL.list ? FIXL.list.filter(x => fixSt(x) !== "resolved").length : 0;
@@ -1860,6 +1888,7 @@ function viewAdmin(all, page){
       ${hidden ? `<div class="row"><button class="btn quiet" id="aRestore">استرجاع ${hidden} منتج محذوف</button></div>` : ""}
     </div></section>
 
+  <section class="panel" data-pg="admin-makeup"><div class="fields" style="max-width:none" id="mkBox"><p class="small">جارٍ التحميل…</p></div></section>
   <section class="panel" data-pg="admin-monitor"><div class="fields" style="max-width:none" id="monBox"><p class="small">جارٍ التحميل…</p></div>
     <details class="efblock" open><summary><b>Elisabetta Franchi — الأسعار والتحقق من الصفحة ٢</b></summary><div id="efBox"><p class="small">جارٍ التحميل…</p></div></details></section>
   <section class="panel" data-pg="admin-monitor"><div><h3>التحديث التلقائي</h3><p class="why">يتم تحديث المنتجات والأسعار والمقاسات تلقائياً كل ١٥ دقيقة (منتجات Macy's كل ساعة). لا يُحذف منتج إلا إذا تأكدنا ٣ مرات خلال ٢٤ ساعة أن المتجر الأصلي حذفه نهائياً.</p></div>
@@ -2051,6 +2080,227 @@ function wireItem(){
 }
 
 /* ---------- router ---------- */
+/* ---------- Makeup — المكياج: Sephora Sale · Makeup Sale · Gifts (data: makeup.json, built from official pages only) ---------- */
+let MK = null, mkLoading = null;
+const MK_EMPTY = { meta: {}, campaigns: [], offers: [], sale: [], makeup: [], gifts: [], history: [] };
+function ensureMK(){
+  if (MK) return Promise.resolve(MK);
+  if (!mkLoading) mkLoading = fetch(BASE + "makeup.json?t=" + Date.now(), { cache:"no-store" }).then(r => r.ok ? r.json() : null).catch(() => null)
+    .then(d => { MK = d || MK_EMPTY; const r = routeOf(); if (isMkRoute(r) || r === "admin-makeup") render(); return MK; });
+  return mkLoading;
+}
+const isMkRoute = r => r === "makeup" || r.startsWith("makeup-") || r.startsWith("mk-");
+const mkSAR = (usd, p) => usd == null || p.add == null ? null : Math.round(usd * usdRate() + p.add);
+const ptToday = () => new Date(Date.now() - 8 * 3600e3).toISOString().slice(0, 10);
+const mkBrand = p => (MK.meta.brandNames || {})[p.brand] || p.brand || "";
+const mkImg = (src, w) => !src ? "" : /sephora\.com/.test(src) ? src.replace(/([?&])imwidth=\d+/, "$1imwidth=" + w).replace(/^([^?]+)$/, "$1?imwidth=" + w) : img(src, w);
+const MK_CATS = () => MK.meta.cats || [];
+const MK_GROUPS = [["face","الوجه","Face"],["lips","الشفاه","Lips"],["eyes","العيون","Eyes"],["other","منتجات مكياج أخرى","Other Makeup"]];
+const mkCatAr = k => (MK_CATS().find(c => c[0] === k) || [k, k, k])[2];
+const mkGroupOf = k => (MK_CATS().find(c => c[0] === k) || [])[3] || "other";
+const MKUI = {};
+const mkui = r => MKUI[r] || (MKUI[r] = { q:"", brand:"", cat:"", top:"", sort:"disc", pmin:"", pmax:"", disc:"", limit:48 });
+function mkIndex(){
+  const m = new Map();
+  for (const k of ["makeup","gifts","sale"]) for (const p of MK[k] || []) if (!m.has(p.id)) m.set(p.id, p);
+  for (const c of MK.campaigns || []) for (const s of c.sections || []) for (const p of s.products || []) if (!m.has(p.id)) m.set(p.id, Object.assign({ src:"sephora", retailer:"Sephora" }, p));
+  for (const o of MK.offers || []) for (const p of o.products || []) if (!m.has(p.id)) m.set(p.id, Object.assign({ src:"sephora", retailer:"Sephora" }, p));
+  return m;
+}
+const mkPriced = p => p.add === undefined ? Object.assign({}, p, { add: null }) : p;   // the add-on always comes from the official-data build
+function mkPrice(p){
+  const now = mkSAR(p.price, p), was = p.compare ? mkSAR(p.compare, p) : null;
+  if (now == null) return "";
+  return `<p class="mk-price${was ? " hot" : ""}">${fmt(now)}<small>SAR</small></p>${was ? `<p class="mk-was"><s>${fmt(was)} SAR</s>${p.discPct ? ` <span>−${p.discPct}%</span>` : ""}</p>` : ""}
+    ${COSTS() ? `<p class="calc">$${p.price}${p.compare ? " (was $" + p.compare + ")" : ""} × ${usdRate().toFixed(3)} + ${p.add} SAR · ${esc(p.addWhy || "")}</p>` : ""}`;
+}
+function mkCard(p){
+  p = mkPriced(p);
+  if (mkSAR(p.price, p) == null) return "";
+  const shades = (p.variants || []).filter(v => v.name).length, out = p.available === false || p.oos;
+  return `<article class="card mk-card${out ? " out" : ""}">
+    <a class="ph mk-ph" href="#mk-${esc(p.id)}" aria-label="${esc(mkBrand(p) + " " + p.title)}">${p.image ? `<img loading="lazy" decoding="async" src="${esc(mkImg(p.image, W.card))}" alt="${esc(mkBrand(p) + " " + p.title)}">` : ""}
+      ${p.discPct ? `<span class="badge">−${p.discPct}%</span>` : ""}${out ? '<span class="flag">Sold out</span>' : p.set && p.items ? `<span class="flag light" lang="ar">${arN(p.items)} منتجات</span>` : ""}</a>
+    <p class="mk-brand" dir="ltr">${esc(mkBrand(p))}</p>
+    <h3 class="mk-title" dir="ltr"><a href="#mk-${esc(p.id)}">${esc(p.title)}</a></h3>
+    ${shades > 1 ? `<p class="small" lang="ar">${arN(shades)} درجات</p>` : p.colors ? `<p class="small" dir="ltr">${esc(p.colors)}</p>` : ""}
+    ${mkPrice(p)}
+    <p class="mk-src small" lang="ar">${p.src === "sephora" ? "من سيفورا أمريكا" : "من المتجر الرسمي"}</p>
+  </article>`;
+}
+function mkGrid(list, u, empty){
+  const shown = list.slice(0, u ? u.limit : 9999);
+  if (!list.length) return `<div class="empty" dir="rtl" lang="ar"><h3>${empty || "لا توجد منتجات الآن"}</h3></div>`;
+  return `<div class="grid mk-grid">${shown.map(mkCard).join("")}</div>${u && list.length > shown.length ? '<button class="more" id="mkMore">عرض المزيد</button>' : ""}`;
+}
+function mkFilter(list, u){
+  const q = u.q.trim().toLowerCase(), lo = u.pmin === "" ? -Infinity : Number(u.pmin), hi = u.pmax === "" ? Infinity : Number(u.pmax);
+  let out = list.map(mkPriced).filter(p => mkSAR(p.price, p) != null
+    && (!q || (p.title + " " + mkBrand(p)).toLowerCase().includes(q)) && (!u.brand || (p.brandKey || p.brand) === u.brand || mkBrand(p) === u.brand)
+    && (!u.cat || p.cat === u.cat || (u.cat.startsWith("g:") && mkGroupOf(p.cat) === u.cat.slice(2))) && (!u.top || p.top === u.top)
+    && mkSAR(p.price, p) >= lo && mkSAR(p.price, p) <= hi && (!u.disc || (p.discPct || 0) >= Number(u.disc)));
+  const by = { disc: (a, b) => (b.discPct || 0) - (a.discPct || 0), asc: (a, b) => mkSAR(a.price, a) - mkSAR(b.price, b), desc: (a, b) => mkSAR(b.price, b) - mkSAR(a.price, a), name: (a, b) => (mkBrand(a) + a.title).localeCompare(mkBrand(b) + b.title) }[u.sort] || (() => 0);
+  return out.sort((a, b) => (a.available === false) - (b.available === false) || by(a, b));
+}
+function mkToolbar(u, list, opts){
+  const brands = [...new Map(list.map(p => [p.brandKey || p.brand, mkBrand(p)])).entries()].sort((a, b) => a[1].localeCompare(b[1]));
+  return `<div class="toolbar ar-filters mk-tools" dir="rtl" lang="ar">
+    <label class="search"><input id="mkQ" type="search" placeholder="ابحثي باسم المنتج أو الماركة" value="${esc(u.q)}" dir="auto"></label>
+    <div class="frow">
+      <label class="fld"><span>الترتيب</span><select id="mkSort">${opt("disc","أعلى خصم",u.sort)}${opt("asc","السعر: من الأقل",u.sort)}${opt("desc","السعر: من الأعلى",u.sort)}${opt("name","الاسم",u.sort)}</select></label>
+      ${opts.brand ? `<label class="fld"><span>الماركة</span><select id="mkBrandSel">${opt("","كل الماركات",u.brand)}${brands.map(([k, n]) => opt(k, n, u.brand)).join("")}</select></label>` : ""}
+      ${opts.top ? `<label class="fld"><span>القسم</span><select id="mkTop">${opt("","كل الأقسام",u.top)}${Object.entries(MK.meta.top || {}).filter(([k]) => list.some(p => p.top === k)).map(([k, n]) => opt(k, ({ makeup:"المكياج", skincare:"العناية بالبشرة", hair:"العناية بالشعر", fragrance:"العطور", bath:"الجسم والاستحمام", tools:"الأدوات والفرش" })[k] || n, u.top)).join("")}</select></label>` : ""}
+      ${opts.disc ? `<label class="fld"><span>الخصم</span><select id="mkDisc">${opt("","أي خصم",u.disc)}${[20,30,40,50].map(n => opt(n, n + "٪ أو أكثر", u.disc)).join("")}</select></label>` : ""}
+      ${opts.price ? `<fieldset class="fld fprice"><legend>السعر</legend><label><span>أقل سعر</span><input id="mkMin" type="number" min="0" value="${esc(u.pmin)}" placeholder="0"><i>ر.س</i></label><label><span>أعلى سعر</span><input id="mkMax" type="number" min="0" value="${esc(u.pmax)}" placeholder="—"><i>ر.س</i></label><button class="btn solid" id="mkPApply">تطبيق</button></fieldset>` : ""}
+    </div></div>`;
+}
+/* the Sephora Sale menu follows what Sephora publishes now: only pages with real content appear */
+function mkSephoraTabs(){
+  const C = (MK.campaigns || []).filter(c => c.status !== "ended" && (c.sections || []).some(s => mkSecHasContent(s)));
+  const by = rx => C.filter(c => rx.test(c.label));
+  const t = [];
+  if ((MK.sale || []).length) t.push(["makeup-sephora-sale", "المنتجات المخفضة", "Sale"]);
+  by(/cyber/).forEach(c => t.push(["makeup-sephora-c-" + c.label, "عروض السايبر", "Cyber Week"]));
+  by(/black-friday/).forEach(c => t.push(["makeup-sephora-c-" + c.label, "عروض البلاك فرايدي", "Black Friday"]));
+  if ((MK.offers || []).some(o => o.page === "beauty-offers")) t.push(["makeup-sephora-offers", "عروض سيفورا", "Beauty Offers"]);
+  C.filter(c => !/cyber|black-friday|beauty-offers/.test(c.label)).forEach(c => t.push(["makeup-sephora-c-" + c.label, c.title.split("|")[0].trim(), "Other"]));
+  return t;
+}
+function mkSecHasContent(s){
+  if (s.kind === "deal") return s.validDate === ptToday() && s.products.length;
+  return (s.products || s.offers || s.banners || s.links || []).length > 0;
+}
+const MK_MEMBERS = { Insider:"Beauty Insider", VIB:"VIB", Rouge:"Rouge" };
+function offerCard(o){
+  const chips = [];
+  if (o.code) chips.push(`<span class="chip code" dir="ltr">${esc(o.code)} <button class="linkish" data-copy="${esc(o.code)}" lang="ar">نسخ</button></span>`);
+  if (o.threshold) chips.push(`<span class="chip" dir="ltr">${esc(o.threshold)}</span>`);
+  if (o.members.length) chips.push(`<span class="chip warn" lang="ar">يتطلب عضوية: <bdi dir="ltr">${o.members.map(m => MK_MEMBERS[m] || m).join(" / ")}</bdi></span>`);
+  if (o.appOnly) chips.push('<span class="chip warn" lang="ar">حصري في تطبيق سيفورا</span>');
+  if (o.onlineOnly) chips.push('<span class="chip" lang="ar">أونلاين فقط</span>');
+  if (o.inStoreOnly) chips.push('<span class="chip" lang="ar">في المتاجر فقط</span>');
+  const KIND = { sample:"عينات مجانية", gwp:"هدية مع الشراء", points:"نقاط إضافية", subscription:"اشتراك", card:"بطاقة سيفورا", code:"كود خصم", sale:"تخفيض", other:"عرض" };
+  return `<article class="offer" id="of-${esc(o.id)}">${o.image ? `<a class="of-img" href="${esc(o.url)}" target="_blank" rel="noopener"><img loading="lazy" src="${esc(o.image)}" alt="${esc(o.imageAlt)}"></a>` : ""}
+    <div class="of-body"><p class="of-kind" lang="ar">${KIND[o.kind] || "عرض"}</p><h4 dir="ltr">${esc(o.title)}</h4>${o.desc ? `<p dir="ltr">${esc(o.desc)}</p>` : ""}
+    <div class="chips">${chips.join("")}</div>${o.legal ? `<p class="small muted" dir="ltr">${esc(o.legal)}</p>` : ""}
+    ${(o.products || []).length ? `<div class="of-prods">${o.products.slice(0, 6).map(p => `<a href="#mk-${esc(p.id)}" title="${esc(p.brand + " " + p.title)}">${p.image ? `<img loading="lazy" src="${esc(mkImg(p.image, 160))}" alt="${esc(p.title)}">` : esc(p.title)}</a>`).join("")}</div>` : ""}
+    <a class="btn quiet" href="${esc(o.url)}" target="_blank" rel="noopener" lang="ar">تفاصيل العرض في سيفورا</a></div></article>`;
+}
+function mkCampaign(c){
+  const off = new Map((MK.offers || []).map(o => [o.id, o]));
+  const tabs = (c.tabs || []).map(t => { const lab = (t.url || "").split("/").pop(); const ours = (MK.campaigns || []).find(x => x.label === lab && x.status !== "ended");
+    return ours ? `<a href="#makeup-sephora-c-${esc(lab)}" ${lab === c.label ? 'aria-current="page"' : ""} dir="ltr">${esc(t.label)}</a>` : ""; }).join("");
+  const body = (c.sections || []).map(s => {
+    if (!mkSecHasContent(s)) return "";
+    const h = s.title ? `<h3 class="mk-sec" dir="ltr">${esc(s.title)}</h3>` : "";
+    if (s.kind === "deal") return `<section class="mk-deal">${h}<p class="small" lang="ar">عرض اليوم فقط — ينتهي في نهاية يوم ${esc(s.validDate)} بتوقيت المحيط الهادئ (PT) حسب سيفورا.</p>${mkGrid(s.products)}${s.more ? `<a class="btn quiet" href="${esc(s.more)}" target="_blank" rel="noopener" lang="ar">كل منتجات العرض في سيفورا</a>` : ""}</section>`;
+    if (s.kind === "products") return `<section>${h}${mkGrid(s.products)}${s.more ? `<a class="btn quiet" href="${esc(s.more)}" target="_blank" rel="noopener" lang="ar">${esc(s.moreLabel || "المزيد في سيفورا")}</a>` : ""}</section>`;
+    if (s.kind === "promos") return `<section>${h}<div class="offers">${s.offers.map(id => off.get(id)).filter(Boolean).map(offerCard).join("")}</div></section>`;
+    if (s.kind === "banners") return `<section>${h}${s.planner ? '<p class="small" lang="ar">جدول العروض كما نشرته سيفورا. العروض القادمة لا تبدأ قبل موعدها.</p>' : ""}<div class="mk-banners">${s.banners.map(b => `<a class="mk-ban" href="${esc(b.url || c.url)}" target="_blank" rel="noopener" style="${b.bg ? `background:${esc(b.bg)};color:${esc(b.color || "#fff")}` : ""}">${b.image ? `<img loading="lazy" src="${esc(b.image)}" alt="${esc(b.alt)}">` : ""}${b.text ? `<span dir="ltr">${esc(b.text).replace(/\n/g, "<br>")}</span>` : ""}</a>`).join("")}</div></section>`;
+    if (s.kind === "links") return `<section>${h}<nav class="subnav" dir="ltr">${s.links.map(l => `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`).join("")}</nav></section>`;
+    return "";
+  }).join("");
+  const hero = c.hero && (c.hero.image || c.hero.text) ? `<a class="mk-hero" href="${esc(c.url)}" target="_blank" rel="noopener" style="${c.hero.bg ? "background:" + esc(c.hero.bg) : ""}">${c.hero.image ? `<img src="${esc(c.hero.image)}" alt="${esc(c.hero.alt)}">` : ""}${c.hero.text ? `<span dir="ltr">${esc(c.hero.text).replace(/\n/g, "<br>")}</span>` : ""}</a>` : "";
+  return `${hero}${tabs ? `<nav class="subnav sub2" aria-label="Sephora campaign">${tabs}</nav>` : ""}${c.status === "preview" ? '<p class="warnline" lang="ar">معاينة: هذه العروض لم تبدأ بعد حسب سيفورا.</p>' : ""}${body || '<div class="empty" lang="ar"><h3>لا توجد عروض منشورة في هذه الصفحة الآن</h3></div>'}
+    <p class="small muted" lang="ar">المصدر: <a href="${esc(c.url)}" target="_blank" rel="noopener" dir="ltr">${esc(c.url)}</a></p>`;
+}
+function viewMakeup(route){
+  if (!MK){ ensureMK(); return '<div class="empty"><h3>Loading</h3></div>'; }
+  const head = (en, ar) => `<div class="list-head"><div><h2>${en}</h2><p class="sec-ar" lang="ar" dir="rtl">${ar}</p></div></div>`;
+  const top = `<nav class="subnav" dir="rtl" aria-label="Makeup">${[["makeup-sephora","عروض سيفورا"],["makeup-sale","تخفيضات المكياج"],["makeup-gifts","مجموعات الهدايا"]].map(([r, a]) => `<a href="#${r}" lang="ar" ${route.startsWith(r) ? 'aria-current="page"' : ""}>${a}</a>`).join("")}</nav>`;
+  if (route.startsWith("mk-")) return mkItem(route.slice(3));
+  if (route === "makeup"){
+    const n = { s: (MK.sale || []).length + (MK.offers || []).length, m: (MK.makeup || []).filter(p => mkSAR(p.price, mkPriced(p)) != null).length, g: (MK.gifts || []).filter(p => p.add != null).length };
+    const tile = (r, en, ar, cnt, note) => `<a class="mk-tile" href="#${r}"><b lang="ar">${ar}</b><span dir="ltr">${en}</span><small lang="ar">${cnt ? arN(cnt) + " " + note : "يُحدَّث قريباً"}</small></a>`;
+    return `${head("Makeup", "المكياج")}<div class="mk-tiles" dir="rtl">${tile("makeup-sephora", "Sephora Sale", "عروض سيفورا", n.s, "منتج وعرض")}${tile("makeup-sale", "Makeup Sale", "تخفيضات المكياج", n.m, "منتج")}${tile("makeup-gifts", "Gifts", "مجموعات الهدايا", n.g, "مجموعة")}</div>`;
+  }
+  if (route.startsWith("makeup-sephora")){
+    const tabs = mkSephoraTabs();
+    let r = route === "makeup-sephora" ? (tabs[0] || [])[0] || "makeup-sephora-sale" : route;
+    const nav = `<nav class="subnav sub2" dir="rtl" aria-label="Sephora Sale">${tabs.map(([k, a, en]) => `<a href="#${k}" ${k === r ? 'aria-current="page"' : ""}><span lang="ar">${esc(a)}</span></a>`).join("")}</nav>`;
+    let body;
+    if (r === "makeup-sephora-sale"){ const u = mkui(r); const res = mkFilter(MK.sale || [], u);
+      const sm = Object.values(MK.meta.sale || {}); const tot = sm.reduce((a, x) => a + (x.total || 0), 0);
+      body = `${mkToolbar(u, MK.sale || [], { brand: 1, top: 1, disc: 1, price: 1 })}<p class="small" lang="ar">${arN(res.length)} منتج مخفّض من صفحة التخفيضات الرسمية في سيفورا أمريكا.</p>${mkGrid(res, u, "لا توجد نتائج")}`; }
+    else if (r === "makeup-sephora-offers"){
+      const secs = (MK.campaigns || []).find(c => c.label === "beauty-offers");
+      body = secs ? mkCampaign(secs) : mkGrid([]);
+      const pers = secs ? secs.sections.filter(s => s.kind === "promos" && s.personalized).map(s => s.title).filter(Boolean) : [];
+      if (pers.length) body += `<p class="warnline" lang="ar">بعض أقسام سيفورا شخصية وتظهر فقط بعد تسجيل الدخول (${pers.map(esc).join("، ")}) — لا يمكن التحقق منها علناً، لذلك لا نعرضها.</p>`;
+    }
+    else { const lab = r.replace("makeup-sephora-c-", ""), c = (MK.campaigns || []).find(x => x.label === lab); body = c && c.status !== "ended" ? mkCampaign(c) : '<div class="empty" lang="ar"><h3>هذا العرض انتهى أو لم يعد منشوراً في سيفورا</h3></div>'; }
+    return `${head("Sephora Sale", "عروض سيفورا")}${top}${tabs.length ? nav : ""}${tabs.length || (MK.sale || []).length ? body : '<div class="empty" lang="ar"><h3>بيانات سيفورا تُقرأ الآن — تظهر هنا بعد أول تحديث</h3></div>'}`;
+  }
+  if (route.startsWith("makeup-sale")){
+    const u = mkui("makeup-sale"); const sub = route.split("-")[2] || ""; u.cat = sub;
+    const all = MK.makeup || [];
+    const brandsAll = Object.entries(MK.meta.brandNames || {});
+    const chips = `<nav class="subnav" dir="ltr" aria-label="Brands"><a href="#${route}" data-mkbrand="" ${!u.brand ? 'aria-current="page"' : ""} lang="ar">كل الماركات</a>${brandsAll.map(([k, n]) => { const c = all.filter(p => p.brand === k).length; return `<a href="#${route}" data-mkbrand="${k}" ${u.brand === k ? 'aria-current="page"' : ""}>${esc(n)} <small>${c}</small></a>`; }).join("")}</nav>`;
+    const cats = `<nav class="subnav sub2" dir="rtl" aria-label="Categories"><a href="#makeup-sale" ${!sub ? 'aria-current="page"' : ""} lang="ar">الكل</a>${MK_GROUPS.map(([g, a]) => `<a href="#makeup-sale-g:${g}" ${sub === "g:" + g ? 'aria-current="page"' : ""} lang="ar">${a}</a>`).join("")}</nav>
+      ${sub ? `<nav class="subnav sub2" dir="rtl">${MK_CATS().filter(c => c[3] === (sub.startsWith("g:") ? sub.slice(2) : mkGroupOf(sub)) && c[0] !== c[3]).map(c => `<a href="#makeup-sale-${c[0]}" ${sub === c[0] ? 'aria-current="page"' : ""} lang="ar">${c[2]}</a>`).join("")}</nav>` : ""}`;
+    const res = mkFilter(all, Object.assign({}, u, { brand: u.brand }));
+    return `${head("Makeup Sale", "تخفيضات المكياج")}${top}${chips}${cats}${mkToolbar(u, all, { disc: 1, price: 1 })}${mkGrid(res, u, "لا توجد منتجات مخفّضة في هذا القسم الآن")}`;
+  }
+  if (route.startsWith("makeup-gifts")){
+    const u = mkui("makeup-gifts"); const res = mkFilter(MK.gifts || [], u);
+    return `${head("Gifts", "مجموعات الهدايا")}${top}${mkToolbar(u, MK.gifts || [], { brand: 1, disc: 1, price: 1 })}<p class="small" lang="ar">مجموعات وهدايا رسمية فقط. السعر يشمل ٢٠ ر.س عن كل منتج داخل المجموعة.</p>${mkGrid(res, u, "لا توجد مجموعات الآن")}`;
+  }
+  return "";
+}
+function mkItem(id){
+  const p0 = mkIndex().get(id);
+  if (!p0) return '<div class="empty" lang="ar"><h3>المنتج غير موجود الآن</h3><a class="cta" href="#makeup">العودة إلى المكياج</a></div>';
+  const p = mkPriced(p0), vs = (p.variants || []).filter(v => v.name), k = Math.min(Number(MKUI._shade && MKUI._shade[id]) || 0, Math.max(0, vs.length - 1));
+  const v = vs[k], view = v ? Object.assign({}, p, { price: v.price, compare: v.compare, image: v.image || p.image, discPct: v.compare ? Math.round(100 * (1 - v.price / v.compare)) : 0 }) : p;
+  const msg = `${mkBrand(p)} ${p.title}${v ? " – " + v.name : ""}\n${location.origin + location.pathname}#mk-${id}`;
+  return `<div class="mk-item"><div class="mk-pic">${view.image ? `<img src="${esc(mkImg(view.image, W.item))}" alt="${esc(mkBrand(p) + " " + p.title)}">` : ""}</div>
+    <div class="mk-info"><p class="mk-brand" dir="ltr">${esc(mkBrand(p))}</p><h2 dir="ltr">${esc(p.title)}</h2>${mkPrice(view)}
+    ${vs.length > 1 ? `<fieldset class="mk-shades"><legend lang="ar">الدرجة: <bdi dir="ltr">${esc(v.name)}</bdi></legend>${vs.map((x, i) => `<button data-mkshade="${i}" aria-pressed="${i === k}" ${x.a ? "" : 'class="na"'} dir="ltr" title="${esc(x.name)}${x.a ? "" : " — sold out"}">${esc(x.name)}</button>`).join("")}</fieldset>` : ""}
+    ${p.set && (p.contents || []).length ? `<div class="mk-contents"><h4 lang="ar">محتوى المجموعة (${arN(p.items)})</h4><ul dir="ltr">${p.contents.map(c => `<li>${esc(c)}</li>`).join("")}</ul></div>` : p.set && p.items ? `<p lang="ar">تحتوي المجموعة على ${arN(p.items)} منتجات.</p>` : ""}
+    <a class="wa" href="https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">${waSVG}<span lang="ar" dir="rtl">للطلب والاستفسار عبر واتساب</span></a>
+    <p><a class="btn quiet" href="${esc(p.url)}" target="_blank" rel="noopener" lang="ar">${p.src === "sephora" ? "صفحة المنتج في سيفورا أمريكا" : "صفحة المنتج في المتجر الرسمي"}</a></p>
+    <p class="small muted" lang="ar">الأسعار بالريال السعودي وتشمل الشحن والخدمة.</p></div></div>`;
+}
+function wireMakeup(route){
+  const r = route.startsWith("makeup-sale") ? "makeup-sale" : route.startsWith("makeup-sephora") ? (route === "makeup-sephora" ? ((mkSephoraTabs()[0] || [])[0] || "makeup-sephora-sale") : route) : route.startsWith("makeup-gifts") ? "makeup-gifts" : route;
+  const u = mkui(r), re = () => { u.limit = 48; render(); };
+  const on = (id, ev, f) => { const el = $(id); if (el) el[ev] = f; };
+  on("#mkQ", "oninput", e => { u.q = e.target.value; const pos = e.target.selectionStart; re(); const n = $("#mkQ"); if (n){ n.focus(); n.setSelectionRange(pos, pos); } });
+  on("#mkSort", "onchange", e => { u.sort = e.target.value; re(); });
+  on("#mkBrandSel", "onchange", e => { u.brand = e.target.value; re(); });
+  on("#mkTop", "onchange", e => { u.top = e.target.value; re(); });
+  on("#mkDisc", "onchange", e => { u.disc = e.target.value; re(); });
+  on("#mkPApply", "onclick", () => { u.pmin = $("#mkMin").value.trim(); u.pmax = $("#mkMax").value.trim(); re(); });
+  on("#mkMore", "onclick", () => { u.limit += 48; const y = scrollY; render(); scrollTo(0, y); });
+  document.querySelectorAll("[data-mkbrand]").forEach(a => a.onclick = e => { e.preventDefault(); u.brand = a.dataset.mkbrand; re(); });
+  document.querySelectorAll("[data-mkshade]").forEach(b => b.onclick = () => { (MKUI._shade = MKUI._shade || {})[route.slice(3)] = Number(b.dataset.mkshade); render(); });
+  document.querySelectorAll("[data-copy]").forEach(b => b.onclick = () => { navigator.clipboard && navigator.clipboard.writeText(b.dataset.copy).then(() => toast("تم نسخ الكود " + b.dataset.copy)); });
+}
+/* admin: Makeup monitoring */
+function drawMakeupAdmin(){
+  const box = $("#mkBox"); if (!box) return;
+  if (!MK){ ensureMK(); box.innerHTML = '<p class="small">جارٍ التحميل…</p>'; return; }
+  const M = MK.meta || {}, ago = t => t ? when(t) : "—";
+  const pages = (M.pages || []).map(p => `<tr><td dir="ltr">${esc(p.label)}</td><td>${ago(p.at)}</td><td>${p.ageH > 12 ? '<span class="warnline">يحتاج إعادة تحقق</span>' : "✓ محدّث"}</td><td><a href="${esc(p.url)}" target="_blank" rel="noopener">فتح</a></td></tr>`).join("");
+  const sale = Object.entries(M.sale || {}).map(([k, s]) => `<tr><td dir="ltr">${esc(k)}</td><td>${arN(s.read)} / ${arN(s.total || 0)}</td><td>${s.complete ? "✓ كامل" : '<span class="warnline">ناقص</span>'}</td><td>${ago(s.at)}</td></tr>`).join("");
+  const C = MK.campaigns || [], st = { active:"🟢 نشط", preview:"🟡 معاينة (لم يبدأ)", ended:"⚪ منتهٍ" };
+  const camps = C.map(c => `<tr><td dir="ltr">${esc(c.title)}</td><td>${st[c.status] || c.status}${c.stale ? ' · <span class="warnline">قديم</span>' : ""}</td><td>${c.endsAt ? when(c.endsAt) : "—"}</td><td>${(c.sections || []).filter(s => s.kind === "deal").map(s => s.validDate === ptToday() ? "عرض اليوم ✓" : "عرض يوم " + esc(s.validDate) + " (انتهى)").join("، ") || "—"}</td></tr>`).join("");
+  const O = MK.offers || [], flag = o => [o.code && "كود " + o.code, o.appOnly && "تطبيق فقط", o.members.length && "عضوية " + o.members.join("/"), o.minSpend && "حد أدنى $" + o.minSpend, o.onlineOnly && "أونلاين فقط"].filter(Boolean).join(" · ");
+  const offers = O.map(o => `<tr><td dir="ltr">${esc(o.title)}</td><td>${esc(o.kind)}</td><td>${esc(flag(o)) || "—"}</td><td dir="ltr">${esc(o.sections.join(", "))}</td></tr>`).join("");
+  const missing = (MK.gifts || []).filter(g => g.add == null);
+  const brands = Object.entries(M.brands || {}).map(([k, b]) => `<tr><td dir="ltr">${esc((M.brandNames || {})[k] || k)}</td><td>${b.ok === true ? "✓" : b.ok === false ? '<span class="warnline">فشل</span>' : "عبر سيفورا"}</td><td>${b.discounted != null ? arN(b.discounted) : "—"}</td><td>${b.sets != null ? arN(b.sets) : "—"}</td><td>${esc(b.error || b.note || ago(b.lastOk))}</td></tr>`).join("");
+  const T = (h, rows, n) => rows ? `<div class="tbl"><table><thead><tr>${h.map(x => `<th>${x}</th>`).join("")}</tr></thead><tbody>${rows}</tbody></table></div>` : `<p class="small">${n || "لا شيء"}</p>`;
+  box.innerHTML = `<div class="dash">${dCard("منتجات سيفورا المخفضة", arN((MK.sale || []).length), "")}${dCard("عروض سيفورا", arN(O.length), "")}${dCard("تخفيضات المكياج", arN((MK.makeup || []).length), "١٣ ماركة")}${dCard("مجموعات الهدايا", arN((MK.gifts || []).length), arN(missing.length) + " بدون سعر بعد")}</div>
+    <h4>صفحات سيفورا المقروءة</h4><p class="small">سيفورا يمنع الخوادم الآلية، لذلك تُقرأ صفحاته من متصفح Claude على جهازك عدة مرات يومياً. إذا كان الجهاز مغلقاً تبقى آخر بيانات مؤكدة وتُعلَّم «يحتاج إعادة تحقق».</p>${T(["الصفحة","آخر قراءة","الحالة",""], pages, "لم تُقرأ أي صفحة بعد")}
+    <h4>قوائم التخفيضات</h4>${T(["القائمة","المقروء / الإجمالي","الاكتمال","آخر قراءة"], sale)}
+    <h4>الحملات</h4>${T(["الحملة","الحالة","تنتهي","عرض اليوم"], camps)}
+    <h4>العروض (أكواد، عضوية، تطبيق فقط، حد أدنى)</h4>${T(["العرض","النوع","الشروط","يظهر في"], offers)}
+    <h4>مجموعات بدون سعر (عدد المنتجات داخلها غير معروف بعد)</h4>${missing.length ? `<ul>${missing.slice(0, 60).map(g => `<li><a href="${esc(g.url)}" target="_blank" rel="noopener" dir="ltr">${esc((g.brand || "") + " — " + g.title)}</a> <span class="small muted">${esc(g.addWhy || "")}</span></li>`).join("")}</ul>` : '<p class="small">لا يوجد</p>'}
+    <h4>متاجر الماركات الرسمية</h4>${T(["الماركة","القراءة","مخفّض","مجموعات","ملاحظة"], brands)}
+    <h4>حملات انتهت (السجل)</h4>${T(["الحملة","انتهت"], (MK.history || []).map(h => `<tr><td dir="ltr">${esc(h.title)}</td><td>${when(h.endedAt)}</td></tr>`).join(""))}
+    <p class="small muted">آخر بناء للبيانات: ${ago(M.updatedAt)}. قواعد السعر: خفيف +٣٠، عادي/باليتات/كريم أساس +٤٠، كبير أو ثقيل (حجم ١٠٠ مل/غ فأكثر مؤكد) +٦٠، المجموعات +٢٠ لكل منتج.</p>`;
+}
+
 const LISTS = ["all","sp","midi","maxi","bags","md","winter","jackets","coats","scarves","recent","discounts","popular"];
 function routeOf(){
   let r = (location.hash || "").slice(1);
@@ -2063,7 +2313,7 @@ function render(){
   let route = routeOf();
   if (route.startsWith("item-") && route.includes("@")){ const [h, k] = route.slice(5).split("@"); VSVAR[h] = { v: Number(k) || 0 }; history.replaceState(null, "", "#item-" + h); route = "item-" + h; }
   if (loaded && route !== lastTracked && !isAdminRoute(route)){ lastTracked = route; trackRoute(route); }
-  let navRoute = parseSec(route) ? parseSec(route).sec : isAdminRoute(route) ? "admin" : route;
+  let navRoute = parseSec(route) ? parseSec(route).sec : isAdminRoute(route) ? "admin" : isMkRoute(route) ? "makeup" : route;
   if (route.startsWith("item-")){ const it = products().find(x => x.handle === route.slice(5)); if (it) navRoute = secOf(it); }
   document.querySelectorAll("nav.tabs a").forEach(a => { if (a.getAttribute("href") === "#" + navRoute) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
   $("#top").classList.toggle("home", route === "home");
@@ -2075,12 +2325,13 @@ function render(){
   if (isAdminRoute(route) && !OWNER){ $("#gate").classList.remove("hidden"); setTimeout(() => $("#pass").focus(), 50); v.innerHTML = ""; return; }
   $("#gate").classList.add("hidden");
   if (route.startsWith("item-") && $("#slides")) window._galleryAt = Math.round($("#slides").scrollLeft / $("#slides").clientWidth);
-  v.innerHTML = route.startsWith("item-") ? viewItem(list, route.slice(5)) : LISTS.includes(route) || parseSec(route) ? viewList(route, list)
+  v.innerHTML = isMkRoute(route) ? viewMakeup(route) : route.startsWith("item-") ? viewItem(list, route.slice(5)) : LISTS.includes(route) || parseSec(route) ? viewList(route, list)
     : route === "favorites" ? viewFav(list) : route === "stats" ? adminShell("stats", viewStats(list)) : isAdminRoute(route) ? viewAdmin(list, route) : viewHome(list);
   document.documentElement.style.setProperty("--hh", $("#top").offsetHeight + "px");
   if (LISTS.includes(route) || parseSec(route)) wireList(route);
   seo(route, list);
   if (route.startsWith("item-")) wireItem();
+  if (isMkRoute(route)){ wireMakeup(route); if (route.startsWith("mk-")) scrollTo(0, 0); }
   if (isAdminRoute(route) && route !== "stats") wireAdmin(list);
   if (route === "stats") wireStats(list);
   warnSizes();
@@ -2210,6 +2461,7 @@ function wireAdmin(list){
   J("vs.json", {}).then(a => { MON.vs = a; drawMonitor(products()); });
   J("audit.json", {}).then(a => { MON.audit = a; drawMonitor(products()); });
   drawBrands(list); drawMonitor(list); drawDash(list); loadDash();
+  if (routeOf() === "admin-makeup") ensureMK().then(drawMakeupAdmin);
   editList(list); $("#aQ").oninput = () => editList(products());
   $("#aCosts").onclick = () => { SHOWCOSTS = !SHOWCOSTS; render(); toast(SHOWCOSTS ? "تظهر تكاليفك الآن في كل الصفحات، لك وحدك." : "تم إخفاء التكاليف."); };
   $("#aLeave").onclick = () => { store.set("sp-unlock", ""); OWNER = false; SHOWCOSTS = false; location.hash = "#home"; render(); loadData(false); toast("أنتِ الآن تشاهدين الموقع كعميلة. للعودة افتحي ‎#admin‎"); };

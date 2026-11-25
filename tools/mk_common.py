@@ -114,6 +114,16 @@ def size_of(text):
     return best
 
 
+def top_of(name):
+    s = (name or "").lower()
+    if re.search(r"parfum|perfume|eau de|cologne|fragrance|body mist|hair & body mist|rollerball", s): return "fragrance"
+    if re.search(r"shampoo|conditioner|hair (mask|oil|serum|spray)|dry shampoo|dryer|straightener|curling|hair", s): return "hair"
+    if re.search(r"body (lotion|wash|cream|butter|oil|scrub)|hand (cream|balm)|shower|bath", s): return "bath"
+    if re.search(r"moistur|serum|cleanser|toner|sunscreen|spf|eye cream|face mask|sheet mask|exfoliat|retinol|essence|night cream|day cream|face cream|skincare", s) and not re.search(r"foundation|tint|primer|lip", s): return "skincare"
+    if re.search(r"brush|sponge|applicator|sharpener|mirror|tweezer|curler", s): return "tools"
+    return "makeup"
+
+
 def add_class(name, cat, size_ml=None, mini=False, top=""):
     """Which add-on applies to one individual product: 'light' 30, 'standard' 40 or 'large' 60."""
     s = (name or "").lower()
