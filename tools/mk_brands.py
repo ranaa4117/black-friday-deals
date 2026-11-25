@@ -277,9 +277,10 @@ def main():
         for p in cat:
             tags = p.get("tags") if isinstance(p.get("tags"), list) else [t.strip() for t in str(p.get("tags") or "").split(",")]
             for t in tags:                                  # the product's own official promotion tag, e.g. "_visibleSave_25" / "tag:25% OFF"
-                m = re.match(r"(?i)^(?:_visibleSave_(\d{2})|tag:\s*(\d{2})% ?off)$", t.strip())
+                m = re.match(r"(?i)^(?:_visibleSave_(\d{2})|tag:\s*(\d{2})% ?off|badge\s*[:|]\s*(\d{2})% ?off)$", t.strip())
                 if m and p.get("handle") not in promo_of:
-                    promo_of[p["handle"]] = (int(m.group(1) or m.group(2)), f"{int(m.group(1) or m.group(2))}% Off")
+                    n = int(m.group(1) or m.group(2) or m.group(3))
+                    promo_of[p["handle"]] = (n, f"{n}% Off")
         for p in cat:
             r = record(brand, base, p)
             if r and not r["compare"] and p.get("handle") in promo_of:
