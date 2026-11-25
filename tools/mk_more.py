@@ -44,6 +44,8 @@ def charlotte():
         d = json.loads(m.group(1))
         prods = d["props"]["initialState"]["page"]["model"]["products"]
         for i, p in enumerate(prods):
+            if p.get("scentEvolution") or "fragrance" in json.dumps(p.get("category") or "").lower() or "fragrance" in json.dumps(p.get("productClass") or "").lower():
+                continue                                  # Charlotte Tilbury perfumes (Love Frequency, Joyphoria …) are fragrance
             pr = p.get("price") or {}
             lp, pp = (pr.get("listingPrice") or {}), (pr.get("purchasePrice") or {})
             if lp.get("currencyCode") != "USD" or pp.get("currencyCode") != "USD":
@@ -113,7 +115,7 @@ async def toofaced():
     for i, it in enumerate(items):
         if it["id"] in seen:
             continue
-        lines = [x.strip() for x in it["text"].split("\n") if x.strip() and x.strip() not in ("SALE", "ADD TO BAG", "SOLD OUT")]
+        lines = [x.strip() for x in it["text"].split("\n") if x.strip() and not re.match(r"(?i)^(sale|add to bag|sold out|new|limited edition|bestseller|best seller|online exclusive|exclusive|just dropped|\d+ shades?|quick ?view)$", x.strip())]
         prices = [float(x.replace("$", "").replace(",", "")) for x in re.findall(r"\$\d[\d,]*\.\d{2}", it["text"])]
         if len(prices) < 2 or not lines:
             continue

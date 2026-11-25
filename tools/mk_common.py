@@ -85,7 +85,7 @@ def is_set(name, ptype="", tags=(), value_price=None):
         return True      # Sephora also shows "(… value)" on value-size single products, so the name must say it's a set
     if re.search(r"\b(set|kit|bundle|vault)\b", (ptype or "").lower()):
         return True
-    if re.search(r"duo[- ]fib(re|er)|\bset(ting)? (spray|powder|mist)\b|\bsetting\b", s.replace("gift set", "")):
+    if re.search(r"duo[- ]fib(re|er)|\bset(ting)? (spray|powder|mist)\b|\bsetting\b|\bduo brush\b|\bquad eyeshadow\b|eyeshadow quad|\bduo (blush|bronzer|highlighter|stick|contour|eyeshadow)\b", s.replace("gift set", "")):
         return False
     return bool(re.search(SET_WORDS, s))
 
@@ -221,6 +221,12 @@ def gift_class(name, contents=(), desc=""):
             return "small", f"compact set: {len(items)} items incl. full-size (official contents)"
         if full and len(items) >= 5:
             return "large", f"large set: {len(items)} items incl. full-size (official contents)"
-    if re.search(r"\bminis?\b|travel", s) and re.search(r"\b(duo|trio|set|kit)\b", s):
+    if re.search(r"\bminis?\b|travel|sample|stocking stuffer", s):
         return "xsmall", "mini set (official name)"
+    if re.search(r"full glam|collector|full collection|spa in a box|dreams come true|wonderland|\bvault\b|\btrunk\b|calendar|train case|vanity case|beauty case", s):
+        return "large", "large packaging or many full-size items (official name)"
+    if re.search(r"\b(lip|gloss|liner|lipstick|plump|balm)\b.*\b(duo|kit|trio|set)\b|\b(duo|kit|trio)\b.*\blip|puff duo|lip lift", s):
+        return "xsmall", "small lip / puff set (official name)"
+    if re.search(r"\b(duo|trio|kit|set|bundle|routine)\b", s):
+        return "small", "compact set of standard items (official name)"
     return None, "size can't be determined from the official contents — manual review"
