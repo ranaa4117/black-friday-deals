@@ -64,7 +64,7 @@ def sephora_item(sku, where=""):
 
 def tile_item(t, top):
     """A product tile from a Sephora sale/gift listing (as shown on screen)."""
-    tx = t.get("t") or []
+    tx = [x for x in (t.get("t") or []) if not re.match(r"(?i)^(quick ?look|compare|add|sponsored|sale)$", x.strip())]
     if len(tx) < 3:
         return None
     brand, name = tx[0], tx[1]

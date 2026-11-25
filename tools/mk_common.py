@@ -71,11 +71,11 @@ def category(name, ptype=""):
     return "other"
 
 
-NOT_BEAUTY = r"phone case|casetify|\bcharm\b|hair clip|claw clip|\bclip\b|\btote\b|hoodie|sweatshirt|t-shirt|\btee\b|\bhat\b|gift card|e-gift|keychain|sticker|\bsocks?\b|blanket|candle holder"
+NOT_BEAUTY = r"phone case|phone accessor|casetify|sunglasses|hoodie|sweatpant|sweatshirt|apparel|scrunchie|ponytail|mirror|alphabet charm|notebook|\bcharm\b|hair clip|claw clip|\bclip\b|\btote\b|hoodie|sweatshirt|t-shirt|\btee\b|\bhat\b|gift card|e-gift|keychain|sticker|\bsocks?\b|blanket|candle holder"
 
 
-def not_beauty(name):
-    return bool(re.search(NOT_BEAUTY, (name or "").lower()))
+def not_beauty(name, ptype=""):
+    return bool(re.search(NOT_BEAUTY, f"{name or ''} {ptype or ''}".lower()))
 
 
 def is_set(name, ptype="", tags=(), value_price=None):

@@ -103,7 +103,7 @@ def record(brand, base, p):
                          "price": price, "compare": comp if comp and comp > price else None, "a": bool(v.get("available")), "image": img})
     if not variants:
         return None
-    if mk.not_beauty(title):
+    if mk.not_beauty(title, ptype):
         return None
     if mk.is_fragrance(title, ptype):                     # no fragrance anywhere on the site
         return None

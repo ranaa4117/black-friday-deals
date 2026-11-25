@@ -65,7 +65,7 @@
     const total = () => { const m = (document.querySelector("main") || document.body).innerText.match(/of ([\d,]+) Results/); return m ? Number(m[1].replace(/,/g, "")) : null; };
     const grab = () => { for (const a of document.querySelectorAll('main a[href*="/product/"]')){
       const h = a.getAttribute("href").split("&icid2")[0], id = (h.match(/-(P\d+)/) || [])[1]; if (!id) continue;
-      const im = a.querySelector("img"), t = a.innerText.split("\n").map(s => s.trim()).filter(Boolean);
+      const im = a.querySelector("img"), t = a.innerText.split("\n").map(s => s.trim()).filter(s => s && !/^(quick ?look|compare)$/i.test(s));
       if (t.length < 2) continue;
       M.set(id, { pid: id, url: abs(h), t, img: im ? (im.currentSrc || im.src || "") : "" }); } };
     // 1) load the whole list: press "Show More Products" until it disappears
@@ -111,11 +111,12 @@
   const UPLOAD = "https://qhuerltbkvihmqzsphpv.supabase.co/rest/v1/rpc/sephora_put", PUB = "sb_publishable_K35x9gcJMqTGCuj2MFj_7w_PsQSF8mU";
   async function put(key, kind, label, data){
     const r = await fetch(UPLOAD, { method: "POST", headers: { apikey: PUB, "Content-Type": "application/json" },
-      body: JSON.stringify({ p_key: key, p_kind: kind, p_label: label, p_url: location.href.split("#")[0], p_data: data }) });
+      body: JSON.stringify({ p_key: key, p_kind: kind, p_label: label, p_url: (window.__srStart || location.href).split("#")[0], p_data: data }) });
     if (!r.ok) throw new Error("upload " + r.status + " " + (await r.text()).slice(0, 200));
   }
   /* one job on the current page, in the background; the task checks window.__sr until done */
   function run(job, label, key){
+    window.__srStart = location.href;          // the address as opened (keeps "sortBy=BEST_SELLING")
     window.__sr = { job, label, state: "running", startedAt: new Date().toISOString() };
     (async () => {
       try {
