@@ -263,8 +263,8 @@ def main():
             if lab.startswith("more-"):
                 more_lists[lab] = items
             elif lab.startswith("gifts"):
-                for r in items:
-                    gift_items.setdefault(r["id"], dict(r, set=True))
+                for r in items:      # Sephora's gift pages also list single products; only real sets get the set fee
+                    gift_items.setdefault(r["id"], dict(r, set=bool(r.get("set")) or mk.is_set(r["title"])))
             elif lab in LIST_TOP:
                 for r in items:
                     sale_items.setdefault(r["id"], r)
@@ -320,7 +320,7 @@ def main():
     # Gifts: genuine sets, no fragrance, fee by set size
     gifts, seen = [], set()
     for p in brands.get("products") or []:
-        if p.get("set") and not mk.not_beauty(p["title"], p.get("type")) and not mk.is_fragrance(p["title"], " ".join(p.get("contents") or [])):
+        if p.get("set") and not mk.not_beauty(p["title"], p.get("type")) and not mk.is_fragrance(p["title"], " ".join(p.get("contents") or []), p.get("id", ""), p.get("url", "")):
             q = price_rule(dict(p), pinfo); q["ship"] = "unverified"; q["rank"] = by_name.get((p["brand"], norm(p["title"]))); gifts.append(q)
     for r in [x for x in sale if x["set"]] + list(gift_items.values()):
         if r["id"] in seen:

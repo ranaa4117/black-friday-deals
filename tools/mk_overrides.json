@@ -2,6 +2,35 @@
  "images": {
   "mk-refy-refy-signature-bag": "https://cdn.shopify.com/s/files/1/0573/2705/9142/files/REFY_SIGNATURE_BAG_-_FLAT_1.jpg?v=1759745761"
  },
- "giftSize": {},
+ "giftSize": {
+  "mk-tarte-eyes-on-me-mascara-liner-clutch": "small",
+  "mk-ct-iconic-hollywood-beauty-secrets-kit": "xsmall",
+  "mk-ct-magic-skin-lip-oil-gift-set": "small",
+  "mk-refy-full-lipstick-collection": "large",
+  "mk-refy-full-blur-liner-collection": "large",
+  "mk-refy-full-lip-gloss-collection": "large",
+  "mk-refy-full-lip-blush-collection": "large",
+  "mk-refy-full-lip-sculpt-collection": "large",
+  "mk-refy-full-cream-blush-collection": "large",
+  "mk-tarte-the-upper-east-side-lip-edit": "large",
+  "mk-fenty-clf-3-piece-makeup-bag": "small",
+  "mk-rare-find-comfort-body-lotion-and-pump": "small",
+  "mk-rare-soft-pinch-lip-cheek-edit": "small",
+  "mk-saie-complexion-boost": "small",
+  "mk-saie-lip-combo": "small",
+  "mk-saie-the-beach-case": "small",
+  "mk-saie-the-bellini-case": "small",
+  "mk-saie-vanity-case-bestseller-bundle": "small",
+  "mk-saie-the-brush-collection": "large",
+  "mk-saie-the-dew-fam": "small",
+  "mk-saie-the-slip-tint-family": "small",
+  "mk-tarte-tarte-x-roller-rabbit-tartelette-tubing-mascara-lip-vinyl-freckle-stamp": "small",
+  "mk-westman-petite-party": "xsmall",
+  "mk-westman-petite-petal-edition": "xsmall",
+  "mk-westman-the-refining-brush-edit": "small",
+  "mk-westman-the-supreme-essentials": "small",
+  "mk-westman-the-supreme-system": "small",
+  "mk-westman-the-vital-system-signature-skin": "small"
+ },
  "_note": "images: product-only photo chosen in the photo check (2026-11-25: all 482 brand-store photos checked; only the REFY Signature Bag used a model photo). giftSize: large | small | xsmall after manual review."
 }
