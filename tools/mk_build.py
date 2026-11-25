@@ -293,7 +293,7 @@ def main():
             by_name[(r["brandKey"], norm(r["title"]))] = r["rank"]
     mk_sale = []
     for p in brands.get("products") or []:
-        if p.get("set") or mk.is_fragrance(p["title"], p.get("type")) or mk.top_of(f'{p["title"]} {p.get("type", "")}') != "makeup":
+        if p.get("set") or mk.not_beauty(p["title"], p.get("type")) or mk.is_fragrance(p["title"], p.get("type")) or mk.top_of(f'{p["title"]} {p.get("type", "")}') != "makeup":
             continue
         q = price_rule(dict(p, top="makeup", cat=mk.category(p["title"], p.get("type", ""))), pinfo)
         q["rank"] = by_name.get((p["brand"], norm(p["title"])))     # same product's place on Sephora's bestselling list
@@ -306,7 +306,7 @@ def main():
     # Gifts: genuine sets, no fragrance, fee by set size
     gifts, seen = [], set()
     for p in brands.get("products") or []:
-        if p.get("set") and not mk.is_fragrance(p["title"], " ".join(p.get("contents") or [])):
+        if p.get("set") and not mk.not_beauty(p["title"], p.get("type")) and not mk.is_fragrance(p["title"], " ".join(p.get("contents") or [])):
             q = price_rule(dict(p), pinfo); q["ship"] = "unverified"; q["rank"] = by_name.get((p["brand"], norm(p["title"]))); gifts.append(q)
     for r in [x for x in sale if x["set"]] + list(gift_items.values()):
         if r["id"] in seen:

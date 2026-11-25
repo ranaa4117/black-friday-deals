@@ -236,10 +236,13 @@ def main():
             out[r["id"]] = r; seen.add(r["id"])
             n_disc += bool(r["compare"]); n_set += r["set"]
         out.update(group_shades(brand, [out.pop(i) for i in [k for k in list(out) if k in seen and not out[k]["set"]]]))
+        handles = {x.get("handle") for x in cat}
         live_urls = {v.get("url") or r["url"] for r in out.values() if r["brand"] == brand for v in r.get("variants", [])} | {r["url"] for r in out.values() if r["brand"] == brand}
         for p in old.get("products", []):                  # missing from the catalog: removed only after 3 misses over 24 h
             if p["brand"] != brand or p["id"] in seen or p["id"] in out or p.get("url") in live_urls:
-                continue                                   # still there (possibly now shown together with its other shades)
+                continue
+            if (p.get("url") or "").rstrip("/").split("/")[-1] in handles:
+                continue                                   # still sold, but now excluded by the rules (not makeup / fragrance / not beauty)                                   # still there (possibly now shown together with its other shades)
             g = p.get("gone") or {"n": 0, "first": ts}
             g = {"n": g["n"] + 1, "first": g.get("first", ts)}
             span = (now - datetime.strptime(g["first"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)).total_seconds() / 3600
