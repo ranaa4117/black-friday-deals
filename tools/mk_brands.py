@@ -15,9 +15,9 @@ UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like 
 SHOPIFY = {   # brand key → official US store
     "mario": "https://www.makeupbymario.com", "westman": "https://www.westman-atelier.com", "saie": "https://saiehello.com",
     "tarte": "https://tartecosmetics.com", "kosas": "https://kosas.com", "refy": "https://us.refybeauty.com",
-    "mac": "https://www.maccosmetics.com", "fenty": "https://fentybeauty.com", "rare": "https://www.rarebeauty.com",
+    "mac": "https://www.maccosmetics.com", "huda": "https://hudabeauty.com", "fenty": "https://fentybeauty.com", "rare": "https://www.rarebeauty.com",
 }
-NOT_READABLE = {"ct": "Charlotte Tilbury", "nars": "NARS", "huda": "HUDA BEAUTY", "toofaced": "Too Faced"}   # covered through Sephora USA
+NOT_READABLE = {"ct": "Charlotte Tilbury", "nars": "NARS", "toofaced": "Too Faced"}   # covered through Sephora USA
 MAKEUP_TYPES = r"makeup|make-up|cosmetic|lip|eye|brow|lash|mascara|liner|face|cheek|blush|bronz|highlight|foundation|conceal|powder|primer|setting|palette|brush|sponge|tint|gloss"
 SKIP_TYPES = r"skin ?care|cleanser|moistur|serum(?!.*foundation)|body|hair|fragrance|perfume|candle|gift card|sample|merch|apparel|tote|bag$|accessor"
 GONE_CHECKS, GONE_SPAN_H = 3, 24
