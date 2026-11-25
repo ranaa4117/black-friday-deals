@@ -28,7 +28,7 @@ def sheet(items, name, cols=8):
             S.paste(thumb(url), (x, y + 18))
         except Exception:
             d.text((x + 4, y + 60), "ERR", fill="red")
-        d.text((x + 2, y + 2), label, fill="black")
+        d.text((x + 2, y + 2), label[:34], fill="black")
     S.save(f"{OUT}/{name}.jpg", quality=80)
 
 
@@ -37,7 +37,17 @@ def main():
     ps = d["products"]
     ids = [x for x in os.environ.get("MK_SHEET_IDS", "").split(",") if x]
     index = {}
-    if ids:
+    if os.environ.get("MK_SHEET_IDS") == "gifts":
+        m = json.load(open(os.path.join(ROOT, "makeup.json")))
+        un = [g for g in m["gifts"] if g.get("add") is None and g.get("image")]
+        global T
+        T = 190
+        for n in range(0, len(un), 30):
+            chunk = un[n:n + 30]
+            sheet([(f"{n + i} {g.get('title', '')[:30]}", g["image"]) for i, g in enumerate(chunk)], f"gifts_{n // 30:02d}", cols=6)
+            for i, g in enumerate(chunk):
+                index[n + i] = {"id": g["id"], "title": g["title"], "brand": g.get("brand"), "price": g.get("price"), "contents": g.get("contents", [])[:12]}
+    elif ids:
         for k, pid in enumerate(ids):
             p = next((x for x in ps if x["id"] == pid), None)
             if not p: continue
