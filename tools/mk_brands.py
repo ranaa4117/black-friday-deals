@@ -246,9 +246,11 @@ def main():
                     out[p["id"]] = dict(p, stale=True)
             print(brand, "FAILED", e); continue
         seen = set(); n_disc = n_set = 0
-        promo_of = {}                                       # product handle → (pct, official collection title)
+        promo_of, promos = {}, {}                           # product handle → (pct, official collection title)
         try:
-            for handle, (pct, title) in promo_collections(base).items():
+            promos = promo_collections(base)
+            print(brand, "promotion collections:", {h: t for h, (pc, t) in promos.items()})
+            for handle, (pct, title) in promos.items():
                 for pr in get(f"{base}/collections/{handle}/products.json?limit=250").get("products") or []:
                     if pct > promo_of.get(pr["handle"], (0, ""))[0]:
                         promo_of[pr["handle"]] = (pct, title)
@@ -290,7 +292,8 @@ def main():
             if g["n"] >= GONE_CHECKS and span >= GONE_SPAN_H:
                 print("removed (gone 3× / 24h):", p["id"]); continue
             out[p["id"]] = dict(p, gone=g)
-        status[brand] = {"ok": True, "at": ts, "lastOk": ts, "catalog": len(cat), "discounted": n_disc, "sets": n_set, "us": us_note, "ranked": len(ranks)}
+        status[brand] = {"ok": True, "at": ts, "lastOk": ts, "catalog": len(cat), "discounted": n_disc, "sets": n_set, "us": us_note, "ranked": len(ranks),
+                         "promoCollections": [t for _, t in promos.values()], "promoProducts": sum(1 for r in out.values() if r["brand"] == brand and r.get("promo"))}
         print(brand, "catalog", len(cat), "discounted", n_disc, "sets", n_set)
         time.sleep(2)
     for b, name in NOT_READABLE.items():
