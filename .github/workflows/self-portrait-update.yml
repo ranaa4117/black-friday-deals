@@ -37,6 +37,10 @@ on:
         description: "Victoria's Secret: 1 = read now, 2 = read now and save the chosen photos for checking"
         required: false
         default: "0"
+      mk:
+        description: "Makeup brands: read the official brand stores now (1 = yes)"
+        required: false
+        default: "0"
       mk_probe:
         description: "Makeup sources test: Sephora USA and brand stores (1 = yes)"
         required: false
@@ -168,6 +172,11 @@ jobs:
         run: |
           mkdir -p /tmp/vs/img && cd /tmp/vs && rm -rf .git && git init -q && git checkout -q -b debug-vs && git add -A
           git -c user.name=bot -c user.email=bot@users.noreply.github.com commit -qm "VS photos" && git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" debug-vs
+      - name: Makeup brands from their official stores (every 3 hours)
+        continue-on-error: true
+        env:
+          MK_FORCE: ${{ github.event.inputs.mk || '0' }}
+        run: python3 tools/mk_brands.py
       - name: Elisabetta Franchi prices as shoppers see them (hourly, real browser)
         continue-on-error: true
         env:
@@ -185,7 +194,7 @@ jobs:
         run: |
           git config user.name "self-portrait-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          touch self-portrait/changes.json self-portrait/selftest.json self-portrait/ef_verify.json self-portrait/vs.json; git add self-portrait/data.json self-portrait/more.json self-portrait/full.json self-portrait/sitemap.xml self-portrait/audit.json self-portrait/changes.json self-portrait/fixes.json self-portrait/selftest.json self-portrait/ef_verify.json self-portrait/vs.json
+          touch self-portrait/changes.json self-portrait/selftest.json self-portrait/ef_verify.json self-portrait/vs.json self-portrait/mk_brands.json; git add self-portrait/data.json self-portrait/more.json self-portrait/full.json self-portrait/sitemap.xml self-portrait/audit.json self-portrait/changes.json self-portrait/fixes.json self-portrait/selftest.json self-portrait/ef_verify.json self-portrait/vs.json self-portrait/mk_brands.json self-portrait/makeup.json
           if git diff --cached --quiet; then echo "No changes"; exit 0; fi
           git commit -m "Self-Portrait sale check $(date -u +%Y-%m-%dT%H:%MZ)"
           for i in 1 2 3; do git pull --rebase --autostash -X theirs origin main && git push && exit 0; sleep 5; done
