@@ -183,6 +183,14 @@ def campaign(snap, now):
             continue
     navi = d.get("navigation") or {}
     tabs = [{"label": n.get("label"), "url": (n.get("url") or "").split("?")[0], "current": n.get("current")} for n in (navi.get("items") or [])]
+    alltext = " ".join([hero.get("text") or "", (hero.get("media") or {}).get("alt", "")] + [b["text"] + " " + b["alt"] for x in secs if x["kind"] == "banners" and not x.get("planner") for b in x["banners"]])
+    pct = None                                   # the campaign's own headline discount, only as Sephora wrote it
+    m3 = re.search(r"(?i)\bhalf off\b", alltext)
+    if m3:
+        pct = 50
+    for n in re.findall(r"(?i)(\d{2})\s*%\s*off", alltext):
+        pct = max(pct or 0, int(n))
+    headline = {"pct": pct, "upTo": bool(re.search(r"(?i)up to|select|half off select", alltext))} if pct else None
     status = "ended" if end and now > end else "active"
     has_deals = any(x["kind"] in ("deal", "products", "promos") for x in secs)
     if starts and now < starts and not has_deals:
@@ -192,7 +200,7 @@ def campaign(snap, now):
     return {"label": snap["label"], "url": d.get("url"), "title": d.get("title", "").replace(" | Sephora", ""), "readAt": snap["at"],
             "hero": {"text": clean(hero.get("text")), "image": (hero.get("media") or {}).get("src", ""), "alt": clean((hero.get("media") or {}).get("alt", "")), "bg": hero.get("bg", "")} if hero else None,
             "parent": {"label": navi.get("label"), "url": (navi.get("url") or "").split("?")[0]} if navi else None, "tabs": tabs,
-            "endsAt": iso(end.astimezone(timezone.utc)) if end else None, "startsAt": iso(starts.astimezone(timezone.utc)) if starts else None, "status": status, "sections": secs}, offers
+            "headline": headline, "endsAt": iso(end.astimezone(timezone.utc)) if end else None, "startsAt": iso(starts.astimezone(timezone.utc)) if starts else None, "status": status, "sections": secs}, offers
 
 
 def norm(t):
@@ -212,6 +220,12 @@ def main():
         brands = json.load(open(BR))
     except Exception:
         brands = {"products": [], "meta": {}}
+    try:                                              # non-Shopify official US stores (Charlotte Tilbury, NARS, Too Faced)
+        more = json.load(open(os.path.join(ROOT, "mk_more.json")))
+        brands["products"] = (brands.get("products") or []) + (more.get("products") or [])
+        brands.setdefault("meta", {}).setdefault("brands", {}).update((more.get("meta") or {}).get("brands") or {})
+    except Exception:
+        pass
     pinfo = dict((old.get("meta") or {}).get("pinfo") or {})
     problems, pages, removed_ship = [], [], []
     try:

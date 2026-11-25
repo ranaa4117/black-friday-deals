@@ -65,6 +65,32 @@ def best_selling(base, pages=5):
     return {h: i + 1 for i, h in enumerate(order)}
 
 
+def promo_collections(base):
+    """Official promotion collections linked from the store's own pages, whose own title states one exact
+    discount ("CYBERFEST 30% Off"). Returns {handle: (pct, title)}. 'Up to' titles are not used."""
+    found = {}
+    for page in ("/", "/collections/sale", "/pages/sale", "/collections/all"):
+        try:
+            req = urllib.request.Request(base + page, headers={"User-Agent": UA})
+            with urllib.request.urlopen(req, timeout=45) as r:
+                h = r.read().decode("utf-8", "replace")
+        except Exception:
+            continue
+        for handle in set(re.findall(r'/collections/([a-z0-9-]*?\d{2}-?(?:percent-|pct-)?off[a-z0-9-]*)', h)):
+            if handle in found:
+                continue
+            try:
+                c = get(f"{base}/collections/{handle}.json").get("collection") or {}
+            except Exception:
+                continue
+            title = c.get("title") or ""
+            m = re.search(r"(?i)(?<!up to )\b(\d{2})\s*%\s*off\b", title)
+            if m and not re.search(r"(?i)up to", title):
+                found[handle] = (int(m.group(1)), title)
+        time.sleep(1)
+    return found
+
+
 def catalog(base):
     out, page = [], 1
     while page <= 40:
@@ -220,8 +246,23 @@ def main():
                     out[p["id"]] = dict(p, stale=True)
             print(brand, "FAILED", e); continue
         seen = set(); n_disc = n_set = 0
+        promo_of = {}                                       # product handle → (pct, official collection title)
+        try:
+            for handle, (pct, title) in promo_collections(base).items():
+                for pr in get(f"{base}/collections/{handle}/products.json?limit=250").get("products") or []:
+                    if pct > promo_of.get(pr["handle"], (0, ""))[0]:
+                        promo_of[pr["handle"]] = (pct, title)
+        except Exception as e:
+            print(brand, "promo collections not read:", e)
         for p in cat:
             r = record(brand, base, p)
+            if r and not r["compare"] and p.get("handle") in promo_of:
+                pct, ptitle = promo_of[p["handle"]]          # the store's own collection says this product is N% off
+                for v in r["variants"]:
+                    if not v.get("compare"):
+                        v["compare"] = v["price"]; v["price"] = round(v["price"] * (1 - pct / 100), 2)
+                r["compare"], r["price"] = r["price"], round(r["price"] * (1 - pct / 100), 2)
+                r["discPct"], r["promo"] = pct, {"pct": pct, "label": ptitle, "applied": "checkout"}
             if not r:
                 continue
             prev = old_by.get(r["id"])
