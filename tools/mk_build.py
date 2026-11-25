@@ -340,6 +340,8 @@ def main():
         for p in lst:                                 # product-only photo chosen in the photo check
             if OVR.get("images", {}).get(p.get("id")):
                 p["image"] = OVR["images"][p["id"]]
+                for v in p.get("variants") or []:
+                    v["image"] = p["image"]
     json.dump(out, open(OUT, "w"), ensure_ascii=False, separators=(",", ":"))
     print(f"makeup.json: campaigns {len(campaigns)}, makeup sale {len(mk_sale)}, gifts {len(gifts)} (priced {sum(1 for g in gifts if g.get('add'))}), "
           f"product pages to read {len(need)}, removed for shipping {len(removed_ship)}, more-lists {len(need_lists)}")
