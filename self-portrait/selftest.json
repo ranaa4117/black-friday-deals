@@ -1,5 +1,5 @@
 {
- "at": "2026-11-25T05:38:43Z",
+ "at": "2026-11-25T11:44:16Z",
  "results": [
   {
    "n": 1,
@@ -9,9 +9,9 @@
   },
   {
    "n": 2,
-   "test": "Mac Duggal dresses previously marked 'extra ended' (4)",
+   "test": "Mac Duggal dresses previously marked 'extra ended' (1)",
    "result": "PASS",
-   "detail": "re-read the 4 most recent: label still shown on 1 (+2 checkout-verify) → the updater gives these their 25% back; truly no label on 1; unreadable 0; e.g. Black Pleated Shimmering One Shoulder Gown, Dusty Rose Feather Embellished Long Sleeve Gown, Black Embellished Mesh Long Sleeve Gown"
+   "detail": "re-read the 1 most recent: label still shown on 0 (+0 checkout-verify) → the updater gives these their 25% back; truly no label on 1; unreadable 0"
   },
   {
    "n": 3,
