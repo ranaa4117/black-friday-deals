@@ -90,6 +90,8 @@ def price_rule(r, set_cache):
     if r.get("set"):
         info = set_cache.get(r.get("pid") or r.get("id")) or {}
         n = r.get("items") or info.get("items")
+        if not n:
+            n, _how = mk.set_items(r.get("title", ""))          # "Duo" / "Trio" / "5-Piece" in the official name
         if n:
             r.update(items=n, add=n * mk.ADD["per_item"], addWhy=f"{n} منتجات × 20", contents=r.get("contents") or info.get("contents") or [])
         else:
@@ -151,8 +153,10 @@ def campaign(snap, now):
         elif s["type"] in ("BannerList", "Banner"):
             bs = [{"text": clean(b.get("text")), "image": (b.get("media") or {}).get("src", ""), "alt": clean((b.get("media") or {}).get("alt", "")),
                    "url": b.get("url") or "", "bg": b.get("bg") or "", "color": b.get("color") or ""} for b in s.get("banners") or []]
-            OFFER = r"% off|\boff\b|free|sale|deal|save|savings|gift with|points|code|\$\d|half off|starts|today only|black friday|cyber"
+            OFFER = r"% off|\boff\b|free gift|free\*? sample|deal|save|savings|gift with|points|code|half off|starts|today only|black friday|cyber"
             planner = bool(re.search(r"come back|upcoming|more deals", t, re.I))
+            if re.search(r"payment|delivery|tools & resources|gifts by price|gift cards?|by category|ways to shop", t, re.I):
+                continue                                 # Sephora services and shopping guides, not promotions
             if not planner:
                 bs = [b for b in bs if re.search(OFFER, b["text"] + " " + b["alt"], re.I)]
             if not bs:
