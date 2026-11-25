@@ -60,7 +60,7 @@
     window.__srOut = JSON.stringify(out); return { bytes: window.__srOut.length, sections: out.sections.length };
   }
   /* sale listing: scroll so every tile renders, press "Show More Products" until the list is complete */
-  async function sale(label, maxMs = 240000){
+  async function sale(label, maxMs = 420000){
     const M = new Map(), t0 = Date.now();
     const total = () => { const m = (document.querySelector("main") || document.body).innerText.match(/of ([\d,]+) Results/); return m ? Number(m[1].replace(/,/g, "")) : null; };
     const grab = () => { for (const a of document.querySelectorAll('main a[href*="/product/"]')){
@@ -68,15 +68,19 @@
       const im = a.querySelector("img"), t = a.innerText.split("\n").map(s => s.trim()).filter(Boolean);
       if (t.length < 2) continue;
       M.set(id, { pid: id, url: abs(h), t, img: im ? (im.currentSrc || im.src || "") : "" }); } };
-    let stall = 0, last = -1;
-    while (Date.now() - t0 < maxMs){
-      grab(); scrollBy(0, innerHeight * 0.9); await sleep(350);
-      if (M.size === last) stall++; else { stall = 0; last = M.size; }
-      if (stall > 4){
-        const btn = [...document.querySelectorAll("button")].find(b => /Show More Products/i.test(b.textContent));
-        if (!btn) break;
-        btn.click(); await sleep(2500); stall = 0;
-      }
+    // 1) load the whole list: press "Show More Products" until it disappears
+    for (let i = 0; i < 60 && Date.now() - t0 < maxMs / 2; i++){
+      scrollTo(0, document.body.scrollHeight); await sleep(900);
+      const btn = [...document.querySelectorAll("button")].find(b => /Show More Products/i.test(b.textContent));
+      if (!btn) break;
+      btn.click(); await sleep(2200);
+    }
+    // 2) tiles only fill in near the screen: walk down the page slowly, up to 3 times, until every tile was seen
+    for (let pass = 0; pass < 3 && Date.now() - t0 < maxMs; pass++){
+      scrollTo(0, 0); await sleep(800);
+      for (let y = 0; y < document.body.scrollHeight && Date.now() - t0 < maxMs; y += innerHeight * 0.75){ grab(); scrollTo(0, y); await sleep(550 + pass * 250); }
+      grab();
+      if (total() && M.size >= total()) break;
     }
     grab();
     const out = { kind: "sale", label, url: location.href, readAt: new Date().toISOString(), total: total(), complete: total() == null || M.size >= total(), items: [...M.values()] };

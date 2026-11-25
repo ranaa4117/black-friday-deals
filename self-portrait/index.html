@@ -2259,7 +2259,7 @@ function mkItem(id){
     ${p.set && (p.contents || []).length ? `<div class="mk-contents"><h4 lang="ar">محتوى المجموعة (${arN(p.items)})</h4><ul dir="ltr">${p.contents.map(c => `<li>${esc(c)}</li>`).join("")}</ul></div>` : p.set && p.items ? `<p lang="ar">تحتوي المجموعة على ${arN(p.items)} منتجات.</p>` : ""}
     <a class="wa" href="https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">${waSVG}<span lang="ar" dir="rtl">للطلب والاستفسار عبر واتساب</span></a>
     <p><a class="btn quiet" href="${esc(p.url)}" target="_blank" rel="noopener" lang="ar">${p.src === "sephora" ? "صفحة المنتج في سيفورا أمريكا" : "صفحة المنتج في المتجر الرسمي"}</a></p>
-    <p class="small muted" lang="ar">الأسعار بالريال السعودي وتشمل الشحن والخدمة.</p></div></div>`;
+    </div></div>`;
 }
 function wireMakeup(route){
   const r = route.startsWith("makeup-sale") ? "makeup-sale" : route.startsWith("makeup-sephora") ? (route === "makeup-sephora" ? ((mkSephoraTabs()[0] || [])[0] || "makeup-sephora-sale") : route) : route.startsWith("makeup-gifts") ? "makeup-gifts" : route;

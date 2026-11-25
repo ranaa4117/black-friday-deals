@@ -131,13 +131,18 @@ def campaign(snap, now):
     m = re.search(r"(?:through|thru|until|ends?)\s+(\d{1,2})/(\d{1,2})", (hero.get("text") or "") + " " + d.get("title", ""), re.I)
     if m:
         end = datetime(read_pt.year, int(m.group(1)), int(m.group(2)), 23, 59, tzinfo=PT)
-    secs, offers = [], []
+    secs, offers, starts = [], [], None
     for s in d.get("sections") or []:
         t = clean(s.get("title"))
         if s["type"] == "ProductList":
             today = bool(re.search(r"today only", t, re.I))
+            prods = [sephora_item(x) for x in s.get("products") or []]
+            if not today:
+                prods = [x for x in prods if x.get("compare")]     # only pieces Sephora shows at a lower price
+                if not prods:
+                    continue
             secs.append({"kind": "deal" if today else "products", "title": t, "todayOnly": today, "validDate": read_pt.strftime("%Y-%m-%d") if today else None,
-                         "more": s.get("more") or "", "moreLabel": s.get("moreLabel") or "", "products": [sephora_item(x) for x in s.get("products") or []]})
+                         "more": s.get("more") or "", "moreLabel": s.get("moreLabel") or "", "products": prods})
         elif s["type"] == "PromotionList":
             ids = []
             for o in s.get("offers") or []:
@@ -146,18 +151,33 @@ def campaign(snap, now):
         elif s["type"] in ("BannerList", "Banner"):
             bs = [{"text": clean(b.get("text")), "image": (b.get("media") or {}).get("src", ""), "alt": clean((b.get("media") or {}).get("alt", "")),
                    "url": b.get("url") or "", "bg": b.get("bg") or "", "color": b.get("color") or ""} for b in s.get("banners") or []]
-            secs.append({"kind": "banners", "title": t, "planner": bool(re.search(r"come back|upcoming|more deals", t, re.I)), "banners": bs})
+            OFFER = r"% off|\boff\b|free|sale|deal|save|savings|gift with|points|code|\$\d|half off|starts|today only|black friday|cyber"
+            planner = bool(re.search(r"come back|upcoming|more deals", t, re.I))
+            if not planner:
+                bs = [b for b in bs if re.search(OFFER, b["text"] + " " + b["alt"], re.I)]
+            if not bs:
+                continue
+            for b in bs:
+                m2 = re.search(r"starts?\s+(\d{1,2})/(\d{1,2})(?:\s+(\d{1,2})(?::(\d{2}))?\s*(am|pm))?", b["text"] + " " + b["alt"], re.I)
+                if m2:
+                    hh = int(m2.group(3) or 0) % 12 + (12 if (m2.group(5) or "").lower() == "pm" else 0)
+                    st = datetime(read_pt.year, int(m2.group(1)), int(m2.group(2)), hh, int(m2.group(4) or 0), tzinfo=PT)
+                    starts = min(starts, st) if starts else st
+            secs.append({"kind": "banners", "title": t, "planner": planner, "banners": bs})
         elif s["type"] == "SoftLinks":
             secs.append({"kind": "links", "title": t, "links": s.get("links") or []})
     navi = d.get("navigation") or {}
     tabs = [{"label": n.get("label"), "url": (n.get("url") or "").split("?")[0], "current": n.get("current")} for n in (navi.get("items") or [])]
     status = "ended" if end and now > end else "active"
-    if re.search(r"\bpreview\b|coming soon|sneak peek", (hero.get("text") or "") + d.get("title", ""), re.I):
+    has_deals = any(x["kind"] in ("deal", "products", "promos") for x in secs)
+    if starts and now < starts and not has_deals:
+        status = "preview"                       # Sephora says it starts later: shown as a preview, never as active
+    if re.search(r"\bpreview\b|coming soon|sneak peek", (hero.get("text") or "") + d.get("title", ""), re.I) and not has_deals:
         status = "preview"
     return {"label": snap["label"], "url": d.get("url"), "title": d.get("title", "").replace(" | Sephora", ""), "readAt": snap["at"],
             "hero": {"text": clean(hero.get("text")), "image": (hero.get("media") or {}).get("src", ""), "alt": clean((hero.get("media") or {}).get("alt", "")), "bg": hero.get("bg", "")} if hero else None,
             "parent": {"label": navi.get("label"), "url": (navi.get("url") or "").split("?")[0]} if navi else None, "tabs": tabs,
-            "endsAt": iso(end.astimezone(timezone.utc)) if end else None, "status": status, "sections": secs}, offers
+            "endsAt": iso(end.astimezone(timezone.utc)) if end else None, "startsAt": iso(starts.astimezone(timezone.utc)) if starts else None, "status": status, "sections": secs}, offers
 
 
 def main():
