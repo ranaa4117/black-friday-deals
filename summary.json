@@ -1,0 +1,390 @@
+{
+ "plain": {
+  "sephora_home": {
+   "status": 200,
+   "bytes": 859438,
+   "linkStore": true,
+   "blocked": true
+  },
+  "sephora_sale": {
+   "status": 403,
+   "bytes": 0,
+   "linkStore": false,
+   "blocked": false
+  },
+  "sephora_offers": {
+   "status": 403,
+   "bytes": 0,
+   "linkStore": false,
+   "blocked": false
+  },
+  "sephora_cyber": {
+   "status": 403,
+   "bytes": 0,
+   "linkStore": false,
+   "blocked": false
+  },
+  "sephora_bf": {
+   "status": 403,
+   "bytes": 0,
+   "linkStore": false,
+   "blocked": false
+  },
+  "sephora_gifts": {
+   "status": 403,
+   "bytes": 0,
+   "linkStore": false,
+   "blocked": false
+  },
+  "mario": {
+   "status": 200,
+   "bytes": 1710632,
+   "linkStore": false,
+   "blocked": true
+  },
+  "westman": {
+   "status": 200,
+   "bytes": 2283883,
+   "linkStore": false,
+   "blocked": true
+  },
+  "saie": {
+   "status": 200,
+   "bytes": 1852203,
+   "linkStore": false,
+   "blocked": true
+  },
+  "tarte": {
+   "status": 200,
+   "bytes": 2680550,
+   "linkStore": false,
+   "blocked": true
+  },
+  "huda": {
+   "status": 404,
+   "bytes": 0,
+   "linkStore": false,
+   "blocked": false
+  },
+  "ct": {
+   "status": 200,
+   "bytes": 1188452,
+   "linkStore": false,
+   "blocked": true
+  },
+  "nars": {
+   "status": 200,
+   "bytes": 417487,
+   "linkStore": false,
+   "blocked": true
+  },
+  "kosas": {
+   "status": 200,
+   "bytes": 411555,
+   "linkStore": false,
+   "blocked": true
+  },
+  "refy": {
+   "status": 200,
+   "bytes": 989477,
+   "linkStore": false,
+   "blocked": true
+  },
+  "mac": {
+   "status": 200,
+   "bytes": 2124001,
+   "linkStore": false,
+   "blocked": true
+  },
+  "toofaced": {
+   "status": 403,
+   "bytes": 0,
+   "linkStore": false,
+   "blocked": false
+  },
+  "fenty": {
+   "status": 200,
+   "bytes": 1486622,
+   "linkStore": false,
+   "blocked": true
+  },
+  "rare": {
+   "status": 200,
+   "bytes": 514955,
+   "linkStore": false,
+   "blocked": true
+  }
+ },
+ "shopify": {
+  "mario": {
+   "status": 200,
+   "products": 5,
+   "sample": [
+    "Enhance & Pop Duo",
+    "MoistureGlow\u2122 Plumping Lip Serum Duo",
+    "The Ethereal Duo"
+   ]
+  },
+  "westman": {
+   "status": 200,
+   "products": 5,
+   "sample": [
+    "The Sun & Sculpt Duo",
+    "The Sheer & Suede Duo",
+    "Petite Lip Suede Matte Lipstick Trio"
+   ]
+  },
+  "saie": {
+   "status": 200,
+   "products": 5,
+   "sample": [
+    "Dew Blush Deluxe 5ML - Lady",
+    "Glowy Super\u2122 Gel Starglow Deluxe",
+    "The Jet-Set Kit"
+   ]
+  },
+  "tarte": {
+   "status": 200,
+   "products": 5,
+   "sample": [
+    "join our click\u2122 maracuja juicy lip trio",
+    "mmm JUICY lip plump & liner duo",
+    "pearly girl\u2122 highlight & brush duo"
+   ]
+  },
+  "huda": {
+   "status": 404,
+   "products": null
+  },
+  "ct": {
+   "status": 404,
+   "products": null
+  },
+  "nars": {
+   "status": 410,
+   "products": null
+  },
+  "kosas": {
+   "status": 200,
+   "products": 5,
+   "sample": [
+    "Mini Blush is Life Trio",
+    "Brighten + Blur Set",
+    "Lip & Cheek Set"
+   ]
+  },
+  "refy": {
+   "status": 200,
+   "products": 5,
+   "sample": [
+    "Solstice Shimmer Duo Set",
+    "Mini Gift",
+    "The Bestsellers"
+   ]
+  },
+  "mac": {
+   "status": 200,
+   "products": 5,
+   "sample": [
+    "M\u00b7A\u00b7CStack Elevated Mascara / Mini M\u00b7A\u00b7C - Black Stack",
+    "Studio Fix 24-Hour Smooth Wear Concealer - NW51",
+    "Chromacake - Cyan"
+   ]
+  },
+  "toofaced": {
+   "status": 403,
+   "products": null
+  },
+  "fenty": {
+   "status": 200,
+   "products": 5,
+   "sample": [
+    "Let's Mesh Travel Bag",
+    "New Fenty Beauty Large Duffel Bag (3.9 in. x 2.4 in. x 2.4 in.) \u2014 Cocoa Nude",
+    "New Fenty Beauty XL Puffer Bag (11.8 in. x 8.7 in.) \u2014 Cocoa Nude"
+   ]
+  },
+  "rare": {
+   "status": 200,
+   "products": 5,
+   "sample": [
+    "Warby Parker x Rare Beauty: Elwell Sunglasses & Blush Bundle \u2013 ENCOURAGE",
+    "Warby Parker x Rare Beauty: Millie Sunglasses & Blush Bundle \u2013 WORTH",
+    "Warby Parker x Rare Beauty: Albie Sunglasses & Blush Bundle \u2013 FAITH"
+   ]
+  }
+ },
+ "browser": {
+  "sephora_home": {
+   "status": 200,
+   "final": "https://www.sephora.com/",
+   "title": "Makeup, Skincare, Fragrance, Hair & Beauty Products | Sephora",
+   "bytes": 1240483,
+   "linkStore": true,
+   "nextData": false,
+   "blocked": true
+  },
+  "sephora_sale": {
+   "status": 403,
+   "final": "https://www.sephora.com/sale",
+   "title": "Access Denied",
+   "bytes": 470,
+   "linkStore": false,
+   "nextData": false,
+   "blocked": true
+  },
+  "sephora_offers": {
+   "status": 403,
+   "final": "https://www.sephora.com/beauty/beauty-offers",
+   "title": "Access Denied",
+   "bytes": 486,
+   "linkStore": false,
+   "nextData": false,
+   "blocked": true
+  },
+  "sephora_cyber": {
+   "status": 403,
+   "final": "https://www.sephora.com/beauty/cyber-week-deals",
+   "title": "Access Denied",
+   "bytes": 489,
+   "linkStore": false,
+   "nextData": false,
+   "blocked": true
+  },
+  "sephora_bf": {
+   "status": 403,
+   "final": "https://www.sephora.com/beauty/black-friday-deals",
+   "title": "Access Denied",
+   "bytes": 491,
+   "linkStore": false,
+   "nextData": false,
+   "blocked": true
+  },
+  "sephora_gifts": {
+   "status": 403,
+   "final": "https://www.sephora.com/shop/gift-sets",
+   "title": "Access Denied",
+   "bytes": 480,
+   "linkStore": false,
+   "nextData": false,
+   "blocked": true
+  },
+  "mario": {
+   "status": 200,
+   "final": "https://www.makeupbymario.com/",
+   "title": "The Best in Makeup & Makeup Products | MAKEUP BY MARIO",
+   "bytes": 1485958,
+   "linkStore": false,
+   "nextData": false,
+   "blocked": true
+  },
+  "westman": {
+   "status": 200,
+   "final": "https://www.westman-atelier.com/",
+   "title": "Official Site: Westman Atelier | Clean Beauty",
+   "bytes": 2509531,
+   "linkStore": false,
+   "nextData": false,
+   "blocked": true
+  },
+  "saie": {
+   "status": 200,
+   "final": "https://saiehello.com/",
+   "title": "Saie | Clean Makeup You'll Love",
+   "bytes": 2080733,
+   "linkStore": false,
+   "nextData": false,
+   "blocked": true
+  },
+  "tarte": {
+   "status": 200,
+   "final": "https://tartecosmetics.com/",
+   "title": "High-Performance Makeup & Beauty Products | Tarte\u2122",
+   "bytes": 3103301,
+   "linkStore": false,
+   "nextData": false,
+   "blocked": true
+  },
+  "huda": {
+   "status": 404,
+   "final": "https://hudabeauty.com/us/",
+   "title": "404 Not Found \u2013 Huda Beauty",
+   "bytes": 746633,
+   "linkStore": false,
+   "nextData": false,
+   "blocked": true
+  },
+  "ct": {
+   "status": 200,
+   "final": "https://www.charlottetilbury.com/us",
+   "title": "Shop 25% Off Everything* Luxury Makeup, Skincare & Fragrance | Charlotte Tilbury",
+   "bytes": 1347893,
+   "linkStore": false,
+   "nextData": true,
+   "blocked": true
+  },
+  "nars": {
+   "status": 200,
+   "final": "https://www.narscosmetics.com/",
+   "title": "NARS Cosmetics | The Official Store | Makeup and Skincare",
+   "bytes": 3058899,
+   "linkStore": false,
+   "nextData": false,
+   "blocked": true
+  },
+  "kosas": {
+   "status": 200,
+   "final": "https://kosas.com/",
+   "title": "Kosas Cosmetics - 100% Makeup. 100% Skincare.",
+   "bytes": 612949,
+   "linkStore": false,
+   "nextData": false,
+   "blocked": true
+  },
+  "refy": {
+   "status": 200,
+   "final": "https://refybeauty.com/",
+   "title": "REFY | Simplifying Beauty | Vegan & Cruelty Free Makeup & Skincare",
+   "bytes": 1280808,
+   "linkStore": false,
+   "nextData": false,
+   "blocked": true
+  },
+  "mac": {
+   "status": 200,
+   "final": "https://www.maccosmetics.com/",
+   "title": "MAC Cosmetics\u00ae| Black Friday: 30% Off Sitewide + Free Gifts*",
+   "bytes": 2332088,
+   "linkStore": false,
+   "nextData": false,
+   "blocked": true
+  },
+  "toofaced": {
+   "status": 200,
+   "final": "https://www.toofaced.com/",
+   "title": "Too Faced: Makeup, Cosmetics & Beauty Products Online | Too Faced Cosmetics",
+   "bytes": 887844,
+   "linkStore": false,
+   "nextData": false,
+   "blocked": false
+  },
+  "fenty": {
+   "status": 200,
+   "final": "https://fentybeauty.com/",
+   "title": "Fenty Beauty by Rihanna | Beauty for All",
+   "bytes": 1884509,
+   "linkStore": false,
+   "nextData": false,
+   "blocked": true
+  },
+  "rare": {
+   "status": 200,
+   "final": "https://www.rarebeauty.com/",
+   "title": "Rare Beauty by Selena Gomez | Vegan & Cruelty Free Makeup",
+   "bytes": 610521,
+   "linkStore": false,
+   "nextData": false,
+   "blocked": true
+  }
+ }
+}
