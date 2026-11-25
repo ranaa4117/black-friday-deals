@@ -2325,13 +2325,16 @@ function drawMakeupAdmin(){
   const unv = all.filter(p => p.ship === "unverified").length;
   const removed = M.removedShipping || [];
   const brands = Object.entries(M.brands || {}).map(([k, b]) => { const n = (MK.makeup || []).filter(p => (p.brandKey || p.brand) === k).length;
-    return `<tr><td dir="ltr">${esc((M.brandNames || {})[k] || k)}</td><td>${arN(n)}</td><td>${b.ok === true ? "✓ " + esc(b.us || "") : b.ok === false ? '<span class="warnline">' + esc(b.error || "فشل") + "</span>" : "عبر سيفورا أمريكا"}</td><td>${esc(b.note || ago(b.lastOk))}</td></tr>`; }).join("");
+    const offers = (b.announcements || []).filter(x => !/[{};=]|var |function/.test(x)).slice(0, 3).join(" · ");
+    return `<tr><td dir="ltr">${esc((M.brandNames || {})[k] || k)}</td><td>${arN(n)}</td><td>${b.ok === true ? "✓ " + esc(b.us || "") : b.ok === false ? '<span class="warnline">' + esc(b.error || "فشل") + "</span>" : "عبر سيفورا أمريكا"}</td><td dir="ltr" class="small">${esc(offers)}${(b.promoCollections || []).length ? "<br>Collections: " + esc(b.promoCollections.join(", ")) : ""}${b.promoProducts ? "<br>" + b.promoProducts + " products with an official promotion" : ""}</td><td>${esc(b.note || ago(b.lastOk))}</td></tr>`; }).join("");
   const li = arr => arr.length ? `<ul>${arr.slice(0, 80).map(g => `<li><a href="${esc(g.url)}" target="_blank" rel="noopener" dir="ltr">${esc((mkBrand(g) || "") + " — " + g.title)}</a> <span class="small muted">${esc(g.addWhy || g.reason || "")}</span></li>`).join("")}</ul>` : '<p class="small">لا يوجد</p>';
   box.innerHTML = `<div class="dash">${dCard("تخفيضات المكياج", arN((MK.makeup || []).length), "١٣ ماركة")}${dCard("مجموعات الهدايا", arN((MK.gifts || []).length), arN(review.length) + " تحتاج مراجعة")}${dCard("عروض سيفورا", arN(C.length), "السايبر والبلاك فرايدي فقط")}${dCard("الشحن الجوي غير مؤكد", arN(unv), arN(removed.length) + " حُذفت")}</div>
+    <h4>تقدّم فحص صفحات منتجات سيفورا</h4><p>${M.checks ? `تم ${arN(M.checks.done)} من ${arN(M.checks.total)} — متبقٍّ ${arN(M.checks.pending)}` : "—"}</p>
+    <h4>مجموعات الهدايا</h4><p>${arN((MK.gifts || []).filter(g => g.add != null).length)} مصنّفة ومسعّرة من ${arN((MK.gifts || []).length)} — ${arN(review.length)} بانتظار التصنيف</p>
     <h4>عروض سيفورا (السايبر والبلاك فرايدي فقط)</h4>${T(["الحملة","الحالة","البداية","النهاية","المنتجات"], camps)}
     <h4>صفحات سيفورا المقروءة</h4><p class="small">تُقرأ من متصفح Claude على جهازك ٤ مرات يومياً. إذا كان الجهاز مغلقاً تبقى آخر بيانات مؤكدة وتُعلَّم «يحتاج إعادة تحقق».</p>${T(["الصفحة","آخر قراءة","الحالة",""], pages, "لم تُقرأ أي صفحة بعد")}
     <h4>قوائم سيفورا</h4>${T(["القائمة","المقروء / الإجمالي","الاكتمال","الترتيب","آخر قراءة"], lists)}
-    <h4>الماركات (مصادر أمريكية فقط)</h4>${T(["الماركة","المنتجات المعروضة","المصدر","آخر قراءة"], brands)}
+    <h4>تدقيق الماركات (مصادر أمريكية فقط)</h4>${T(["الماركة","المنتجات المعروضة","المصدر","عروض الموقع الرسمي","آخر قراءة"], brands)}
     <h4>الشحن الجوي</h4><p class="small">حُذف كل منتج تعلّمه سيفورا كمادة خطرة ممنوعة من الشحن الجوي. باقي المنتجات (${arN(unv)}) «الشحن الجوي غير مؤكد»: المتجر لا ينشر قيوداً عليها، ولم نؤكد أهليتها من صفحة الدفع.</p><h5>حُذفت لأنها لا تُشحن جواً</h5>${li(removed)}
     <h4>مجموعات تحتاج مراجعة يدوية لحجمها (لا تظهر للعميلات)</h4>${li(review)}
     <h4>باليتات لم يُذكر حجمها (احتُسبت +٤٠)</h4>${li(palCheck)}
