@@ -318,14 +318,16 @@ def main():
         gifts.append(price_rule(ranked(dict(r, brandKey=mk.SEPHORA_NAMES.get(r["brand"].lower()), retailer="Sephora", src="sephora")), pinfo))
     gifts.sort(key=lambda p: (p.get("rank") or 10**6, p.get("storeRank") or 10**6))
     # Sephora product pages still to read (shipping flag, set contents, palette size), most visible first
-    shown = [p for c in campaigns for sec in c["sections"] for p in sec.get("products") or []] + \
-            [p for p in mk_sale if p.get("src") == "sephora"] + [g for g in gifts if g.get("src") == "sephora"]
+    deal = [p for c in campaigns for sec in c["sections"] if sec.get("kind") == "deal" for p in sec.get("products") or []]
+    rest = [p for c in campaigns for sec in c["sections"] if sec.get("kind") != "deal" for p in sec.get("products") or []]
+    shown = deal + [p for p in mk_sale if p.get("src") == "sephora"] + [g for g in gifts if g.get("src") == "sephora"] + \
+            sorted(rest, key=lambda p: p.get("rank") or 10**6)          # most visible first
     need = list(dict.fromkeys(p["url"].split("?")[0] for p in shown if p.get("pid") and p["pid"] not in pinfo and p.get("url")))
     hist = {h["label"]: h for h in (old.get("history") or [])}
     for c in campaigns:
         if c["status"] == "ended":
             hist[c["label"]] = {"label": c["label"], "title": c["title"], "url": c["url"], "endedAt": c.get("endsAt") or ts, "lastRead": c["readAt"]}
-    removed_ship = list({x["id"]: x for x in removed_ship}.values())
+    removed_ship = list({x["title"]: x for x in removed_ship}.values())
     out = {"meta": {"updatedAt": ts, "sephoraOk": sephora_ok, "pages": sorted(pages, key=lambda p: p["label"]), "sale": sale_meta,
                     "brands": (brands.get("meta") or {}).get("brands", {}), "brandsAt": (brands.get("meta") or {}).get("updatedAt"),
                     "needProducts": need[:120], "needSets": need[:120], "needLists": need_lists, "pinfo": pinfo, "problems": problems,
