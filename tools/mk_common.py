@@ -33,7 +33,7 @@ CAT_RULES = [   # first match wins; checked against "type + name"
     ("brows", r"\bbrow"), ("mascara", r"mascara"), ("eyeliner", r"eye ?liner|kohl|\bliner\b(?!.*lip)"),
     ("eyeshadow", r"eye ?shadow|shadow (palette|stick)|eye palette|shadow"),
     ("concealer", r"conceal|corrector|color correct"), ("foundation", r"foundation|skin tint|tinted moisturi|\bbb cream|\bcc cream|serum foundation"),
-    ("blush", r"blush|\bcheek"), ("bronzer", r"bronz|contour|sculpt"), ("highlighter", r"highlight|illuminat|luminiz|glow (drops|stick)|strobe"),
+    ("face", r"primer|setting spray|setting mist"), ("blush", r"blush|\bcheek"), ("bronzer", r"bronz|contour|sculpt"), ("highlighter", r"highlight|illuminat|luminiz|glow (drops|stick)|strobe"),
     ("powder", r"powder"), ("lipgloss", r"gloss|lip oil|plump"), ("lipbalm", r"lip (balm|mask|treatment|butter)|balm"),
     ("lipstick", r"lipstick|lip stick|lip colou?r|matte lip|liquid lip|lip (cream|crayon|stain)"), ("lips", r"\blip"),
     ("eyes", r"\blash|eye primer|\beye"), ("face", r"primer|setting spray|setting mist|fixing|face|cushion|complexion|flawless filter|palette"),
@@ -49,20 +49,30 @@ def text_of(body):
 
 
 def category(name, ptype=""):
-    s = f"{ptype} {name}".lower()
-    for key, rx in CAT_RULES:
-        if re.search(rx, s):
-            return key
+    """The product's own name decides first; the store's product type only when the name says nothing."""
+    for s in ((name or "").lower(), (ptype or "").lower()):
+        for key, rx in CAT_RULES:
+            if re.search(rx, s):
+                return key
     return "other"
 
 
+NOT_BEAUTY = r"phone case|casetify|\bcharm\b|hair clip|claw clip|\bclip\b|\btote\b|hoodie|sweatshirt|t-shirt|\btee\b|\bhat\b|gift card|e-gift|keychain|sticker|\bsocks?\b|blanket|candle holder"
+
+
+def not_beauty(name):
+    return bool(re.search(NOT_BEAUTY, (name or "").lower()))
+
+
 def is_set(name, ptype="", tags=(), value_price=None):
-    s = f"{ptype} {name} {' '.join(tags or [])}".lower()
+    s = f"{ptype} {name}".lower()        # store tags are not used: they mark gift-guide pages, not what the product is
     if value_price:      # Sephora shows "(… value)" only for sets
         return True
     if re.search(r"\b(set|kit|bundle|vault)\b", (ptype or "").lower()):
         return True
-    return bool(re.search(SET_WORDS, s)) and not re.search(r"setting (spray|powder|mist)|\bsetting\b", s.replace("gift set", ""))
+    if re.search(r"duo[- ]fib(re|er)|\bset(ting)? (spray|powder|mist)\b|\bsetting\b", s.replace("gift set", "")):
+        return False
+    return bool(re.search(SET_WORDS, s))
 
 
 WORD_N = {"duo": 2, "trio": 3, "quad": 4, "quartet": 4}
@@ -92,6 +102,11 @@ def set_items(name, desc=""):
                 q = re.match(r"^(\d+)\s*x\s", l, re.I)
                 qty += int(q.group(1)) if q else 1
             return qty, "description list"
+    m = re.search(r"(?i)(?:set|kit|bundle|collection|duo|trio)?\s*(?:includes?|contains?|what'?s included|featuring)\s*:?\s*([^\n.]{8,400})", d)
+    if m and re.search(r",| and | \+ ", m.group(1)):
+        parts = [x for x in re.split(r",\s*(?:and\s+)?|\s+and\s+|\s\+\s", m.group(1)) if len(x.strip()) > 2]
+        if 2 <= len(parts) <= 15:
+            return len(parts), "description sentence"
     n = re.search(r"(?i)\b(\d{1,2})[- ]?(piece|pc|pcs)\b", name + " " + d[:300])
     if n:
         return int(n.group(1)), "name"

@@ -77,6 +77,8 @@ def record(brand, base, p):
                          "price": price, "compare": comp if comp and comp > price else None, "a": bool(v.get("available")), "image": img})
     if not variants:
         return None
+    if mk.not_beauty(title):
+        return None
     is_set = mk.is_set(title, ptype, tags)
     cat = mk.category(title, ptype)
     if not is_set:
@@ -99,10 +101,45 @@ def record(brand, base, p):
         n, how = mk.set_items(title, desc)
         rec.update(items=n, itemsHow=how, add=n * mk.ADD["per_item"] if n else None, addWhy=f"{n} × 20" if n else how)
         rec["contents"] = contents_list(desc)
+        if not n:
+            rec["descText"] = mk.text_of(desc)[:1200]     # kept so the admin can see why the count is missing
     else:
         cls, why = mk.add_class(title, cat, size)
         rec.update(add=mk.ADD[cls], addClass=cls, addWhy=why, sizeMl=round(size) if size else None)
     return rec
+
+
+SPLIT = re.compile(r"\s+[—–]\s+")
+
+
+def group_shades(brand, recs):
+    """Some stores sell each shade as its own product ("Name — Shade"). Shown as one product with shades."""
+    groups = {}
+    for r in recs:
+        parts = SPLIT.split(r["title"], maxsplit=1)
+        key = parts[0].strip().lower() if len(parts) == 2 else r["id"]
+        groups.setdefault(key, []).append((r, parts[1].strip() if len(parts) == 2 else ""))
+    out = {}
+    for key, items in groups.items():
+        if len(items) == 1 and not items[0][1]:
+            out[items[0][0]["id"]] = items[0][0]; continue
+        items.sort(key=lambda x: x[1])
+        base = dict(items[0][0]); base["title"] = SPLIT.split(base["title"], maxsplit=1)[0].strip()
+        base["id"] = f"mk-{brand}-g-" + re.sub(r"[^a-z0-9]+", "-", key).strip("-")[:80]
+        vs = []
+        for r, shade in items:
+            for v in r["variants"]:
+                vs.append(dict(v, name=shade + (" / " + v["name"] if v.get("name") else ""), url=r["url"]))
+        base["variants"] = vs
+        disc = [v for v in vs if v.get("compare") and v.get("a")] or [v for v in vs if v.get("compare")] or vs
+        best = min(disc, key=lambda v: v["price"])
+        base.update(price=best["price"], compare=best.get("compare"), image=best.get("image") or base.get("image"), url=best.get("url") or base["url"],
+                    available=any(v.get("a") for v in vs), firstSeen=min(r.get("firstSeen", "") for r, _ in items))
+        base.pop("discPct", None)
+        if base["compare"]:
+            base["discPct"] = round(100 * (1 - base["price"] / base["compare"]))
+        out[base["id"]] = base
+    return out
 
 
 def contents_list(desc):
@@ -160,9 +197,11 @@ def main():
                 r["discEndedAt"] = ts                      # discount ended: stays at the official regular price
             out[r["id"]] = r; seen.add(r["id"])
             n_disc += bool(r["compare"]); n_set += r["set"]
+        out.update(group_shades(brand, [out.pop(i) for i in [k for k in list(out) if k in seen and not out[k]["set"]]]))
+        live_urls = {v.get("url") or r["url"] for r in out.values() if r["brand"] == brand for v in r.get("variants", [])} | {r["url"] for r in out.values() if r["brand"] == brand}
         for p in old.get("products", []):                  # missing from the catalog: removed only after 3 misses over 24 h
-            if p["brand"] != brand or p["id"] in seen:
-                continue
+            if p["brand"] != brand or p["id"] in seen or p["id"] in out or p.get("url") in live_urls:
+                continue                                   # still there (possibly now shown together with its other shades)
             g = p.get("gone") or {"n": 0, "first": ts}
             g = {"n": g["n"] + 1, "first": g.get("first", ts)}
             span = (now - datetime.strptime(g["first"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)).total_seconds() / 3600
