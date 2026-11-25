@@ -604,7 +604,7 @@ const PASS_HASH = "d6f7961e955b42afb04e910ef174ce7b82af4efe180a05605bc68aee28cad
 const REPO = "ranaa4117/black-friday-deals";
 const WORKFLOW = "self-portrait-update.yml";
 const LS = "sp-edit-v1";
-const APP_VERSION = "46";
+const APP_VERSION = "47";
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
@@ -2199,13 +2199,13 @@ function mkCampaign(c){
   const soon = isBF && !started;
   const hl = c.headline && c.headline.pct ? `<span class="mkb-pct" dir="ltr">${c.headline.upTo ? "UP TO " : ""}${c.headline.pct}% OFF</span><span class="mkb-ar" lang="ar">خصم ${c.headline.upTo ? "حتى " : ""}${arN(c.headline.pct)}٪</span>` : "";
   const banner = isBF
-    ? (hl ? `<div class="mk-bfb">${hl}${soon ? `<span class="mkb-soon" dir="ltr">COMING SOON — <span lang="ar">قادم قريبًا</span></span>` : ""}</div>` : "")
-    : (c.hero && c.hero.image ? `<div class="mk-hero"><img src="${esc(c.hero.image)}" alt="${esc(c.hero.alt)}"></div>` : hl ? `<div class="mk-bfb cy">${hl}</div>` : "");
+    ? (c.headline && c.headline.pct ? `<div class="mk-bfb"><span class="mkb-pct" dir="ltr">${c.headline.upTo ? "UP TO " : ""}${c.headline.pct}% OFF</span></div>` : "")
+    : (c.hero && c.hero.image ? `<div class="mk-hero"><img src="${esc(c.hero.image)}" alt="Cyber Sale"></div>` : hl ? `<div class="mk-bfb cy">${hl}</div>` : "");
   const when = isBF
-    ? (c.startsAt ? `<p class="mk-dates" lang="ar"><span class="chip ${started ? "ok" : "warn"}">${started ? (ended ? "انتهى" : "العرض متاح الآن") : "قادم قريبًا"}</span>
+    ? (c.startsAt ? `<p class="mk-dates" lang="ar"><span class="chip ${started ? "ok" : "warn"}">${started ? (ended ? "انتهى" : "العرض متاح الآن") : 'COMING SOON — <span lang="ar">قادم قريبًا</span>'}</span>
         <span>${started ? "بدأ" : "يبدأ"} <b>${esc(fmtKSA(c.startsAt))}</b> <small dir="ltr">(${esc(fmtKSAen(c.startsAt))})</small></span>
         ${!started ? `<span class="mk-count" data-until="${esc(c.startsAt)}"></span>` : ""}${c.endsAt ? `<span>ينتهي <b>${esc(fmtKSA(c.endsAt))}</b></span>` : ""}</p>`
-      : `<p class="mk-dates" lang="ar"><span class="chip warn">قادم قريبًا</span><b>Start date and time not announced yet — لم يُعلن عن موعد البداية بعد</b></p>`)
+      : `<p class="mk-dates" lang="ar"><span class="chip warn">COMING SOON — قادم قريبًا</span><b>Start date and time not announced yet — لم يُعلن عن موعد البداية بعد</b></p>`)
     : `<p class="mk-dates" lang="ar"><span class="chip ok">العرض متاح الآن</span>${c.endsAt ? `<span>حتى <b>${esc(fmtKSA(c.endsAt))}</b></span>` : ""}</p>`;
   const body = soon ? "" : (c.sections || []).map(s => {
     if (!mkSecHasContent(s) || s.kind === "banners") return "";
