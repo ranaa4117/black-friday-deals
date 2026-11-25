@@ -65,6 +65,18 @@ def best_selling(base, pages=5):
     return {h: i + 1 for i, h in enumerate(order)}
 
 
+def announcements(base):
+    """What the US store's own home page announces (for the admin audit): lines mentioning % off, sale, code, free."""
+    try:
+        req = urllib.request.Request(base + "/", headers={"User-Agent": UA})
+        with urllib.request.urlopen(req, timeout=45) as r:
+            t = mk.text_of(r.read().decode("utf-8", "replace"))
+    except Exception as e:
+        return [f"home page not readable ({type(e).__name__})"]
+    lines = [ln for ln in t.split("\n") if 6 < len(ln) < 160 and re.search(r"(?i)\d+\s*% off|\bsale\b|\bcode\b|free gift|gift with|bogo|buy \d|black friday|cyber", ln)]
+    return list(dict.fromkeys(lines))[:8]
+
+
 def promo_collections(base):
     """Official promotion collections linked from the store's own pages, whose own title states one exact
     discount ("CYBERFEST 30% Off"). Returns {handle: (pct, title)}. 'Up to' titles are not used."""
@@ -249,6 +261,8 @@ def main():
         promo_of, promos = {}, {}                           # product handle → (pct, official collection title)
         try:
             promos = promo_collections(base)
+            ann = announcements(base)
+            print(brand, "home page offers:", ann)
             print(brand, "promotion collections:", {h: t for h, (pc, t) in promos.items()})
             for handle, (pct, title) in promos.items():
                 for pr in get(f"{base}/collections/{handle}/products.json?limit=250").get("products") or []:
@@ -293,7 +307,7 @@ def main():
                 print("removed (gone 3× / 24h):", p["id"]); continue
             out[p["id"]] = dict(p, gone=g)
         status[brand] = {"ok": True, "at": ts, "lastOk": ts, "catalog": len(cat), "discounted": n_disc, "sets": n_set, "us": us_note, "ranked": len(ranks),
-                         "promoCollections": [t for _, t in promos.values()], "promoProducts": sum(1 for r in out.values() if r["brand"] == brand and r.get("promo"))}
+                         "promoCollections": [t for _, t in promos.values()], "announcements": ann if 'ann' in dir() else [], "promoProducts": sum(1 for r in out.values() if r["brand"] == brand and r.get("promo"))}
         print(brand, "catalog", len(cat), "discounted", n_disc, "sets", n_set)
         time.sleep(2)
     for b, name in NOT_READABLE.items():
