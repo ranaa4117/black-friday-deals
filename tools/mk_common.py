@@ -50,7 +50,8 @@ FRAGRANCE = r"parfum|perfume|eau de|cologne|fragrance|body mist|hair (& |and )?b
 
 
 def is_fragrance(*texts):
-    return bool(re.search(FRAGRANCE, " ".join(t or "" for t in texts).lower()))
+    t = re.sub(r"fragrance[- ]free|unscented|no (added )?fragrance", " ", " ".join(t or "" for t in texts).lower())
+    return bool(re.search(FRAGRANCE, t))
 
 
 SET_WORDS = r"\b(gift set|value set|set|kit|duo|trio|quad|bundle|vault|collection set|minis? set|\d+[- ]piece)\b"
