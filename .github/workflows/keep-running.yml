@@ -26,13 +26,32 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
         run: |
+          # GitHub's API sometimes answers HTTP 500 for a moment; retry a few times so a 15-minute slot isn't lost.
           for i in $(seq 1 23); do
-            busy=$(gh run list -R "$REPO" -w self-portrait-update.yml --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress")] | length')
-            if [ "$busy" = "0" ]; then gh workflow run self-portrait-update.yml -R "$REPO" --ref main && echo "started $(date -u +%H:%M)"; else echo "already running $(date -u +%H:%M)"; fi
-            sleep 900
+            t0=$(date +%s)
+            busy=""
+            for a in 1 2 3 4 5; do
+              busy=$(gh run list -R "$REPO" -w self-portrait-update.yml --json status --jq '[.[] | select(.status=="queued" or .status=="in_progress")] | length' 2>/dev/null) && break
+              echo "run list failed (try $a), retrying"; sleep 30
+            done
+            if [ "$busy" = "0" ] || [ -z "$busy" ]; then
+              ok=0
+              for a in 1 2 3 4 5; do
+                if gh workflow run self-portrait-update.yml -R "$REPO" --ref main; then ok=1; echo "started $(date -u +%H:%M)"; break; fi
+                echo "start failed (try $a), retrying"; sleep 30
+              done
+              [ "$ok" = "1" ] || echo "could not start $(date -u +%H:%M)"
+            else echo "already running $(date -u +%H:%M)"; fi
+            spent=$(( $(date +%s) - t0 )); left=$(( 900 - spent )); [ "$left" -gt 60 ] || left=60
+            sleep "$left"
           done
       - name: Hand over to a fresh copy
         if: always()
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh workflow run keep-running.yml -R "${{ github.repository }}" --ref main
+        run: |
+          for a in 1 2 3 4 5; do
+            gh workflow run keep-running.yml -R "${{ github.repository }}" --ref main && exit 0
+            echo "hand-over failed (try $a), retrying"; sleep 30
+          done
+          exit 1
