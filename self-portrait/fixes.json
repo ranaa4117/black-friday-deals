@@ -1,6 +1,34 @@
 {
  "fixes": [
   {
+   "key": "stale:shoes.json",
+   "at": "2026-11-25T04:57:21Z",
+   "updated": "2026-11-25T04:57:21Z",
+   "status": "open",
+   "problem": "أسعار Macy's (الجزم): لم تتحدّث منذ 4 ساعة",
+   "fix": "تبقى آخر الأسعار المؤكدة. الفحص الدوري يحدّثها كلما سُمح له بفتح صفحات Macy's.",
+   "n": 2,
+   "src": "auto",
+   "cause": "لم يُحدَّد السبب بعد.",
+   "brand": "Macy's",
+   "priority": "medium",
+   "investigation": "الفحص الآلي راجع وقت آخر تحديث للملف على GitHub."
+  },
+  {
+   "key": "stale:winter.json",
+   "at": "2026-11-25T04:57:21Z",
+   "updated": "2026-11-25T04:57:21Z",
+   "status": "open",
+   "problem": "أسعار Macy's (التخفيضات الشتوية): لم تتحدّث منذ 4 ساعة",
+   "fix": "تبقى آخر الأسعار المؤكدة. الفحص الدوري يحدّثها كلما سُمح له بفتح صفحات Macy's.",
+   "n": 3,
+   "src": "auto",
+   "cause": "لم يُحدَّد السبب بعد.",
+   "brand": "Macy's",
+   "priority": "medium",
+   "investigation": "الفحص الآلي راجع وقت آخر تحديث للملف على GitHub."
+  },
+  {
    "key": "fix:sephora-blocked",
    "at": "2026-11-25T02:10:00Z",
    "updated": "2026-11-25T03:25:00Z",
