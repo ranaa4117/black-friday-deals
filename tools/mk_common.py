@@ -206,6 +206,15 @@ def gift_class(name, contents=(), desc=""):
         if total <= 220:
             return "small", f"compact set: about {round(total)} ml/g in total"
         return "large", f"large set: about {round(total)} ml/g in total"
+    if len(items) >= 2:                                  # sizes not stated: use what the contents list says about each item
+        mini = [c for c in items if re.search(r"(?i)\bmini\b|travel|deluxe|sample|trial", c)]
+        full = [c for c in items if re.search(r"(?i)full[- ]size|full size|standard size", c)]
+        if len(mini) == len(items):
+            return "xsmall", f"very small: all {len(items)} items are minis (official contents)"
+        if full and len(items) <= 4:
+            return "small", f"compact set: {len(items)} items incl. full-size (official contents)"
+        if full and len(items) >= 5:
+            return "large", f"large set: {len(items)} items incl. full-size (official contents)"
     if re.search(r"\bminis?\b|travel", s) and re.search(r"\b(duo|trio|set|kit)\b", s):
         return "xsmall", "mini set (official name)"
     return None, "size can't be determined from the official contents — manual review"
