@@ -197,7 +197,12 @@ def gift_class(name, contents=(), desc=""):
     s = (name or "").lower()
     if re.search(r"advent calendar|vault|trunk|train case|vanity case|carry-?all|beauty box", s):
         return "large", "large packaging stated in the official name"
-    items = [c for c in (contents or []) if c]
+    items = []
+    for c in (contents or []):                           # "3 x 0.06 oz Lip Gloss" counts as three items of that size
+        if not c:
+            continue
+        m = re.match(r"^\s*(\d{1,2})\s*x\s+(.*)", c, re.I)
+        items += [m.group(2)] * int(m.group(1)) if m else [c]
     known = [x for x in (size_of(c) for c in items) if x]
     if items and len(known) >= max(2, round(len(items) * 0.6)):
         total = sum(known)
