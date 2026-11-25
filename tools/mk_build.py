@@ -271,7 +271,11 @@ def main():
         for sec in c["sections"]:
             if "products" not in sec:
                 continue
-            if sec.get("more"):
+            if sec.get("more") and re.search(r"keyword=sale\b", sec["more"]) and sale_items:
+                # Sephora links this section to its whole Sale: every discounted product from the Sale lists
+                sec["products"] = [x for x in sale_items.values() if x.get("compare")]
+                sec["allRead"] = True
+            elif sec.get("more"):
                 slug = "more-" + re.sub(r"[^a-z0-9]+", "-", sec["more"].split("sephora.com/")[-1].split("?")[0].lower()).strip("-")[:80]
                 sep = "&" if "?" in sec["more"] else "?"
                 need_lists.append({"label": slug, "url": sec["more"] + ("" if "sortBy=" in sec["more"] else sep + "sortBy=BEST_SELLING")})
@@ -324,7 +328,7 @@ def main():
     removed_ship = list({x["id"]: x for x in removed_ship}.values())
     out = {"meta": {"updatedAt": ts, "sephoraOk": sephora_ok, "pages": sorted(pages, key=lambda p: p["label"]), "sale": sale_meta,
                     "brands": (brands.get("meta") or {}).get("brands", {}), "brandsAt": (brands.get("meta") or {}).get("updatedAt"),
-                    "needProducts": need[:80], "needSets": need[:80], "needLists": need_lists, "pinfo": pinfo, "problems": problems,
+                    "needProducts": need[:120], "needSets": need[:120], "needLists": need_lists, "pinfo": pinfo, "problems": problems,
                     "removedShipping": removed_ship, "add": mk.ADD, "giftAdd": mk.GIFT_ADD, "cats": mk.CATS, "brandNames": mk.BRANDS, "top": TOP},
            "campaigns": campaigns, "offers": [], "sale": [], "makeup": mk_sale, "gifts": gifts,
            "history": sorted(hist.values(), key=lambda h: h.get("endedAt") or "", reverse=True)[:60]}
