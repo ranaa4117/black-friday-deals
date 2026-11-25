@@ -262,7 +262,8 @@ def main():
         gifts.append(price_rule(dict(r, brandKey=mk.SEPHORA_NAMES.get(r["brand"].lower()), retailer="Sephora", src="sephora"), set_cache))
     for c in campaigns:                      # products shown inside Sephora campaign pages and offers: same price rules
         for sec in c["sections"]:
-            sec["products"] = [price_rule(dict(p, top=mk.top_of(p["title"])), set_cache) for p in sec.get("products") or []]
+            if "products" in sec:
+                sec["products"] = [price_rule(dict(p, top=mk.top_of(p["title"])), set_cache) for p in sec["products"]]
     for o in offers.values():
         o["products"] = [price_rule(dict(p, top=mk.top_of(p["title"])), set_cache) for p in o.get("products") or []]
     camp_sets = [p["url"] for c in campaigns for sec in c["sections"] for p in sec.get("products") or [] if p.get("set") and p.get("add") is None and p.get("pid") not in set_cache]
@@ -278,6 +279,14 @@ def main():
                     "add": mk.ADD, "cats": mk.CATS, "brandNames": mk.BRANDS, "top": TOP},
            "campaigns": campaigns, "offers": list(offers.values()), "sale": sale, "makeup": mk_sale, "gifts": gifts,
            "history": sorted(hist.values(), key=lambda h: h.get("endedAt") or "", reverse=True)[:60]}
+    if not sephora_ok and old.get("meta"):
+        # the snapshot database couldn't be read: keep every Sephora part exactly as last confirmed (never wipe it)
+        out["campaigns"], out["offers"], out["sale"] = old.get("campaigns", []), old.get("offers", []), old.get("sale", [])
+        out["makeup"] += [p for p in old.get("makeup", []) if p.get("src") == "sephora"]
+        out["gifts"] += [p for p in old.get("gifts", []) if p.get("src") == "sephora"]
+        for k in ("pages", "sale", "needSets"):
+            out["meta"][k] = (old.get("meta") or {}).get(k, out["meta"][k])
+        out["meta"]["sephoraStaleSince"] = (old.get("meta") or {}).get("sephoraStaleSince") or ts
     json.dump(out, open(OUT, "w"), ensure_ascii=False, separators=(",", ":"))
     print(f"makeup.json: campaigns {len(campaigns)}, offers {len(offers)}, sephora sale {len(sale)}, makeup sale {len(mk_sale)}, gifts {len(gifts)} (need contents: {len(need_sets)})")
 

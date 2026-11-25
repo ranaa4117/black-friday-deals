@@ -597,7 +597,7 @@ const PASS_HASH = "d6f7961e955b42afb04e910ef174ce7b82af4efe180a05605bc68aee28cad
 const REPO = "ranaa4117/black-friday-deals";
 const WORKFLOW = "self-portrait-update.yml";
 const LS = "sp-edit-v1";
-const APP_VERSION = "42";
+const APP_VERSION = "43";
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
@@ -2163,12 +2163,13 @@ function mkSephoraTabs(){
   by(/cyber/).forEach(c => t.push(["makeup-sephora-c-" + c.label, "عروض السايبر", "Cyber Week"]));
   by(/black-friday/).forEach(c => t.push(["makeup-sephora-c-" + c.label, "عروض البلاك فرايدي", "Black Friday"]));
   if ((MK.offers || []).some(o => o.page === "beauty-offers")) t.push(["makeup-sephora-offers", "عروض سيفورا", "Beauty Offers"]);
-  C.filter(c => !/cyber|black-friday|beauty-offers/.test(c.label)).forEach(c => t.push(["makeup-sephora-c-" + c.label, c.title.split("|")[0].trim(), "Other"]));
+  C.filter(c => !/cyber|black-friday|beauty-offers/.test(c.label)).forEach(c => t.push(["makeup-sephora-c-" + c.label, "عروض أخرى: " + c.title.split("|")[0].replace(/\s*20\d\d\s*$/, "").trim(), "Other"]));
   return t;
 }
 function mkSecHasContent(s){
-  if (s.kind === "deal") return s.validDate === ptToday() && s.products.length;
-  return (s.products || s.offers || s.banners || s.links || []).length > 0;
+  if (s.kind === "deal") return s.validDate === ptToday() && (s.products || []).length > 0;
+  const list = { products: s.products, promos: s.offers, banners: s.banners, links: s.links }[s.kind] || [];
+  return list.length > 0;
 }
 const MK_MEMBERS = { Insider:"Beauty Insider", VIB:"VIB", Rouge:"Rouge" };
 function offerCard(o){
@@ -2262,6 +2263,7 @@ function mkItem(id){
     </div></div>`;
 }
 function wireMakeup(route){
+  if (!MK) return;
   const r = route.startsWith("makeup-sale") ? "makeup-sale" : route.startsWith("makeup-sephora") ? (route === "makeup-sephora" ? ((mkSephoraTabs()[0] || [])[0] || "makeup-sephora-sale") : route) : route.startsWith("makeup-gifts") ? "makeup-gifts" : route;
   const u = mkui(r), re = () => { u.limit = 48; render(); };
   const on = (id, ev, f) => { const el = $(id); if (el) el[ev] = f; };
