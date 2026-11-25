@@ -572,7 +572,7 @@ ul.breakdown li.tot{font-size:16px}
     <a href="#shoes" lang="ar">جزم</a>
     <a href="#winter" lang="ar" class="winterlink">التخفيضات الشتوية</a>
     <a href="#vs" class="brandlink" dir="ltr">Victoria's Secret</a>
-    <a href="#makeup" lang="ar">المكياج</a>
+    <a href="#makeup" lang="ar" id="navMakeup" class="hidden">المكياج</a>
     <a href="#all" lang="ar">جميع المنتجات</a>
     <a href="#favorites" lang="ar">المفضلة<span id="c-fav"></span></a>
     <a href="#popular" lang="ar">الأكثر تفضيلاً</a>
@@ -597,7 +597,7 @@ const PASS_HASH = "d6f7961e955b42afb04e910ef174ce7b82af4efe180a05605bc68aee28cad
 const REPO = "ranaa4117/black-friday-deals";
 const WORKFLOW = "self-portrait-update.yml";
 const LS = "sp-edit-v1";
-const APP_VERSION = "43";
+const APP_VERSION = "44";
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k,v){ try { localStorage.setItem(k,v); } catch {} } };
@@ -2320,11 +2320,12 @@ function render(){
   document.querySelectorAll("nav.tabs a").forEach(a => { if (a.getAttribute("href") === "#" + navRoute) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current"); });
   $("#top").classList.toggle("home", route === "home");
   $("#navAdmin").classList.toggle("hidden", !OWNER);
+  $("#navMakeup").classList.toggle("hidden", !OWNER);   // Makeup is private to the admin until it's ready
   statusBar();
   const list = products(); counts(list);
   const v = $("#view");
   if (!loaded){ v.innerHTML = '<div class="empty"><h3>Loading the collection</h3><p>One moment.</p></div>'; return; }
-  if (isAdminRoute(route) && !OWNER){ $("#gate").classList.remove("hidden"); setTimeout(() => $("#pass").focus(), 50); v.innerHTML = ""; return; }
+  if ((isAdminRoute(route) || isMkRoute(route)) && !OWNER){ $("#gate").classList.remove("hidden"); setTimeout(() => $("#pass").focus(), 50); v.innerHTML = ""; return; }
   $("#gate").classList.add("hidden");
   if (route.startsWith("item-") && $("#slides")) window._galleryAt = Math.round($("#slides").scrollLeft / $("#slides").clientWidth);
   v.innerHTML = isMkRoute(route) ? viewMakeup(route) : route.startsWith("item-") ? viewItem(list, route.slice(5)) : LISTS.includes(route) || parseSec(route) ? viewList(route, list)
