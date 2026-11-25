@@ -86,11 +86,11 @@
   async function product(){
     const ls = document.getElementById("linkStore"); const page = ls ? JSON.parse(ls.textContent).page || {} : {};
     const p = page.product || {}, cs = p.currentSku || {}, info = p.productDetails || {};
-    const out = { kind: "product", url: location.href, pid: info.productId || p.productId, brand: (info.brand || {}).displayName, name: info.displayName,
-      list: cs.listPrice, sale: cs.salePrice || null, value: cs.valuePrice || null, size: cs.size || cs.variationValue || "", skuType: cs.skuType || "",
-      desc: (info.longDescription || "").slice(0, 6000), sets: cs.setIncludes || null, img: (cs.skuImages || {}).imageUrl || "",
-      variants: (p.regularChildSkus || []).map(s => ({ sku: s.skuId, name: s.variationValue || s.variationDesc || "", list: s.listPrice, sale: s.salePrice || null, oos: !!s.isOutOfStock, img: (s.skuImages || {}).imageUrl || "" })),
-      bc: (page.breadcrumbs || p.parentCategory ? JSON.stringify(p.parentCategory || "").slice(0, 400) : "") };
+    const chain = []; for (let c = p.parentCategory; c && chain.length < 6; c = c.parentCategory) chain.unshift(c.displayName);
+    const out = { kind: "product", url: location.href.split("?")[0], pid: info.productId || p.productId, brand: (info.brand || {}).displayName, name: info.displayName,
+      sku: cs.skuId, list: cs.listPrice, sale: cs.salePrice || null, value: cs.valuePrice || null, variation: cs.variationValue || "", size: cs.size || "",
+      appOnly: !!cs.isAppExclusive, onlineOnly: !!cs.isOnlineOnly, bi: cs.biExclusiveLevel || "none", oos: !!cs.isOutOfStock, limited: !!cs.isLimitedEdition,
+      desc: String(info.longDescription || "").slice(0, 8000), img: ((cs.skuImages || {}).imageUrl) || "", cats: chain };
     window.__srOut = JSON.stringify(out); return { bytes: window.__srOut.length };
   }
   /* Sephora's own sale & offers navigation (header menu and the banner across the top of every page) */
