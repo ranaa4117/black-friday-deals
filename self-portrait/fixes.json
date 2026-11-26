@@ -3,9 +3,9 @@
   {
    "key": "stale:shoes.json",
    "at": "2026-11-26T00:54:26Z",
-   "updated": "2026-11-26T15:10:05Z",
+   "updated": "2026-11-26T16:08:05Z",
    "status": "open",
-   "problem": "أسعار Macy's (الجزم): لم تتحدّث منذ 38 ساعة",
+   "problem": "أسعار Macy's (الجزم): لم تتحدّث منذ 39 ساعة",
    "fix": "تبقى آخر الأسعار المؤكدة. الفحص الدوري يحدّثها كلما سُمح له بفتح صفحات Macy's.",
    "n": 2,
    "src": "auto",
@@ -20,9 +20,9 @@
   {
    "key": "stale:shoes.json",
    "at": "2026-11-25T23:53:52Z",
-   "updated": "2026-11-26T15:10:05Z",
+   "updated": "2026-11-26T16:08:05Z",
    "status": "open",
-   "problem": "أسعار Macy's (الجزم): لم تتحدّث منذ 38 ساعة",
+   "problem": "أسعار Macy's (الجزم): لم تتحدّث منذ 39 ساعة",
    "fix": "تبقى آخر الأسعار المؤكدة. يلزم أن تعمل مهمة Macy's المجدولة أو أن يُسمح بفتح موقع macys.com لتحديثها.",
    "n": 2,
    "src": "auto",
@@ -37,9 +37,9 @@
   {
    "key": "stale:shoes.json",
    "at": "2026-11-25T04:57:21Z",
-   "updated": "2026-11-26T15:10:05Z",
+   "updated": "2026-11-26T16:08:05Z",
    "status": "open",
-   "problem": "أسعار Macy's (الجزم): لم تتحدّث منذ 38 ساعة",
+   "problem": "أسعار Macy's (الجزم): لم تتحدّث منذ 39 ساعة",
    "fix": "تبقى آخر الأسعار المؤكدة. يلزم أن تعمل مهمة Macy's المجدولة أو أن يُسمح بفتح موقع macys.com لتحديثها.",
    "n": 2,
    "src": "claude",
@@ -54,9 +54,9 @@
   {
    "key": "stale:winter.json",
    "at": "2026-11-26T00:54:26Z",
-   "updated": "2026-11-26T15:10:04Z",
+   "updated": "2026-11-26T16:08:04Z",
    "status": "open",
-   "problem": "أسعار Macy's (التخفيضات الشتوية): لم تتحدّث منذ 38 ساعة",
+   "problem": "أسعار Macy's (التخفيضات الشتوية): لم تتحدّث منذ 39 ساعة",
    "fix": "تبقى آخر الأسعار المؤكدة. الفحص الدوري يحدّثها كلما سُمح له بفتح صفحات Macy's.",
    "n": 3,
    "src": "auto",
@@ -71,9 +71,9 @@
   {
    "key": "stale:winter.json",
    "at": "2026-11-25T23:53:52Z",
-   "updated": "2026-11-26T15:10:04Z",
+   "updated": "2026-11-26T16:08:04Z",
    "status": "open",
-   "problem": "أسعار Macy's (التخفيضات الشتوية): لم تتحدّث منذ 38 ساعة",
+   "problem": "أسعار Macy's (التخفيضات الشتوية): لم تتحدّث منذ 39 ساعة",
    "fix": "تبقى آخر الأسعار المؤكدة. يلزم أن تعمل مهمة Macy's المجدولة أو أن يُسمح بفتح موقع macys.com لتحديثها.",
    "n": 3,
    "src": "auto",
@@ -88,9 +88,9 @@
   {
    "key": "stale:winter.json",
    "at": "2026-11-25T04:57:21Z",
-   "updated": "2026-11-26T15:10:04Z",
+   "updated": "2026-11-26T16:08:04Z",
    "status": "open",
-   "problem": "أسعار Macy's (التخفيضات الشتوية): لم تتحدّث منذ 38 ساعة",
+   "problem": "أسعار Macy's (التخفيضات الشتوية): لم تتحدّث منذ 39 ساعة",
    "fix": "تبقى آخر الأسعار المؤكدة. يلزم أن تعمل مهمة Macy's المجدولة أو أن يُسمح بفتح موقع macys.com لتحديثها.",
    "n": 3,
    "src": "claude",
@@ -105,7 +105,7 @@
   {
    "key": "efprice:ef-abr3157e2900",
    "at": "2026-11-26T15:10:03Z",
-   "updated": "2026-11-26T15:10:03Z",
+   "updated": "2026-11-26T16:08:03Z",
    "status": "progress",
    "problem": "«Abito Red Carpet in paillettes — Argento» (Elisabetta Franchi): السعر في الموقع لا يطابق صفحة المتجر (€ 790 -35% € 514)",
    "fix": "سيُصحَّح من بيانات المتجر في التحديث القادم ثم يُعاد التحقق.",
@@ -122,7 +122,7 @@
   {
    "key": "efprice:ef-abr1056e2ea5",
    "at": "2026-11-26T15:10:03Z",
-   "updated": "2026-11-26T15:10:03Z",
+   "updated": "2026-11-26T16:08:03Z",
    "status": "progress",
    "problem": "«Abito Red Carpet in jersey di viscosa con collana — Cherry» (Elisabetta Franchi): السعر في الموقع لا يطابق صفحة المتجر (€ 690 -35% € 449)",
    "fix": "سيُصحَّح من بيانات المتجر في التحديث القادم ثم يُعاد التحقق.",
@@ -139,7 +139,7 @@
   {
    "key": "efprice:ef-abr3057e2cg3",
    "at": "2026-11-26T15:10:03Z",
-   "updated": "2026-11-26T15:10:03Z",
+   "updated": "2026-11-26T16:08:03Z",
    "status": "progress",
    "problem": "«Abito Red Carpet in paillettes — Rouge Noir» (Elisabetta Franchi): السعر في الموقع لا يطابق صفحة المتجر (€ 790 -35% € 514)",
    "fix": "سيُصحَّح من بيانات المتجر في التحديث القادم ثم يُعاد التحقق.",
@@ -156,7 +156,7 @@
   {
    "key": "efprice:ef-abr1556e2ea5",
    "at": "2026-11-26T15:10:03Z",
-   "updated": "2026-11-26T15:10:03Z",
+   "updated": "2026-11-26T16:08:03Z",
    "status": "progress",
    "problem": "«Abito in jersey crépe con moschettone gioiello — Cherry» (Elisabetta Franchi): السعر في الموقع لا يطابق صفحة المتجر (€ 690 -35% € 449)",
    "fix": "سيُصحَّح من بيانات المتجر في التحديث القادم ثم يُعاد التحقق.",
@@ -173,7 +173,7 @@
   {
    "key": "efprice:ef-abr0456e2ea8",
    "at": "2026-11-26T15:10:03Z",
-   "updated": "2026-11-26T15:10:03Z",
+   "updated": "2026-11-26T16:08:03Z",
    "status": "progress",
    "problem": "«Abito Red Carpet in jersey di cupro con cut-out — Twilight» (Elisabetta Franchi): السعر في الموقع لا يطابق صفحة المتجر (€ 690 -35% € 449)",
    "fix": "سيُصحَّح من بيانات المتجر في التحديث القادم ثم يُعاد التحقق.",
@@ -190,7 +190,7 @@
   {
    "key": "efprice:ef-ab04760eoa28",
    "at": "2026-11-26T15:10:03Z",
-   "updated": "2026-11-26T15:10:03Z",
+   "updated": "2026-11-26T16:08:03Z",
    "status": "progress",
    "problem": "«Abito Red Carpet in paillettes — Sky blue» (Elisabetta Franchi): السعر في الموقع لا يطابق صفحة المتجر (€ 790 -35% € 514)",
    "fix": "سيُصحَّح من بيانات المتجر في التحديث القادم ثم يُعاد التحقق.",
@@ -207,7 +207,7 @@
   {
    "key": "efprice:ef-abr3057e2ec1",
    "at": "2026-11-26T15:10:03Z",
-   "updated": "2026-11-26T15:10:03Z",
+   "updated": "2026-11-26T16:08:03Z",
    "status": "progress",
    "problem": "«Abito Red Carpet in paillettes — Brown Sugar» (Elisabetta Franchi): السعر في الموقع لا يطابق صفحة المتجر (€ 790 -35% € 514)",
    "fix": "سيُصحَّح من بيانات المتجر في التحديث القادم ثم يُعاد التحقق.",
@@ -224,7 +224,7 @@
   {
    "key": "efprice:ef-abr4057e2ec1",
    "at": "2026-11-26T15:10:03Z",
-   "updated": "2026-11-26T15:10:03Z",
+   "updated": "2026-11-26T16:08:03Z",
    "status": "progress",
    "problem": "«Abito Red Carpet in jersey lurex con collana — Brown Sugar» (Elisabetta Franchi): السعر في الموقع لا يطابق صفحة المتجر (€ 850 -35% € 553)",
    "fix": "سيُصحَّح من بيانات المتجر في التحديث القادم ثم يُعاد التحقق.",
@@ -241,7 +241,7 @@
   {
    "key": "efprice:ef-abr0557e2222",
    "at": "2026-11-26T15:10:03Z",
-   "updated": "2026-11-26T15:10:03Z",
+   "updated": "2026-11-26T16:08:03Z",
    "status": "progress",
    "problem": "«Abito in jersey crépe con moschettone gioiello — Nero/Bianco» (Elisabetta Franchi): السعر في الموقع لا يطابق صفحة المتجر (€ 750 -35% € 488)",
    "fix": "سيُصحَّح من بيانات المتجر في التحديث القادم ثم يُعاد التحقق.",
@@ -258,7 +258,7 @@
   {
    "key": "efprice:ef-abr2257e2360",
    "at": "2026-11-26T15:10:03Z",
-   "updated": "2026-11-26T15:10:03Z",
+   "updated": "2026-11-26T16:08:03Z",
    "status": "progress",
    "problem": "«Abito Red Carpet in tulle e jersey con ricami cocco — Avorio» (Elisabetta Franchi): السعر في الموقع لا يطابق صفحة المتجر (€ 890 -35% € 579)",
    "fix": "سيُصحَّح من بيانات المتجر في التحديث القادم ثم يُعاد التحقق.",
@@ -275,7 +275,7 @@
   {
    "key": "efprice:ef-abr2857e2110",
    "at": "2026-11-26T15:10:03Z",
-   "updated": "2026-11-26T15:10:03Z",
+   "updated": "2026-11-26T16:08:03Z",
    "status": "progress",
    "problem": "«Abito Red Carpet in crépe con stampa pitone — Nero» (Elisabetta Franchi): السعر في الموقع لا يطابق صفحة المتجر (€ 650 -35% € 423)",
    "fix": "سيُصحَّح من بيانات المتجر في التحديث القادم ثم يُعاد التحقق.",
