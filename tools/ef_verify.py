@@ -25,7 +25,11 @@ JS = """() => {
 
 
 def num(x):
-    return float(x.replace(".", "").replace(",", ".")) if re.search(r",\d{2}$", x) else float(x.replace(",", ""))
+    if re.search(r",\d{2}$", x):                       # 1.234,50
+        return float(x.replace(".", "").replace(",", "."))
+    if re.search(r"^\d{1,3}([.,]\d{3})+$", x):          # 1.234 / 1,234 (thousands, no cents)
+        return float(re.sub(r"[.,]", "", x))
+    return float(x.replace(",", ""))
 
 
 def parse(text):

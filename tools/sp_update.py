@@ -427,12 +427,30 @@ def fetch_ef(debug=False):
     return out, len(links)
 
 
+def ef_shown_sale(handle, orig, pct, sale):
+    """The sale price exactly as the official outlet page shows it to shoppers (ef_verify.json, read in a real
+    browser within the last 6 hours). The outlet rounds some promotion prices (e.g. € 790 -35% → € 514 instead of
+    € 513.50); we follow the store's own figure only when its original price and promotion % match ours and it
+    differs by rounding only (< €1). Otherwise our computed price stays."""
+    try:
+        ev = json.load(open(os.path.join(HERE, "..", "self-portrait", "ef_verify.json"), encoding="utf-8"))
+        v = (ev.get("items") or {}).get(handle)
+        if not pct or not v or age_s(ev.get("at", "")) > 6 * 3600:
+            return sale
+        if abs(v["orig"] - orig) < 0.011 and v["pct"] == pct and abs(v["sale"] - sale) < 1:
+            return round(v["sale"], 2)
+    except Exception:  # noqa: BLE001
+        pass
+    return sale
+
+
 def ef_record(d, code):
     """Original price = the outlet's listed price; sale price = original × (1 − promotion %) when the product carries
     the outlet's own percentage promotion (what its page shows as "€ 650 -35% € 422.50")."""
     orig = round(max(d["price"], d["compare"] or 0), 2)
     pct = d.get("promoPct") or 0
     sale = round(orig * (1 - pct / 100), 2) if pct else round(d["price"], 2)
+    sale = ef_shown_sale("ef-" + code.lower(), orig, pct, sale)
     return {
             "handle": "ef-" + code.lower(), "brand": "ef", "cat": "maxi", "cur": "EUR", "url": d["url"],
             "title": d["name"] + (" — " + d["color"] if d["color"] else ""), "image": d["images"][0] if d["images"] else "",
@@ -757,7 +775,8 @@ def ef_promo_decide(n, o, ts, fresh_read=True):
         n.pop("promoEndedAt", None)
         n["promoCheckedAt"] = ts
         return n
-    keep = lambda status, **kw: n.update(price=round(orig * (1 - had / 100), 2), compare=orig, discPct=had, promoStatus=status, **kw)
+    keep = lambda status, **kw: n.update(price=ef_shown_sale(n.get("handle", ""), orig, had, round(orig * (1 - had / 100), 2)),
+                                         compare=orig, discPct=had, promoStatus=status, **kw)
     if had and (not fresh_read or n.get("promoStatus") == "unverified"):
         keep("unverified")
         return n
