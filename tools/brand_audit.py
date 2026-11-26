@@ -128,7 +128,14 @@ class Fixes:
         self.items = (load("fixes.json") or {}).get("fixes", [])
 
     def latest(self, key):
-        return next((x for x in self.items if x.get("key") == key), None)
+        """The open entry for this key if there is one (newest first), otherwise the newest entry."""
+        same = [x for x in self.items if x.get("key") == key]
+        same.sort(key=lambda x: x.get("updated") or x.get("at", ""), reverse=True)
+        return next((x for x in same if x.get("status") != "resolved"), same[0] if same else None)
+
+    def open_dups(self, key, cur):
+        """Older still-open entries with the same key (left over from earlier runs); kept, never deleted."""
+        return [x for x in self.items if x is not cur and x.get("key") == key and x.get("status") != "resolved"]
 
     @staticmethod
     def meta_for(key):
@@ -165,6 +172,8 @@ class Fixes:
                 cur["desc"] = text
             for k, v in self.meta_for(key).items():   # fill any missing detail field
                 cur.setdefault(k, v)
+            for d in self.open_dups(key, cur):        # keep older copies of the same problem in step
+                d.update(problem=text, status=status, updated=ts)
             return
         n = (cur.get("n", 1) + 1) if cur else 1
         self.items.insert(0, dict({"key": key, "at": ts, "updated": ts, "status": status, "problem": text, "fix": fix, "n": n, "src": "auto",
@@ -174,20 +183,15 @@ class Fixes:
         """Only called after the fix has been verified."""
         cur = self.latest(key)
         if cur and cur.get("status") != "resolved":
-            cur.update(status="resolved", fix=fix, updated=now(), verification="الفحص الآلي في " + now()[:16].replace("T", " ") + " UTC أعاد التحقق ووجد المشكلة غير موجودة.")
+            ver = "الفحص الآلي في " + now()[:16].replace("T", " ") + " UTC أعاد التحقق ووجد المشكلة غير موجودة."
+            for d in [cur] + self.open_dups(key, cur):
+                d.update(status="resolved", fix=fix, updated=now(), verification=ver)
 
     def open_keys(self, prefix):
         return [x["key"] for x in self.items if x.get("key", "").startswith(prefix) and x.get("status") != "resolved"]
 
     def write(self):
-        unresolved = sum(1 for x in self.items if x.get("status") != "resolved")
-        room, out = max(0, 200 - unresolved), []
-        for x in self.items:           # keep every unresolved problem and the newest resolved ones
-            if x.get("status") != "resolved":
-                out.append(x)
-            elif room > 0:
-                out.append(x)
-                room -= 1
+        out = list(self.items)         # entries are never deleted
         out.sort(key=lambda x: x.get("updated") or x.get("at", ""), reverse=True)
         save("fixes.json", {"fixes": out})
 
