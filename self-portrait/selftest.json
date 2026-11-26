@@ -1,5 +1,5 @@
 {
- "at": "2026-11-26T11:38:38Z",
+ "at": "2026-11-26T17:40:33Z",
  "results": [
   {
    "n": 1,
@@ -40,8 +40,8 @@
   {
    "n": 7,
    "test": "Permanently removed from the official site",
-   "result": "LIMIT",
-   "detail": "no product is currently 'not found' in the store's data to test against"
+   "result": "PASS",
+   "detail": "«Burgundy Velvet Midi Dress»: data and official page both 'not found' → kept on 1st check, deleted only after 3 checks over 24h"
   },
   {
    "n": 8,
