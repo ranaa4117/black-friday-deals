@@ -78,9 +78,42 @@ def read_page(url, tries=3):
         pd = page_data(h)
         if pd:
             return pd
-        last = RuntimeError("page did not include its product data")
+        t = re.search(r"<title[^>]*>(.*?)</title>", h or "", re.S | re.I)
+        last = RuntimeError("page did not include its product data (%d bytes, title: %s)"
+                            % (len(h or ""), (t.group(1).strip()[:60] if t else "-")))
         time.sleep(8 * (i + 1))
+    # The plain request sometimes gets a page without the product data (a busy/cached or protection page).
+    # Second safe way: open the same official page in a real browser, as a shopper does, and read the same data.
+    try:
+        pd = asyncio.run(browser_page_data(url))
+        if pd:
+            print("   read in a real browser:", url)
+            return pd
+    except Exception as e:  # noqa: BLE001
+        print("   browser read failed:", url, e)
     raise RuntimeError(str(last))
+
+
+async def browser_page_data(url):
+    """The official product page opened in a real browser; returns the same productData the page itself carries."""
+    from playwright.async_api import async_playwright
+    async with async_playwright() as p:
+        b = await p.chromium.launch(executable_path=os.environ.get("CHROME", "/usr/bin/google-chrome"), args=["--no-sandbox"])
+        try:
+            pg = await b.new_page(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36")
+            r = await pg.goto(url, wait_until="domcontentloaded", timeout=90000)
+            if r is not None and r.status in (404, 410):
+                return None   # gone is decided only by the plain request rule (3 checks over 24 h), never here
+            for _ in range(6):
+                txt = await pg.evaluate("(document.getElementById('clientProps')||{}).textContent || ''")
+                if txt:
+                    pd = page_data('<script id="clientProps" type="application/json">' + txt + '</script>')
+                    if pd:
+                        return pd
+                await pg.wait_for_timeout(3000)
+            return None
+        finally:
+            await b.close()
 
 
 def size_label(k, s):
