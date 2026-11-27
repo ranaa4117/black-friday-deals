@@ -449,13 +449,23 @@ def ef_record(d, code):
     the outlet's own percentage promotion (what its page shows as "€ 650 -35% € 422.50")."""
     orig = round(max(d["price"], d["compare"] or 0), 2)
     pct = d.get("promoPct") or 0
-    sale = round(orig * (1 - pct / 100), 2) if pct else round(d["price"], 2)
-    sale = ef_shown_sale("ef-" + code.lower(), orig, pct, sale)
+    promo_src = "promotion" if pct else ""
+    if not pct and d.get("compare") and d["price"] and d["compare"] > d["price"]:
+        # Since 27 Nov 12:36Z the outlet publishes the same -35% as its own sale price book (original € 650 and sale
+        # € 423 both in the product's official data) instead of a "promo_outlet_35%" promotion id. The store's page
+        # still shows "€ 650 -35% € 423". The sale price is the store's own figure (never computed here).
+        pct = int(round((1 - d["price"] / orig) * 100))
+        promo_src = "store sale price"
+    if promo_src == "store sale price":
+        sale = round(d["price"], 2)
+    else:
+        sale = round(orig * (1 - pct / 100), 2) if pct else round(d["price"], 2)
+        sale = ef_shown_sale("ef-" + code.lower(), orig, pct, sale)
     return {
             "handle": "ef-" + code.lower(), "brand": "ef", "cat": "maxi", "cur": "EUR", "url": d["url"],
             "title": d["name"] + (" — " + d["color"] if d["color"] else ""), "image": d["images"][0] if d["images"] else "",
             "images": d["images"][:6], "details": d["desc"][:500], "price": sale,
-            "compare": orig if orig > sale else sale, "discPct": pct, "promoIds": d.get("promoIds", []),
+            "compare": orig if orig > sale else sale, "discPct": pct, "promoIds": d.get("promoIds", []), "promoSrc": promo_src,
             "promoStatus": "active" if pct else ("unverified" if d.get("promoUnclear") else "none"),
             "colors": [d["color"]] if d["color"] else [], "sizes": [{"s": "IT " + k, "a": a} for k, a in d["sizes"].items()],
             "lengthCm": d["length"], "publishedAt": "",
@@ -736,7 +746,7 @@ def refresh_product(p, bf_handles):
         elif brand == "ef":
             d = ef_product(p["url"].replace(EF_SITE, ""))
             r = ef_record(d, p["handle"][3:]) if d["price"] else None
-            n = dict(p, **{k: r[k] for k in ("price", "compare", "discPct", "promoIds", "promoStatus", "sizes")}) if r else None
+            n = dict(p, **{k: r[k] for k in ("price", "compare", "discPct", "promoIds", "promoSrc", "promoStatus", "sizes")}) if r else None
         else:
             return None
     except urllib.error.HTTPError as e:
