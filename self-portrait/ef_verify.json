@@ -1,9 +1,9 @@
 {
- "at": "2026-11-27T11:54:13Z",
+ "at": "2026-11-27T12:52:51Z",
  "ok": true,
  "page": "https://outlet.elisabettafranchi.com/it-it/abbigliamento/abiti/abiti-lunghi/?page=2",
- "listed": 23,
- "read": 23,
+ "listed": 24,
+ "read": 24,
  "error": "",
  "items": {
   "ef-abr2857e2110": {
@@ -131,6 +131,12 @@
    "pct": 35,
    "sale": 481.0,
    "shown": "€ 740 -35% € 481"
+  },
+  "ef-am17s56e2ea6": {
+   "orig": 450.0,
+   "pct": 35,
+   "sale": 293.0,
+   "shown": "€ 450 -35% € 293"
   },
   "ef-abr0656e2ea3": {
    "orig": 800.0,
