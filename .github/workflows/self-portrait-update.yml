@@ -119,6 +119,8 @@ jobs:
       - name: Mac Duggal product page diagnostics
         continue-on-error: true
         if: ${{ github.event.inputs.md_probe == '2' }}
+        env:
+          MD_HANDLES: ${{ github.event.inputs.probe || '' }}
         run: python3 tools/md_page_probe.py
       - name: Test shared favorites database
         if: ${{ github.event.inputs.fav_test == '1' }}

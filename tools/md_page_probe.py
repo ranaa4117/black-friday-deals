@@ -19,3 +19,18 @@ for path in ["/", "/products/6135", "/products/30777", "/products/11782", "/prod
         print(path, "plain  ", cfg(u.MD_STORE + path))
         print(path, "busted ", cfg(u.MD_STORE + path + ("&" if "?" in path else "?") + "_rc=%d%d" % (time.time(), i)))
         time.sleep(1)
+
+# Product pages that the data feed no longer finds: what the official page answers (status, final address, title).
+for hd in [x for x in os.environ.get("MD_HANDLES", "").split(",") if x.strip()]:
+    for path in ("/products/%s" % hd.strip(), "/products/%s.json" % hd.strip(), "/products/%s.js" % hd.strip()):
+        try:
+            r = u.urllib.request.urlopen(u.urllib.request.Request(u.MD_STORE + path + "?_rc=%d" % time.time(),
+                                         headers={"User-Agent": u.UA, "Accept": "text/html,application/json"}), timeout=40)
+            body = r.read().decode("utf-8", "replace")
+            t = re.search(r"<title[^>]*>(.*?)</title>", body, re.S | re.I)
+            print(hd, path, r.status, "→", r.geturl(), "| title:", re.sub(r"\s+", " ", t.group(1)).strip()[:120] if t else body[:160])
+        except u.urllib.error.HTTPError as e:
+            print(hd, path, "HTTP", e.code, "→", e.geturl())
+        except Exception as e:  # noqa: BLE001
+            print(hd, path, "ERR", str(e)[:120])
+        time.sleep(1)
