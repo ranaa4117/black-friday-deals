@@ -250,7 +250,7 @@ def main():
             live, err = read_live(p)
         except U.Gone:
             checked += 1
-            if U.page_state(p) == "exists":   # page still there (sold out / hidden from the data feed): not removed
+            if U.page_state(p) in ("exists", "withdrawn"):   # page still there (sold out / hidden from the data feed): not removed
                 F.resolve(key, "صفحة القطعة الأصلية موجودة (نفدت أو مخفية)، فبقيت في الموقع كـ«غير متوفرة». تم التحقق.")
                 continue
             if p.get("status") == "discontinued":
@@ -323,7 +323,9 @@ def main():
                       "progress", "باقية على آخر سعر مؤكد ولم تُحذف. ستُعاد المحاولة تلقائياً.")
     for key in F.open_keys("verify:"):
         if key.split(":", 1)[1] not in vf:
-            F.resolve(key, "تم التحقق من سعرها في المتجر الأصلي.")
+            q = next((x for x in items if x.get("handle") == key.split(":", 1)[1]), {})
+            F.resolve(key, "المتجر الأصلي أوقف صفحتها (تحوّل رابطها إلى الصفحة الرئيسية)، فصارت «غير متوفرة» في الموقع ولم تُحذف."
+                      if q.get("withdrawnAt") else "تم التحقق من سعرها في المتجر الأصلي.")
 
     # 3) every product has its own direct official product link
     bad_links = 0

@@ -70,6 +70,25 @@ def fetch(url, accept="application/json", tries=4):
             raise
 
 
+def fetch_page(url, tries=3):
+    """An official web page and the address it finally landed on (after the store's own redirects)."""
+    for i in range(tries):
+        req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "text/html"})
+        try:
+            with urllib.request.urlopen(req, timeout=45) as r:
+                return r.read().decode("utf-8", "replace"), r.geturl()
+        except urllib.error.HTTPError as e:
+            if e.code in (429, 500, 502, 503, 504) and i < tries - 1:
+                time.sleep(5 * (i + 1) ** 2)
+                continue
+            raise
+        except (urllib.error.URLError, TimeoutError, ConnectionError):
+            if i < tries - 1:
+                time.sleep(5 * (i + 1))
+                continue
+            raise
+
+
 def get_json(url):
     return json.loads(fetch(url))
 
@@ -699,11 +718,17 @@ def page_state(p):
     if not u:
         return "unknown"
     try:
-        h = fetch(u + ("&" if "?" in u else "?") + "_rc=%d" % time.time(), accept="text/html")
+        h, final = fetch_page(u + ("&" if "?" in u else "?") + "_rc=%d" % time.time())
     except urllib.error.HTTPError as e:
         return "gone" if e.code in (404, 410) else "unknown"
     except Exception:  # noqa: BLE001
         return "unknown"
+    want = urllib.parse.urlsplit(u).path.rstrip("/")
+    got = urllib.parse.urlsplit(final or u).path.rstrip("/")
+    if "/products/" in want and "/products/" not in got:
+        # the store sends its product address to another page (e.g. the home page): it no longer sells it.
+        # Not "gone" (no 404/410), so never deleted — shown as not available.
+        return "withdrawn"
     words = [w for w in re.findall(r"[a-z]{4,}", (p.get("title") or "").lower())][:4]
     return "exists" if words and sum(w in h.lower() for w in words) >= max(1, len(words) - 1) else "unknown"
 
@@ -1087,12 +1112,17 @@ def main():
                     continue
             except Gone:
                 state = page_state(p)
-                if state == "exists":
-                    # the official page is still there (sold out / hidden from the data feed): never removed, never "gone"
+                if state in ("exists", "withdrawn"):
+                    # the official page is still there (sold out / hidden from the data feed), or the store now sends
+                    # its address to another page: it can't be bought, but it is never removed and never "gone"
                     fresh[h] = dict(p, listed=False, status="unavailable", pageCheckedAt=ts,
                                     sizes=[dict(x, a=False) for x in p.get("sizes", [])])
                     fresh[h].pop("goneChecks", None)
-                    print("  data feed says not found but the official page exists — kept as unavailable:", h)
+                    (meta.get("verifyFail") or {}).pop(h, None)
+                    if state == "withdrawn":
+                        fresh[h]["withdrawnAt"] = p.get("withdrawnAt") or ts
+                    print("  data feed says not found; official page", "redirects away" if state == "withdrawn" else "exists",
+                          "— kept as unavailable:", h)
                     continue
                 if state == "unknown":
                     print("  not found in the data feed; page could not be read — kept, will retry:", h)

@@ -168,7 +168,7 @@ def main():
         time.sleep(3)
         st = U.page_state(p)
         done = True
-        if st == "exists":
+        if st in ("exists", "withdrawn"):
             rec(7, "Product missing from the store's data but its official page still exists", True,
                 f"«{p['title']}»: data feed 'not found', official page still there (sold out) → kept, NOT deleted")
         elif st == "gone":
