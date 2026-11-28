@@ -1191,7 +1191,9 @@ def main():
         if o.get("listed", True) != n.get("listed", True):
             msgs.append("Back in the sale" if n.get("listed", True) else "Left the store's sale list")
         if o.get("status", "ok") != n.get("status", "ok"):
-            msgs.append("No longer sold by the store" if n.get("status") == "discontinued" else "Available again")
+            st = n.get("status", "ok")
+            msgs.append("No longer sold by the store" if st == "discontinued" else
+                        "Not available (the store no longer offers it)" if st == "unavailable" else "Available again")
         if (o.get("extraPct") or 0) != (n.get("extraPct") or 0) and n.get("brand") == "md":
             msgs.append(f"Extra {n.get('extraPct') or o.get('extraPct')}% " + ("now applies" if n.get("extraPct") else "no longer applies"))
         if (o.get("discPct") or 0) != (n.get("discPct") or 0) and n.get("brand") == "ef":
